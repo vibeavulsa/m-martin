@@ -1,13 +1,19 @@
 .category-section {
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 20px;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.category-section .glass {
+  display: flex !important;
+  width: 100% !important;
 }
 
 .category-header {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .category-icon {
@@ -45,7 +51,7 @@
 
 @media (max-width: 768px) {
   .category-section {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   
   .category-header {
