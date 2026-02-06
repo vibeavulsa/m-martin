@@ -10,6 +10,14 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick }) => {
   const { totalItems } = useCart();
   const { isLoggedIn, profile } = useUser();
 
+  const handleNavClick = (e, targetId) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <motion.header
       className="header"
@@ -23,10 +31,10 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick }) => {
           <p className="tagline">ESTOFADOS FINOS</p>
         </div>
         <nav className="nav">
-          <a href="#sofas" className="nav-link">Sofás</a>
-          <a href="#almofadas" className="nav-link">Almofadas</a>
-          <a href="#travesseiros" className="nav-link">Travesseiros</a>
-          <a href="#homecare-hospitalar" className="nav-link">Homecare</a>
+          <a href="#sofas" className="nav-link" onClick={(e) => handleNavClick(e, 'sofas')}>Sofás</a>
+          <a href="#almofadas" className="nav-link" onClick={(e) => handleNavClick(e, 'almofadas')}>Almofadas</a>
+          <a href="#travesseiros" className="nav-link" onClick={(e) => handleNavClick(e, 'travesseiros')}>Travesseiros</a>
+          <a href="#homecare-hospitalar" className="nav-link" onClick={(e) => handleNavClick(e, 'homecare-hospitalar')}>Homecare</a>
           <div className="nav-actions">
             <motion.button
               className={`nav-icon-btn ${isLoggedIn ? 'nav-icon-btn-active' : ''}`}
