@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="150" viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
+  <!-- Golden gradient definition -->
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#836424;stop-opacity:1" />
+      <stop offset="38%" style="stop-color:#d9b154;stop-opacity:1" />
+      <stop offset="52%" style="stop-color:#f7ecc4;stop-opacity:1" />
+      <stop offset="68%" style="stop-color:#d9b154;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#836424;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- M'Martin text in elegant cursive style -->
+  <text x="200" y="80" font-family="'Cormorant Garamond', cursive, serif" font-size="72" font-weight="700" font-style="italic" text-anchor="middle" fill="url(#goldGradient)">M'Martin</text>
+  
+  <!-- Elegant swoosh below -->
+  <path d="M 50 110 Q 100 120, 150 110 T 250 110 T 350 110" stroke="url(#goldGradient)" stroke-width="3" fill="none" opacity="0.8"/>
+</svg>

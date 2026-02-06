@@ -1,15 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import LiquidGlass from 'liquid-glass-react';
 import { IconPackage } from '@tabler/icons-react';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <LiquidGlass className="product-card">
       <div className="product-image">
-        <div className="image-placeholder">
-          <IconPackage size={64} stroke={1.5} className="placeholder-icon" />
-        </div>
+        {!imageError ? (
+          <img 
+            src={product.image} 
+            alt={product.name}
+            className="product-img"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="image-placeholder">
+            <IconPackage size={64} stroke={1.5} className="placeholder-icon" />
+          </div>
+        )}
       </div>
       <div className="product-info">
         <h3 className="product-name">{product.name}</h3>

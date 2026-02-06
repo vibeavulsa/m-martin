@@ -5,7 +5,7 @@ const Hero = () => {
   return (
     <section className="hero">
       <div className="hero-content">
-        <h1 className="hero-title">M'Martin</h1>
+        <img src="/MMartin.svg" alt="M'Martin" className="hero-logo" />
         <p className="hero-subtitle">Estofados Finos</p>
         <p className="hero-description">
           Catálogo moderno de sofás, almofadas, travesseiros e produtos para homecare e hospitalar.
