@@ -57,7 +57,7 @@ const CustomerDialog = ({ isOpen, onClose, onSubmit }) => {
     if (isOpen) {
       setForm(customer || defaultForm); // eslint-disable-line react-hooks/set-state-in-effect
     }
-  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen, customer]);
 
   useEffect(() => {
     const handleKey = (e) => {
