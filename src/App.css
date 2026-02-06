@@ -5,10 +5,9 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: 'Raleway', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
   min-height: 100vh;
 }
 
@@ -35,9 +34,9 @@ body {
 }
 
 .site-footer {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(152deg, #483726 0%, #281c12 100%);
   padding: 4rem 2rem;
-  color: white;
+  color: #e8e1d4;
 }
 
 .footer-content {
@@ -54,6 +53,8 @@ body {
   font-size: 1.75rem;
   margin-bottom: 1rem;
   font-weight: 700;
+  font-family: 'Cormorant Garamond', serif;
+  color: #d9b154;
 }
 
 .footer-info p,
