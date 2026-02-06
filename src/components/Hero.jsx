@@ -1,11 +1,12 @@
 import React from 'react';
 import './Hero.css';
+import logo from '../assets/logo.png';
 
 const Hero = () => {
   return (
     <section className="hero">
       <div className="hero-content">
-        <img src="/MMartin.svg" alt="M'Martin" className="hero-logo" />
+        <img src={logo} alt="M'Martin" className="hero-logo" />
         <p className="hero-subtitle">Estofados Finos</p>
         <p className="hero-description">
           Catálogo moderno de sofás, almofadas, travesseiros e produtos para homecare e hospitalar.

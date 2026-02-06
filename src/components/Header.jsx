@@ -1,12 +1,13 @@
 import React from 'react';
 import './Header.css';
+import logo from '../assets/logo.png';
 
 const Header = () => {
   return (
     <header className="header">
       <div className="header-container">
         <div className="logo">
-          <img src="/MMartin.svg" alt="M'Martin" className="logo-image" />
+          <img src={logo} alt="M'Martin" className="logo-image" />
           <p className="tagline">ESTOFADOS FINOS</p>
         </div>
         <nav className="nav">

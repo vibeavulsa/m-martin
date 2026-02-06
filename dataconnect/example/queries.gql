@@ -1,0 +1,41 @@
+mutation CreatePublicMovieList($name: String!, $description: String!) @auth(level: PUBLIC, insecureReason: "Public movie lists are user-generated content and do not require authentication") {
+  movieList_insert(data: {
+    name: $name,
+    description: $description,
+    isPublic: true,
+    userId_expr: "uuidV4()", # Dummy User ID for public lists
+    createdAt_expr: "request.time",
+    updatedAt_expr: "request.time"
+  })
+}
+
+query GetPublicMovieLists @auth(level: PUBLIC, insecureReason: "Public movie lists are safe to expose to all users.") {
+  movieLists(where: {isPublic: {eq: true}}) {
+    id
+    name
+    description
+    createdAt
+    updatedAt
+  }
+}
+
+mutation CreatePrivateMovieList($name: String!, $description: String!) @auth(level: USER) {
+  movieList_insert(data: {
+    name: $name,
+    description: $description,
+    isPublic: false,
+    userId_expr: "auth.uid",
+    createdAt_expr: "request.time",
+    updatedAt_expr: "request.time"
+  })
+}
+
+query GetMyPrivateMovieLists @auth(level: USER) {
+  movieLists(where: {isPublic: {eq: false}, userId: {eq_expr: "auth.uid"}}) {
+    id
+    name
+    description
+    createdAt
+    updatedAt
+  }
+}
