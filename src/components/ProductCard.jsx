@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { IconPackage, IconShoppingCartPlus } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import ProductDialog from './ProductDialog';
 import './ProductCard.css';
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+  }
+};
 
 const ProductCard = ({ product }) => {
   const [imageError, setImageError] = useState(false);
@@ -19,7 +29,15 @@ const ProductCard = ({ product }) => {
 
   return (
     <>
-      <div className="product-card">
+      <motion.div
+        className="product-card"
+        variants={cardVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-50px' }}
+        whileHover={{ y: -7, boxShadow: '0 18px 38px rgba(0,0,0,0.38), 0 0 18px rgba(217,177,84,0.12)' }}
+        transition={{ duration: 0.28 }}
+      >
         <div className="product-image">
           {!imageError ? (
             <img 
@@ -47,18 +65,27 @@ const ProductCard = ({ product }) => {
           <div className="product-footer">
             <span className="product-price">{product.price}</span>
             <div className="product-actions">
-              <button
+              <motion.button
                 className={`btn-add-cart ${added ? 'btn-added' : ''}`}
                 onClick={handleAddToCart}
                 title="Adicionar ao carrinho"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <IconShoppingCartPlus size={18} stroke={2} />
-              </button>
-              <button className="btn-contact" onClick={() => setDialogOpen(true)}>Consultar</button>
+              </motion.button>
+              <motion.button
+                className="btn-contact"
+                onClick={() => setDialogOpen(true)}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Consultar
+              </motion.button>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
       <ProductDialog
         product={product}
         isOpen={dialogOpen}
