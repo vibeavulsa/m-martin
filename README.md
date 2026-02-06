@@ -106,6 +106,33 @@ O catálogo apresenta um design moderno com:
 - Grid responsivo de produtos
 - Footer com informações da empresa
 
+## 📝 Changelog / Histórico de Mudanças
+
+### v1.0.0 (Fevereiro 2026)
+
+#### 🎨 Identidade Visual
+- **Logo atualizado** - Substituição do logo SVG por versão PNG em `assets/logo.png` para melhor compatibilidade
+- **Imagens reais de produtos** - Adição de fotos profissionais do Unsplash para sofás, almofadas, travesseiros e produtos hospitalares
+- **Logo no Header e Hero** - Integração do logo M'Martin nas seções de cabeçalho e hero do site
+
+#### ✨ Funcionalidades Implementadas
+- **Catálogo moderno** - Implementação completa do catálogo com design liquid-glass usando `liquid-glass-react`
+- **Ícones profissionais** - Integração da biblioteca Tabler Icons para ícones consistentes e modernos
+- **Efeitos glassmorphism** - Cards de produtos com efeito de vidro líquido animado
+- **Design responsivo** - Layout adaptável para desktop, tablet e mobile
+
+#### 📚 Documentação
+- **README abrangente** - Documentação completa com instruções de instalação, execução e estrutura do projeto
+- **Configuração Firebase** - Guia de configuração do Firebase para backend e hosting
+- **Estrutura de pastas** - Documentação da arquitetura de componentes e arquivos
+
+#### 🏗️ Infraestrutura
+- **Firebase Data Connect** - Configuração do serviço de dados com PostgreSQL
+- **Firestore Rules** - Regras de segurança configuradas para o banco de dados
+- **Vite + React 19** - Setup moderno de desenvolvimento com hot reload
+
+---
+
 ## 📄 Licença
 
 © 2026 M'Martin. Todos os direitos reservados.
