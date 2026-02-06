@@ -14,7 +14,6 @@
     "@dataconnect/generated": "file:src/dataconnect-generated",
     "@tabler/icons-react": "^3.36.1",
     "firebase": "^12.9.0",
-    "liquid-glass-react": "^1.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

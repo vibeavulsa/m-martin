@@ -1,5 +1,4 @@
 import { Component } from 'react';
-import LiquidGlass from 'liquid-glass-react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CategorySection from './components/CategorySection';
@@ -42,7 +41,7 @@ class App extends Component {
     
     return (
       <footer className="site-footer">
-        <LiquidGlass className="footer-content">
+        <div className="footer-content">
           <div className="footer-info">
             <h3>{corpus.marca}</h3>
             <p>Projeto: {corpus.identificadorProjeto}</p>
@@ -52,7 +51,7 @@ class App extends Component {
             <p>Entre em contato para mais informações</p>
             <p>© 2026 M'Martin. Todos os direitos reservados.</p>
           </div>
-        </LiquidGlass>
+        </div>
       </footer>
     );
   }
