@@ -138,6 +138,14 @@
   font-size: 0.95rem;
   cursor: pointer;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dialog-cta-added {
+  background: linear-gradient(148deg, #4caf50 0%, #2e7d32 100%);
+  color: #fff;
 }
 
 .dialog-cta:hover {
