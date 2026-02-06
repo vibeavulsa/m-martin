@@ -27,24 +27,11 @@ body {
   position: relative;
 }
 
-.category-group > .bg-black,
-.category-group > span {
-  position: absolute !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  pointer-events: none;
-}
-
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 1.25rem;
   margin-top: 1.25rem;
-}
-
-.products-grid > :not(.product-card) {
-  display: none !important;
 }
 
 .site-footer {
@@ -61,6 +48,10 @@ body {
   gap: 3rem;
   padding: 2rem;
   border-radius: 20px;
+  background: rgba(72, 55, 38, 0.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(217, 177, 84, 0.08);
 }
 
 .footer-info h3 {

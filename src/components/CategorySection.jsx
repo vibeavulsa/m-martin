@@ -1,6 +1,5 @@
 import React from 'react';
 import { IconArmchair, IconPalette, IconMoon, IconHeartbeat } from '@tabler/icons-react';
-import LiquidGlass from 'liquid-glass-react';
 import './CategorySection.css';
 
 const mapeadorDeIcones = {
@@ -14,7 +13,7 @@ const CategorySection = ({ category }) => {
   const ComponenteIcone = mapeadorDeIcones[category.iconName];
   
   return (
-    <LiquidGlass className="category-section" id={category.id}>
+    <div className="category-section" id={category.id}>
       <div className="category-header">
         <span className="category-icon">
           {ComponenteIcone && <ComponenteIcone size={48} stroke={1.5} />}
@@ -24,7 +23,7 @@ const CategorySection = ({ category }) => {
           <p className="category-description">{category.description}</p>
         </div>
       </div>
-    </LiquidGlass>
+    </div>
   );
 };
 

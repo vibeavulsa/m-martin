@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import LiquidGlass from 'liquid-glass-react';
 import { IconPackage } from '@tabler/icons-react';
 import './ProductCard.css';
 
@@ -7,7 +6,7 @@ const ProductCard = ({ product }) => {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <LiquidGlass className="product-card">
+    <div className="product-card">
       <div className="product-image">
         {!imageError ? (
           <img 
@@ -37,7 +36,7 @@ const ProductCard = ({ product }) => {
           <button className="btn-contact">Consultar</button>
         </div>
       </div>
-    </LiquidGlass>
+    </div>
   );
 };
 
