@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconX, IconPackage } from '@tabler/icons-react';
+import { IconX, IconPackage, IconShoppingCartPlus } from '@tabler/icons-react';
+import { useCart } from '../context/CartContext';
 import './ProductDialog.css';
 
 const overlayVariants = {
@@ -45,6 +46,14 @@ const featureVariants = {
 
 const DialogInner = ({ product, onClose }) => {
   const [imageError, setImageError] = useState(false);
+  const [added, setAdded] = useState(false);
+  const { addItem } = useCart();
+
+  const handleAddToCart = () => {
+    addItem(product);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
 
   return (
     <motion.div
@@ -113,11 +122,13 @@ const DialogInner = ({ product, onClose }) => {
         <motion.div className="dialog-footer" variants={itemVariants}>
           <span className="dialog-price">{product.price}</span>
           <motion.button
-            className="dialog-cta"
+            className={`dialog-cta ${added ? 'dialog-cta-added' : ''}`}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
+            onClick={handleAddToCart}
           >
-            Solicitar Orçamento
+            <IconShoppingCartPlus size={18} stroke={2} />
+            {added ? 'Adicionado!' : 'Adicionar ao Carrinho'}
           </motion.button>
         </motion.div>
       </motion.div>

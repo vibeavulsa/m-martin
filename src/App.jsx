@@ -1,8 +1,13 @@
-import { Component } from 'react';
+import { Component, useState, useCallback } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CategorySection from './components/CategorySection';
 import ProductCard from './components/ProductCard';
+import CartDialog from './components/CartDialog';
+import CustomerDialog from './components/CustomerDialog';
+import CheckoutDialog from './components/CheckoutDialog';
+import OrderConfirmationDialog from './components/OrderConfirmationDialog';
+import { CartProvider, useCart } from './context/CartContext';
 import { categories, products } from './data/products';
 import './App.css';
 
@@ -16,6 +21,78 @@ function* geradorDeMostruario(linhasProdutos, inventarioGeral) {
     }
     yield { metadadosLinha: linha, colecaoPecas: pecasLinha };
   }
+}
+
+function SalesDialogs() {
+  const [cartOpen, setCartOpen] = useState(false);
+  const [customerOpen, setCustomerOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [orderNumber, setOrderNumber] = useState(null);
+  const { setCustomer, clearCart } = useCart();
+
+  const handleOpenCart = useCallback(() => setCartOpen(true), []);
+  const handleCloseCart = useCallback(() => setCartOpen(false), []);
+
+  const handleCheckout = useCallback(() => {
+    setCartOpen(false);
+    setCustomerOpen(true);
+  }, []);
+
+  const handleCloseCustomer = useCallback(() => setCustomerOpen(false), []);
+
+  const handleCustomerSubmit = useCallback((data) => {
+    setCustomer(data);
+    setCustomerOpen(false);
+    setCheckoutOpen(true);
+  }, [setCustomer]);
+
+  const handleCloseCheckout = useCallback(() => setCheckoutOpen(false), []);
+
+  const handleBackToCustomer = useCallback(() => {
+    setCheckoutOpen(false);
+    setCustomerOpen(true);
+  }, []);
+
+  const handleConfirmOrder = useCallback(() => {
+    const num = Math.floor(100000 + Math.random() * 900000);
+    setCheckoutOpen(false);
+    setConfirmationOpen(true);
+    setOrderNumber(num.toString());
+    clearCart();
+  }, [clearCart]);
+
+  const handleCloseConfirmation = useCallback(() => {
+    setConfirmationOpen(false);
+    setOrderNumber(null);
+  }, []);
+
+  return (
+    <>
+      <Header onCartClick={handleOpenCart} />
+      <CartDialog
+        isOpen={cartOpen}
+        onClose={handleCloseCart}
+        onCheckout={handleCheckout}
+      />
+      <CustomerDialog
+        isOpen={customerOpen}
+        onClose={handleCloseCustomer}
+        onSubmit={handleCustomerSubmit}
+      />
+      <CheckoutDialog
+        isOpen={checkoutOpen}
+        onClose={handleCloseCheckout}
+        onConfirm={handleConfirmOrder}
+        onBack={handleBackToCustomer}
+      />
+      <OrderConfirmationDialog
+        isOpen={confirmationOpen}
+        onClose={handleCloseConfirmation}
+        orderNumber={orderNumber}
+      />
+    </>
+  );
 }
 
 class App extends Component {
@@ -100,14 +177,16 @@ class App extends Component {
 
   render() {
     return (
-      <div className="app-wrapper">
-        <Header />
-        <Hero />
-        <main className="catalog-container">
-          {this.gerarTodasExposicoes()}
-        </main>
-        {this.renderizarInformacoesCorporativas()}
-      </div>
+      <CartProvider>
+        <div className="app-wrapper">
+          <SalesDialogs />
+          <Hero />
+          <main className="catalog-container">
+            {this.gerarTodasExposicoes()}
+          </main>
+          {this.renderizarInformacoesCorporativas()}
+        </div>
+      </CartProvider>
     );
   }
 }

@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
-import { IconPackage } from '@tabler/icons-react';
+import { IconPackage, IconShoppingCartPlus } from '@tabler/icons-react';
+import { useCart } from '../context/CartContext';
 import ProductDialog from './ProductDialog';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
   const [imageError, setImageError] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [added, setAdded] = useState(false);
+  const { addItem } = useCart();
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    addItem(product);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
 
   return (
     <>
@@ -36,7 +46,16 @@ const ProductCard = ({ product }) => {
           </div>
           <div className="product-footer">
             <span className="product-price">{product.price}</span>
-            <button className="btn-contact" onClick={() => setDialogOpen(true)}>Consultar</button>
+            <div className="product-actions">
+              <button
+                className={`btn-add-cart ${added ? 'btn-added' : ''}`}
+                onClick={handleAddToCart}
+                title="Adicionar ao carrinho"
+              >
+                <IconShoppingCartPlus size={18} stroke={2} />
+              </button>
+              <button className="btn-contact" onClick={() => setDialogOpen(true)}>Consultar</button>
+            </div>
           </div>
         </div>
       </div>
