@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconPackage, IconShoppingCartPlus } from '@tabler/icons-react';
+import { IconPackage, IconShoppingCartPlus, IconEye } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import ProductDialog from './ProductDialog';
 import './ProductCard.css';
@@ -80,7 +80,8 @@ const ProductCard = ({ product }) => {
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Consultar
+                <IconEye size={16} stroke={2} />
+                Ver Detalhes
               </motion.button>
             </div>
           </div>

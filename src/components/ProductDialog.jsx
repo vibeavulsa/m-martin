@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconX, IconPackage, IconShoppingCartPlus } from '@tabler/icons-react';
+import {
+  IconX,
+  IconPackage,
+  IconShoppingCartPlus,
+  IconMinus,
+  IconPlus,
+  IconTruck,
+  IconShieldCheck,
+  IconBrandWhatsapp,
+  IconCheck,
+  IconStar,
+} from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import './ProductDialog.css';
 
@@ -30,7 +41,7 @@ const contentVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.15 }
+    transition: { staggerChildren: 0.06, delayChildren: 0.12 }
   }
 };
 
@@ -46,14 +57,30 @@ const featureVariants = {
 
 const DialogInner = ({ product, onClose }) => {
   const [imageError, setImageError] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
 
   const handleAddToCart = () => {
-    addItem(product);
+    addItem(product, quantity);
     setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    setTimeout(() => setAdded(false), 2000);
   };
+
+  const handleBuyNow = () => {
+    addItem(product, quantity);
+    onClose();
+  };
+
+  const handleWhatsApp = () => {
+    const message = encodeURIComponent(
+      `Olá! Gostaria de mais informações sobre o produto: *${product.name}* (${product.price})`
+    );
+    window.open(`https://wa.me/?text=${message}`, '_blank');
+  };
+
+  const decrementQty = () => setQuantity((q) => Math.max(1, q - 1));
+  const incrementQty = () => setQuantity((q) => Math.min(99, q + 1));
 
   return (
     <motion.div
@@ -74,64 +101,137 @@ const DialogInner = ({ product, onClose }) => {
         <IconX size={18} stroke={2} />
       </motion.button>
 
-      <motion.div
-        className="dialog-image"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
-        {!imageError ? (
-          <img
-            src={product.image}
-            alt={product.name}
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="dialog-image-placeholder">
-            <IconPackage size={72} stroke={1.5} className="placeholder-icon" />
-          </div>
-        )}
-      </motion.div>
+      <div className="dialog-layout">
+        <motion.div
+          className="dialog-image"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+        >
+          {!imageError ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="dialog-image-placeholder">
+              <IconPackage size={72} stroke={1.5} className="placeholder-icon" />
+            </div>
+          )}
+        </motion.div>
 
-      <motion.div
-        className="dialog-body"
-        variants={contentVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.h2 className="dialog-title" variants={itemVariants}>
-          {product.name}
-        </motion.h2>
+        <motion.div
+          className="dialog-body"
+          variants={contentVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="dialog-header-section" variants={itemVariants}>
+            <div className="dialog-category-badge">{product.category}</div>
+            <h2 className="dialog-title">{product.name}</h2>
+            <div className="dialog-rating">
+              {[...Array(5)].map((_, i) => (
+                <IconStar key={i} size={14} stroke={1.5} fill={i < 4 ? '#d9b154' : 'none'} color="#d9b154" />
+              ))}
+              <span className="dialog-rating-text">4.0</span>
+            </div>
+          </motion.div>
 
-        <motion.p className="dialog-description" variants={itemVariants}>
-          {product.description}
-        </motion.p>
+          <motion.p className="dialog-description" variants={itemVariants}>
+            {product.description}
+          </motion.p>
 
-        <motion.div className="dialog-features" variants={itemVariants}>
-          {product.features.map((feature, index) => (
-            <motion.span
-              key={index}
-              className="dialog-feature-tag"
-              variants={featureVariants}
+          <motion.div className="dialog-features" variants={itemVariants}>
+            <h4 className="dialog-section-label">Características</h4>
+            <div className="dialog-features-list">
+              {product.features.map((feature, index) => (
+                <motion.span
+                  key={index}
+                  className="dialog-feature-tag"
+                  variants={featureVariants}
+                >
+                  <IconCheck size={12} stroke={3} />
+                  {feature}
+                </motion.span>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div className="dialog-price-section" variants={itemVariants}>
+            <span className="dialog-price">{product.price}</span>
+            <span className="dialog-installments">
+              ou até 10x sem juros
+            </span>
+          </motion.div>
+
+          <motion.div className="dialog-quantity-section" variants={itemVariants}>
+            <h4 className="dialog-section-label">Quantidade</h4>
+            <div className="dialog-quantity-control">
+              <motion.button
+                className="dialog-qty-btn"
+                onClick={decrementQty}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                disabled={quantity <= 1}
+              >
+                <IconMinus size={16} stroke={2} />
+              </motion.button>
+              <span className="dialog-qty-value">{quantity}</span>
+              <motion.button
+                className="dialog-qty-btn"
+                onClick={incrementQty}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <IconPlus size={16} stroke={2} />
+              </motion.button>
+            </div>
+          </motion.div>
+
+          <motion.div className="dialog-actions" variants={itemVariants}>
+            <motion.button
+              className={`dialog-btn-cart ${added ? 'dialog-btn-cart-added' : ''}`}
+              onClick={handleAddToCart}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {feature}
-            </motion.span>
-          ))}
-        </motion.div>
+              <IconShoppingCartPlus size={18} stroke={2} />
+              {added ? 'Adicionado!' : 'Adicionar ao Carrinho'}
+            </motion.button>
+            <motion.button
+              className="dialog-btn-buy"
+              onClick={handleBuyNow}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Comprar Agora
+            </motion.button>
+          </motion.div>
 
-        <motion.div className="dialog-footer" variants={itemVariants}>
-          <span className="dialog-price">{product.price}</span>
           <motion.button
-            className={`dialog-cta ${added ? 'dialog-cta-added' : ''}`}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={handleAddToCart}
+            className="dialog-btn-whatsapp"
+            onClick={handleWhatsApp}
+            variants={itemVariants}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <IconShoppingCartPlus size={18} stroke={2} />
-            {added ? 'Adicionado!' : 'Adicionar ao Carrinho'}
+            <IconBrandWhatsapp size={18} stroke={2} />
+            Consultar via WhatsApp
           </motion.button>
+
+          <motion.div className="dialog-trust-badges" variants={itemVariants}>
+            <div className="trust-badge">
+              <IconTruck size={18} stroke={1.5} />
+              <span>Entrega para todo Brasil</span>
+            </div>
+            <div className="trust-badge">
+              <IconShieldCheck size={18} stroke={1.5} />
+              <span>Garantia de fábrica</span>
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 };
