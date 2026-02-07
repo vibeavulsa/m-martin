@@ -1,8 +1,17 @@
-import { Component } from 'react';
+import { Component, useState, useCallback } from 'react';
+import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CategorySection from './components/CategorySection';
 import ProductCard from './components/ProductCard';
+import CartDialog from './components/CartDialog';
+import CustomerDialog from './components/CustomerDialog';
+import CheckoutDialog from './components/CheckoutDialog';
+import OrderConfirmationDialog from './components/OrderConfirmationDialog';
+import UserProfileDialog from './components/UserProfileDialog';
+import SettingsDialog from './components/SettingsDialog';
+import { CartProvider, useCart } from './context/CartContext';
+import { UserProvider } from './context/UserContext';
 import { categories, products } from './data/products';
 import './App.css';
 
@@ -16,6 +25,96 @@ function* geradorDeMostruario(linhasProdutos, inventarioGeral) {
     }
     yield { metadadosLinha: linha, colecaoPecas: pecasLinha };
   }
+}
+
+function SalesDialogs() {
+  const [cartOpen, setCartOpen] = useState(false);
+  const [customerOpen, setCustomerOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [orderNumber, setOrderNumber] = useState(null);
+  const { setCustomer, clearCart } = useCart();
+
+  const handleOpenCart = useCallback(() => setCartOpen(true), []);
+  const handleCloseCart = useCallback(() => setCartOpen(false), []);
+  const handleOpenProfile = useCallback(() => setProfileOpen(true), []);
+  const handleCloseProfile = useCallback(() => setProfileOpen(false), []);
+  const handleOpenSettings = useCallback(() => setSettingsOpen(true), []);
+  const handleCloseSettings = useCallback(() => setSettingsOpen(false), []);
+
+  const handleCheckout = useCallback(() => {
+    setCartOpen(false);
+    setCustomerOpen(true);
+  }, []);
+
+  const handleCloseCustomer = useCallback(() => setCustomerOpen(false), []);
+
+  const handleCustomerSubmit = useCallback((data) => {
+    setCustomer(data);
+    setCustomerOpen(false);
+    setCheckoutOpen(true);
+  }, [setCustomer]);
+
+  const handleCloseCheckout = useCallback(() => setCheckoutOpen(false), []);
+
+  const handleBackToCustomer = useCallback(() => {
+    setCheckoutOpen(false);
+    setCustomerOpen(true);
+  }, []);
+
+  const handleConfirmOrder = useCallback(() => {
+    const num = Math.floor(100000 + Math.random() * 900000);
+    setCheckoutOpen(false);
+    setConfirmationOpen(true);
+    setOrderNumber(num.toString());
+    clearCart();
+  }, [clearCart]);
+
+  const handleCloseConfirmation = useCallback(() => {
+    setConfirmationOpen(false);
+    setOrderNumber(null);
+  }, []);
+
+  return (
+    <>
+      <Header
+        onCartClick={handleOpenCart}
+        onProfileClick={handleOpenProfile}
+        onSettingsClick={handleOpenSettings}
+      />
+      <CartDialog
+        isOpen={cartOpen}
+        onClose={handleCloseCart}
+        onCheckout={handleCheckout}
+      />
+      <CustomerDialog
+        isOpen={customerOpen}
+        onClose={handleCloseCustomer}
+        onSubmit={handleCustomerSubmit}
+      />
+      <CheckoutDialog
+        isOpen={checkoutOpen}
+        onClose={handleCloseCheckout}
+        onConfirm={handleConfirmOrder}
+        onBack={handleBackToCustomer}
+      />
+      <OrderConfirmationDialog
+        isOpen={confirmationOpen}
+        onClose={handleCloseConfirmation}
+        orderNumber={orderNumber}
+      />
+      <UserProfileDialog
+        isOpen={profileOpen}
+        onClose={handleCloseProfile}
+      />
+      <SettingsDialog
+        isOpen={settingsOpen}
+        onClose={handleCloseSettings}
+      />
+    </>
+  );
 }
 
 class App extends Component {
@@ -40,7 +139,13 @@ class App extends Component {
     };
     
     return (
-      <footer className="site-footer">
+      <motion.footer
+        className="site-footer"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
         <div className="footer-content">
           <div className="footer-info">
             <h3>{corpus.marca}</h3>
@@ -49,10 +154,10 @@ class App extends Component {
           </div>
           <div className="footer-contact">
             <p>Entre em contato para mais informações</p>
-            <p>© 2026 M'Martin. Todos os direitos reservados.</p>
+            <p>© 2026 M&apos;Martin. Todos os direitos reservados.</p>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     );
   }
 
@@ -100,14 +205,18 @@ class App extends Component {
 
   render() {
     return (
-      <div className="app-wrapper">
-        <Header />
-        <Hero />
-        <main className="catalog-container">
-          {this.gerarTodasExposicoes()}
-        </main>
-        {this.renderizarInformacoesCorporativas()}
-      </div>
+      <UserProvider>
+        <CartProvider>
+          <div className="app-wrapper">
+            <SalesDialogs />
+            <Hero />
+            <main className="catalog-container">
+              {this.gerarTodasExposicoes()}
+            </main>
+            {this.renderizarInformacoesCorporativas()}
+          </div>
+        </CartProvider>
+      </UserProvider>
     );
   }
 }
