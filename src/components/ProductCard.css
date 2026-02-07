@@ -144,6 +144,10 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
 }
 
 .btn-contact:hover {
