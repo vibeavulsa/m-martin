@@ -7,17 +7,17 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [customer, setCustomer] = useState(null);
 
-  const addItem = useCallback((product) => {
+  const addItem = useCallback((product, qty = 1) => {
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
         return prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + qty }
             : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: qty }];
     });
   }, []);
 
