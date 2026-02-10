@@ -9,7 +9,10 @@ const STORAGE_KEY_PRODUCTS = 'mmartin_admin_products';
 const STORAGE_KEY_ORDERS = 'mmartin_admin_orders';
 const STORAGE_KEY_STOCK = 'mmartin_admin_stock';
 
-const ADMIN_CREDENTIALS = { user: 'admin', pass: 'mmartin2026' };
+const ADMIN_CREDENTIALS = {
+  user: import.meta.env.VITE_ADMIN_USER || 'admin',
+  pass: import.meta.env.VITE_ADMIN_PASS || 'mmartin2026',
+};
 
 function loadFromStorage(key, fallback) {
   try {
@@ -78,7 +81,7 @@ export function AdminProvider({ children }) {
   }, []);
 
   const addProduct = useCallback((product) => {
-    const newId = Date.now();
+    const newId = crypto.randomUUID();
     const newProduct = { ...product, id: newId };
     setProducts(prev => [...prev, newProduct]);
     setStock(prev => ({ ...prev, [newId]: { quantity: product.stockQuantity || 0, minStock: product.minStock || 5 } }));
@@ -115,7 +118,7 @@ export function AdminProvider({ children }) {
   const addOrder = useCallback((order) => {
     const newOrder = {
       ...order,
-      id: Date.now(),
+      id: crypto.randomUUID(),
       date: new Date().toISOString(),
       status: 'pendente',
     };

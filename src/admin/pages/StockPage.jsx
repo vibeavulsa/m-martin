@@ -122,22 +122,22 @@ const StockPage = () => {
                   <td><span className="category-badge">{getCategoryName(p.category)}</span></td>
                   <td>
                     <div className="stock-controls">
-                      <button onClick={() => updateStock(p.id, s.quantity - 1)}>
+                      <button onClick={() => updateStock(p.id, s.quantity - 1)} aria-label="Diminuir quantidade em estoque">
                         <IconMinus size={14} stroke={2} />
                       </button>
                       <span className={`stock-value ${getStockClass(p.id)}`}>{s.quantity}</span>
-                      <button onClick={() => updateStock(p.id, s.quantity + 1)}>
+                      <button onClick={() => updateStock(p.id, s.quantity + 1)} aria-label="Aumentar quantidade em estoque">
                         <IconPlus size={14} stroke={2} />
                       </button>
                     </div>
                   </td>
                   <td>
                     <div className="stock-controls">
-                      <button onClick={() => updateMinStock(p.id, s.minStock - 1)}>
+                      <button onClick={() => updateMinStock(p.id, s.minStock - 1)} aria-label="Diminuir estoque mínimo">
                         <IconMinus size={14} stroke={2} />
                       </button>
                       <span className="stock-value">{s.minStock}</span>
-                      <button onClick={() => updateMinStock(p.id, s.minStock + 1)}>
+                      <button onClick={() => updateMinStock(p.id, s.minStock + 1)} aria-label="Aumentar estoque mínimo">
                         <IconPlus size={14} stroke={2} />
                       </button>
                     </div>

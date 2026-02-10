@@ -157,10 +157,10 @@ const ProductsPage = () => {
                   </td>
                   <td>
                     <div className="table-actions">
-                      <button title="Editar" onClick={() => openEdit(p)}>
+                      <button title="Editar" aria-label="Editar produto" onClick={() => openEdit(p)}>
                         <IconPencil size={16} stroke={1.6} />
                       </button>
-                      <button title="Excluir" className="delete" onClick={() => handleDelete(p.id)}>
+                      <button title="Excluir" aria-label="Excluir produto" className="delete" onClick={() => handleDelete(p.id)}>
                         <IconTrash size={16} stroke={1.6} />
                       </button>
                     </div>
