@@ -4,6 +4,9 @@ import {
   IconPencil,
   IconTrash,
   IconSearch,
+  IconX,
+  IconPackage,
+  IconAlertTriangle,
 } from '@tabler/icons-react';
 import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
@@ -25,6 +28,7 @@ const ProductsPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyProduct);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return products;
@@ -55,9 +59,14 @@ const ProductsPage = () => {
     setModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este produto?')) {
-      deleteProduct(id);
+  const handleDelete = (product) => {
+    setConfirmDelete(product);
+  };
+
+  const confirmDeleteProduct = () => {
+    if (confirmDelete) {
+      deleteProduct(confirmDelete.id);
+      setConfirmDelete(null);
     }
   };
 
@@ -160,7 +169,7 @@ const ProductsPage = () => {
                       <button title="Editar" aria-label="Editar produto" onClick={() => openEdit(p)}>
                         <IconPencil size={16} stroke={1.6} />
                       </button>
-                      <button title="Excluir" aria-label="Excluir produto" className="delete" onClick={() => handleDelete(p.id)}>
+                      <button title="Excluir" aria-label="Excluir produto" className="delete" onClick={() => handleDelete(p)}>
                         <IconTrash size={16} stroke={1.6} />
                       </button>
                     </div>
@@ -182,59 +191,84 @@ const ProductsPage = () => {
       {modalOpen && (
         <div className="admin-modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{editing !== null ? 'Editar Produto' : 'Novo Produto'}</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="prod-name">Nome do Produto</label>
-                <input id="prod-name" name="name" value={form.name} onChange={handleChange} required />
+            <button className="admin-modal-close" onClick={() => setModalOpen(false)} aria-label="Fechar">
+              <IconX size={18} stroke={2} />
+            </button>
+            <div className="admin-modal-body">
+              <div className="admin-modal-header">
+                <IconPackage size={32} stroke={1.5} className="modal-header-icon" />
+                <h2>{editing !== null ? 'Editar Produto' : 'Novo Produto'}</h2>
+                <p>{editing !== null ? 'Atualize as informações do produto' : 'Preencha os dados para cadastrar um novo produto'}</p>
               </div>
-
-              <div className="form-row">
+              <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label htmlFor="prod-category">Categoria</label>
-                  <select id="prod-category" name="category" value={form.category} onChange={handleChange}>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
+                  <label htmlFor="prod-name">Nome do Produto</label>
+                  <input id="prod-name" name="name" value={form.name} onChange={handleChange} placeholder="Ex: Sofá Premium" required />
                 </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="prod-category">Categoria</label>
+                    <select id="prod-category" name="category" value={form.category} onChange={handleChange}>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="prod-price">Preço</label>
+                    <input id="prod-price" name="price" value={form.price} onChange={handleChange} placeholder="R$ 0,00" required />
+                  </div>
+                </div>
+
                 <div className="form-group">
-                  <label htmlFor="prod-price">Preço</label>
-                  <input id="prod-price" name="price" value={form.price} onChange={handleChange} placeholder="R$ 0,00" required />
+                  <label htmlFor="prod-desc">Descrição</label>
+                  <textarea id="prod-desc" name="description" value={form.description} onChange={handleChange} rows="3" placeholder="Descreva o produto..." />
                 </div>
-              </div>
 
-              <div className="form-group">
-                <label htmlFor="prod-desc">Descrição</label>
-                <textarea id="prod-desc" name="description" value={form.description} onChange={handleChange} rows="3" />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="prod-image">URL da Imagem</label>
-                <input id="prod-image" name="image" value={form.image} onChange={handleChange} placeholder="https://..." />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="prod-features">Características (separadas por vírgula)</label>
-                <input id="prod-features" name="features" value={form.features} onChange={handleChange} placeholder="Tecido premium, Design moderno" />
-              </div>
-
-              <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="prod-stock">Quantidade em Estoque</label>
-                  <input id="prod-stock" name="stockQuantity" type="number" min="0" value={form.stockQuantity} onChange={handleChange} />
+                  <label htmlFor="prod-image">URL da Imagem</label>
+                  <input id="prod-image" name="image" value={form.image} onChange={handleChange} placeholder="https://..." />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="prod-min">Estoque Mínimo</label>
-                  <input id="prod-min" name="minStock" type="number" min="0" value={form.minStock} onChange={handleChange} />
-                </div>
-              </div>
 
-              <div className="form-actions">
-                <button type="button" className="btn-secondary" onClick={() => setModalOpen(false)}>Cancelar</button>
-                <button type="submit" className="btn-primary">{editing !== null ? 'Salvar' : 'Cadastrar'}</button>
+                <div className="form-group">
+                  <label htmlFor="prod-features">Características (separadas por vírgula)</label>
+                  <input id="prod-features" name="features" value={form.features} onChange={handleChange} placeholder="Tecido premium, Design moderno" />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="prod-stock">Quantidade em Estoque</label>
+                    <input id="prod-stock" name="stockQuantity" type="number" min="0" value={form.stockQuantity} onChange={handleChange} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="prod-min">Estoque Mínimo</label>
+                    <input id="prod-min" name="minStock" type="number" min="0" value={form.minStock} onChange={handleChange} />
+                  </div>
+                </div>
+
+                <div className="form-actions">
+                  <button type="button" className="btn-secondary" onClick={() => setModalOpen(false)}>Cancelar</button>
+                  <button type="submit" className="btn-primary">{editing !== null ? 'Salvar Alterações' : 'Cadastrar Produto'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="admin-confirm-overlay" onClick={() => setConfirmDelete(null)}>
+          <div className="admin-confirm-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-confirm-body">
+              <IconAlertTriangle size={48} stroke={1.5} className="confirm-icon" />
+              <h3>Excluir Produto</h3>
+              <p>Tem certeza que deseja excluir <strong>{confirmDelete.name}</strong>? Esta ação não pode ser desfeita.</p>
+              <div className="admin-confirm-actions">
+                <button className="btn-cancel" onClick={() => setConfirmDelete(null)}>Cancelar</button>
+                <button className="btn-delete" onClick={confirmDeleteProduct}>Excluir</button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
