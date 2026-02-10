@@ -140,13 +140,17 @@ O projeto inclui um painel administrativo completo acessível em `/admin`.
 
 **URL:** `/admin`
 
-**Credenciais padrão:**
+**Credenciais padrão (apenas para desenvolvimento):**
 - Usuário: `admin`
 - Senha: `mmartin2026`
 
-> ⚠️ **Importante:** Altere as credenciais em produção usando variáveis de ambiente:
-> - `VITE_ADMIN_USER`
-> - `VITE_ADMIN_PASS`
+> ⚠️ **SEGURANÇA CRÍTICA:** Estas são credenciais de desenvolvimento. NUNCA use em produção!
+> 
+> **Para produção, OBRIGATORIAMENTE configure as variáveis de ambiente:**
+> - `VITE_ADMIN_USER` - Defina um nome de usuário seguro
+> - `VITE_ADMIN_PASS` - Defina uma senha forte
+> 
+> As credenciais acima só devem ser usadas em ambiente de desenvolvimento local.
 
 ### Funcionalidades
 
