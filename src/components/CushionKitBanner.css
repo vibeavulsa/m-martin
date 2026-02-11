@@ -1,0 +1,322 @@
+.cushion-kit-banner {
+  position: relative;
+  background: linear-gradient(158deg, #3a2d20 0%, #1e150e 100%);
+  border: 1px solid rgba(217, 177, 84, 0.18);
+  border-radius: 22px;
+  padding: 3rem 2.5rem;
+  margin: 2rem 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.cushion-kit-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 50%, rgba(217, 177, 84, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.cushion-kit-banner-content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.cushion-kit-banner-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #d9b154;
+  background: rgba(217, 177, 84, 0.12);
+  border: 1px solid rgba(217, 177, 84, 0.2);
+  border-radius: 8px;
+  padding: 0.3rem 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.cushion-kit-banner-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #e8e1d4;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.cushion-kit-banner-title span {
+  color: #d9b154;
+}
+
+.cushion-kit-banner-description {
+  font-size: 1rem;
+  color: #bfb3a2;
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+  max-width: 480px;
+}
+
+.cushion-kit-banner-price {
+  font-size: 0.95rem;
+  color: #e8e1d4;
+  margin: 1rem 0;
+}
+
+.cushion-kit-banner-price strong {
+  font-size: 1.5rem;
+  color: #d9b154;
+}
+
+.cushion-kit-banner-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.cushion-kit-feature-tag {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #d9b154;
+  background: rgba(217, 177, 84, 0.08);
+  border: 1px solid rgba(217, 177, 84, 0.15);
+  border-radius: 8px;
+  padding: 0.3rem 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.cushion-kit-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  background: linear-gradient(148deg, #d9b154 0%, #836424 100%);
+  color: #191210;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+.cushion-kit-banner-cta:hover {
+  opacity: 0.92;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.32), 0 0 14px rgba(217, 177, 84, 0.32);
+}
+
+.cushion-kit-banner-visual {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  max-width: 200px;
+}
+
+.cushion-preview-item {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  border: 2px solid rgba(217, 177, 84, 0.2);
+}
+
+/* Cushion Kit Dialog Overlay */
+.cushion-kit-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+}
+
+.cushion-kit-dialog {
+  background: linear-gradient(158deg, #3a2d20 0%, #1e150e 100%);
+  border: 1px solid rgba(217, 177, 84, 0.18);
+  border-radius: 22px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 32px rgba(217, 177, 84, 0.08);
+  position: relative;
+  padding: 2rem;
+}
+
+.cushion-kit-dialog-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(217, 177, 84, 0.12);
+  border: 1px solid rgba(217, 177, 84, 0.18);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #d9b154;
+  transition: background 0.2s;
+  z-index: 1;
+}
+
+.cushion-kit-dialog-close:hover {
+  background: rgba(217, 177, 84, 0.25);
+}
+
+.cushion-kit-dialog-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.cushion-kit-dialog-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  color: #e8e1d4;
+  margin: 0 0 0.3rem;
+}
+
+.cushion-kit-dialog-header p {
+  font-size: 0.88rem;
+  color: #bfb3a2;
+  margin: 0;
+}
+
+.cushion-kit-dialog-size {
+  margin-bottom: 1rem;
+}
+
+.cushion-kit-dialog-size h4 {
+  font-size: 0.85rem;
+  color: #d9b154;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.5rem;
+}
+
+.cushion-kit-dialog-size-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cushion-kit-size-btn {
+  padding: 0.5rem 1rem;
+  background: rgba(72, 55, 38, 0.35);
+  border: 1px solid rgba(217, 177, 84, 0.15);
+  border-radius: 10px;
+  color: #bfb3a2;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cushion-kit-size-btn:hover {
+  border-color: rgba(217, 177, 84, 0.4);
+}
+
+.cushion-kit-size-btn.active {
+  background: rgba(217, 177, 84, 0.15);
+  border-color: #d9b154;
+  color: #d9b154;
+  font-weight: 600;
+}
+
+.cushion-kit-dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.cushion-kit-dialog-actions .btn-add-kit {
+  flex: 2;
+  padding: 0.85rem;
+  background: linear-gradient(148deg, #d9b154 0%, #836424 100%);
+  color: #191210;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+.cushion-kit-dialog-actions .btn-add-kit:hover {
+  opacity: 0.92;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.32), 0 0 14px rgba(217, 177, 84, 0.32);
+}
+
+.cushion-kit-dialog-actions .btn-add-kit.added {
+  background: linear-gradient(148deg, #4caf50 0%, #2e7d32 100%);
+}
+
+.cushion-kit-dialog-actions .btn-whatsapp-kit {
+  flex: 1;
+  padding: 0.85rem;
+  background: rgba(37, 211, 102, 0.12);
+  border: 1px solid rgba(37, 211, 102, 0.25);
+  border-radius: 12px;
+  color: #25d366;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+
+.cushion-kit-dialog-actions .btn-whatsapp-kit:hover {
+  background: rgba(37, 211, 102, 0.2);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .cushion-kit-banner {
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .cushion-kit-banner-title {
+    font-size: 1.6rem;
+  }
+
+  .cushion-kit-banner-description {
+    max-width: none;
+  }
+
+  .cushion-kit-banner-features {
+    justify-content: center;
+  }
+
+  .cushion-kit-banner-visual {
+    justify-content: center;
+    max-width: none;
+  }
+
+  .cushion-kit-dialog {
+    padding: 1.5rem;
+  }
+
+  .cushion-kit-dialog-actions {
+    flex-direction: column;
+  }
+}

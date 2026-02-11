@@ -6,6 +6,7 @@ import {
   IconReceipt,
   IconArrowLeft,
   IconLogout,
+  IconPalette,
 } from '@tabler/icons-react';
 import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
@@ -34,6 +35,10 @@ const AdminLayout = () => {
           <NavLink to="/admin/produtos" className={({ isActive }) => `admin-nav-link${isActive ? ' active' : ''}`}>
             <IconPackage size={20} stroke={1.6} />
             <span>Produtos</span>
+          </NavLink>
+          <NavLink to="/admin/almofadas" className={({ isActive }) => `admin-nav-link${isActive ? ' active' : ''}`}>
+            <IconPalette size={20} stroke={1.6} />
+            <span>Kit Almofadas</span>
           </NavLink>
           <NavLink to="/admin/estoque" className={({ isActive }) => `admin-nav-link${isActive ? ' active' : ''}`}>
             <IconBoxSeam size={20} stroke={1.6} />

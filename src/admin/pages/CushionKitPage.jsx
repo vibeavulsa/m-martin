@@ -1,0 +1,365 @@
+import { useState } from 'react';
+import {
+  IconPalette,
+  IconPlus,
+  IconTrash,
+  IconDeviceFloppy,
+  IconCheck,
+} from '@tabler/icons-react';
+import { useAdmin } from '../context/AdminContext';
+import '../Admin.css';
+
+const colorGradients = {
+  'Azul': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  'Verde': 'linear-gradient(135deg, #5ecc7b 0%, #0ba360 100%)',
+  'Vermelho': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  'Amarelo': 'linear-gradient(135deg, #fad961 0%, #f76b1c 100%)',
+  'Rosa': 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+  'Cinza': 'linear-gradient(135deg, #a8a8a8 0%, #5a5a5a 100%)',
+  'Bege': 'linear-gradient(135deg, #e0c3a3 0%, #c9a27b 100%)',
+  'Preto': 'linear-gradient(135deg, #434343 0%, #000000 100%)',
+  'Branco': 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
+  'Marrom': 'linear-gradient(135deg, #8B6914 0%, #5C4033 100%)',
+  'Lilás': 'linear-gradient(135deg, #C8A2C8 0%, #9B59B6 100%)',
+  'Terracota': 'linear-gradient(135deg, #E2725B 0%, #C04000 100%)',
+};
+
+const CushionKitPage = () => {
+  const { cushionKit, updateCushionKit } = useAdmin();
+  const [newColor, setNewColor] = useState('');
+  const [saved, setSaved] = useState(false);
+  const [productForm, setProductForm] = useState({
+    name: cushionKit.product.name,
+    description: cushionKit.product.description,
+    price: cushionKit.product.price,
+    priceCash: cushionKit.product.priceCash || cushionKit.product.price,
+    priceInstallment: cushionKit.product.priceInstallment || '',
+    installments: cushionKit.product.installments || 5,
+    image: cushionKit.product.image || '',
+    features: cushionKit.product.features.join(', '),
+  });
+  const [sizesText, setSizesText] = useState(cushionKit.sizes.join(', '));
+
+  const handleAddColor = () => {
+    const color = newColor.trim();
+    if (color && !cushionKit.colors.includes(color)) {
+      updateCushionKit({ colors: [...cushionKit.colors, color] });
+      setNewColor('');
+    }
+  };
+
+  const handleRemoveColor = (color) => {
+    updateCushionKit({ colors: cushionKit.colors.filter(c => c !== color) });
+  };
+
+  const handleProductChange = (e) => {
+    const { name, value } = e.target;
+    setProductForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveProduct = (e) => {
+    e.preventDefault();
+    const featuresArr = productForm.features
+      .split(',')
+      .map(f => f.trim())
+      .filter(Boolean);
+
+    const sizesArr = sizesText
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    updateCushionKit({
+      sizes: sizesArr,
+      product: {
+        ...cushionKit.product,
+        name: productForm.name,
+        description: productForm.description,
+        price: productForm.price,
+        priceCash: productForm.priceCash,
+        priceInstallment: productForm.priceInstallment,
+        installments: parseInt(productForm.installments, 10) || 5,
+        image: productForm.image,
+        features: featuresArr,
+      },
+    });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  return (
+    <>
+      <div className="admin-page-header">
+        <h1>Kit de Almofadas</h1>
+        <p>Gerencie as cores disponíveis e informações do kit de almofadas personalizáveis</p>
+      </div>
+
+      <div className="dashboard-sections" style={{ gridTemplateColumns: '1fr' }}>
+        {/* Colors Section */}
+        <div className="dashboard-section">
+          <h2>
+            <IconPalette size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#d9b154' }} />
+            Cores Disponíveis
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+            {cushionKit.colors.map((color) => (
+              <div
+                key={color}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.4rem 0.75rem',
+                  background: 'rgba(217, 177, 84, 0.08)',
+                  border: '1px solid rgba(217, 177, 84, 0.15)',
+                  borderRadius: '10px',
+                }}
+              >
+                <span
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '6px',
+                    background: colorGradients[color] || '#999',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    flexShrink: 0,
+                  }}
+                />
+                <span style={{ fontSize: '0.85rem', color: '#e8e1d4' }}>{color}</span>
+                <button
+                  onClick={() => handleRemoveColor(color)}
+                  title="Remover cor"
+                  aria-label={`Remover cor ${color}`}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#f44336',
+                    cursor: 'pointer',
+                    padding: '2px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <IconTrash size={14} stroke={1.6} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <input
+              className="admin-search"
+              style={{ maxWidth: '200px', flex: 1 }}
+              placeholder="Nome da cor..."
+              value={newColor}
+              onChange={(e) => setNewColor(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleAddColor(); }}
+            />
+            <button className="btn-primary" onClick={handleAddColor} disabled={!newColor.trim()}>
+              <IconPlus size={16} stroke={2} />
+              Adicionar Cor
+            </button>
+          </div>
+        </div>
+
+        {/* Product Info Section */}
+        <div className="dashboard-section">
+          <h2>Informações do Produto</h2>
+          <form onSubmit={handleSaveProduct} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label htmlFor="kit-name" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Nome do Kit</label>
+              <input
+                id="kit-name"
+                name="name"
+                value={productForm.name}
+                onChange={handleProductChange}
+                placeholder="Ex: Kit Refil de Almofada"
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(72, 55, 38, 0.35)',
+                  border: '1px solid rgba(217, 177, 84, 0.12)',
+                  borderRadius: '10px',
+                  color: '#e8e1d4',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label htmlFor="kit-desc" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Descrição</label>
+              <textarea
+                id="kit-desc"
+                name="description"
+                value={productForm.description}
+                onChange={handleProductChange}
+                rows="3"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(72, 55, 38, 0.35)',
+                  border: '1px solid rgba(217, 177, 84, 0.12)',
+                  borderRadius: '10px',
+                  color: '#e8e1d4',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  resize: 'vertical',
+                  fontFamily: 'inherit',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div className="form-group">
+                <label htmlFor="kit-price" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço à Vista</label>
+                <input
+                  id="kit-price"
+                  name="priceCash"
+                  value={productForm.priceCash}
+                  onChange={handleProductChange}
+                  placeholder="R$ 0,00"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(72, 55, 38, 0.35)',
+                    border: '1px solid rgba(217, 177, 84, 0.12)',
+                    borderRadius: '10px',
+                    color: '#e8e1d4',
+                    fontSize: '0.95rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="kit-installment" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço Parcela</label>
+                <input
+                  id="kit-installment"
+                  name="priceInstallment"
+                  value={productForm.priceInstallment}
+                  onChange={handleProductChange}
+                  placeholder="R$ 0,00"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(72, 55, 38, 0.35)',
+                    border: '1px solid rgba(217, 177, 84, 0.12)',
+                    borderRadius: '10px',
+                    color: '#e8e1d4',
+                    fontSize: '0.95rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div className="form-group">
+                <label htmlFor="kit-installments" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Nº de Parcelas</label>
+                <input
+                  id="kit-installments"
+                  name="installments"
+                  type="number"
+                  min="1"
+                  value={productForm.installments}
+                  onChange={handleProductChange}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(72, 55, 38, 0.35)',
+                    border: '1px solid rgba(217, 177, 84, 0.12)',
+                    borderRadius: '10px',
+                    color: '#e8e1d4',
+                    fontSize: '0.95rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="kit-sizes" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Tamanhos (vírgula)</label>
+                <input
+                  id="kit-sizes"
+                  value={sizesText}
+                  onChange={(e) => setSizesText(e.target.value)}
+                  placeholder="45x45, 50x50"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(72, 55, 38, 0.35)',
+                    border: '1px solid rgba(217, 177, 84, 0.12)',
+                    borderRadius: '10px',
+                    color: '#e8e1d4',
+                    fontSize: '0.95rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label htmlFor="kit-image" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>URL da Imagem</label>
+              <input
+                id="kit-image"
+                name="image"
+                value={productForm.image}
+                onChange={handleProductChange}
+                placeholder="https://..."
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(72, 55, 38, 0.35)',
+                  border: '1px solid rgba(217, 177, 84, 0.12)',
+                  borderRadius: '10px',
+                  color: '#e8e1d4',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label htmlFor="kit-features" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Características (vírgula)</label>
+              <input
+                id="kit-features"
+                name="features"
+                value={productForm.features}
+                onChange={handleProductChange}
+                placeholder="Kit com 5 unidades, Tecido Oxford"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(72, 55, 38, 0.35)',
+                  border: '1px solid rgba(217, 177, 84, 0.12)',
+                  borderRadius: '10px',
+                  color: '#e8e1d4',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn-primary"
+              style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              {saved ? <IconCheck size={18} stroke={2} /> : <IconDeviceFloppy size={18} stroke={2} />}
+              {saved ? 'Salvo!' : 'Salvar Alterações'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default CushionKitPage;

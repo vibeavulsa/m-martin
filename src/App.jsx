@@ -1,9 +1,12 @@
-import { Component, useState, useCallback } from 'react';
+import { Component, useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './config/firebase';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CategorySection from './components/CategorySection';
 import ProductCard from './components/ProductCard';
+import CushionKitBanner from './components/CushionKitBanner';
 import CartDialog from './components/CartDialog';
 import CustomerDialog from './components/CustomerDialog';
 import CheckoutDialog from './components/CheckoutDialog';
@@ -12,8 +15,19 @@ import UserProfileDialog from './components/UserProfileDialog';
 import SettingsDialog from './components/SettingsDialog';
 import { CartProvider, useCart } from './context/CartContext';
 import { UserProvider } from './context/UserContext';
-import { categories, products } from './data/products';
+import { categories as fallbackCategories, products as fallbackProducts } from './data/products';
 import './App.css';
+
+const STORAGE_KEY_PRODUCTS = 'mmartin_admin_products';
+const STORAGE_KEY_CUSHION_KIT = 'mmartin_cushion_kit';
+
+function loadFromStorage(key, fallback) {
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored) return JSON.parse(stored);
+  } catch { /* ignore */ }
+  return fallback;
+}
 
 function* geradorDeMostruario(linhasProdutos, inventarioGeral) {
   for (const linha of linhasProdutos) {
@@ -117,8 +131,9 @@ function SalesDialogs() {
   );
 }
 
-class App extends Component {
+class AppCatalog extends Component {
   obterExposicoesMontadas() {
+    const { categories, products } = this.props;
     const expositor = geradorDeMostruario(categories, products);
     const todasExposicoes = [];
     let proximaExposicao = expositor.next();
@@ -178,6 +193,13 @@ class App extends Component {
   }
 
   gerarExposicaoCompleta(exposicao, numeroExposicao) {
+    if (exposicao.metadadosLinha.id === 'almofadas') {
+      return (
+        <section key={`expositor-numero-${numeroExposicao}`} className="category-group">
+          <CushionKitBanner kitConfig={this.props.cushionKit} />
+        </section>
+      );
+    }
     return (
       <section key={`expositor-numero-${numeroExposicao}`} className="category-group">
         <CategorySection category={exposicao.metadadosLinha} />
@@ -205,20 +227,71 @@ class App extends Component {
 
   render() {
     return (
-      <UserProvider>
-        <CartProvider>
-          <div className="app-wrapper">
-            <SalesDialogs />
-            <Hero />
-            <main className="catalog-container">
-              {this.gerarTodasExposicoes()}
-            </main>
-            {this.renderizarInformacoesCorporativas()}
-          </div>
-        </CartProvider>
-      </UserProvider>
+      <>
+        <SalesDialogs />
+        <Hero />
+        <main className="catalog-container">
+          {this.gerarTodasExposicoes()}
+        </main>
+        {this.renderizarInformacoesCorporativas()}
+      </>
     );
   }
+}
+
+function App() {
+  const [categories, setCategories] = useState(fallbackCategories);
+  const [products, setProducts] = useState(() => {
+    return loadFromStorage(STORAGE_KEY_PRODUCTS, fallbackProducts);
+  });
+  const [cushionKit, setCushionKit] = useState(() => {
+    return loadFromStorage(STORAGE_KEY_CUSHION_KIT, null);
+  });
+
+  useEffect(() => {
+    async function loadFromDB() {
+      try {
+        const prodSnap = await getDocs(collection(db, 'products'));
+        if (!prodSnap.empty) {
+          const dbProducts = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setProducts(dbProducts);
+        }
+
+        const catSnap = await getDocs(collection(db, 'categories'));
+        if (!catSnap.empty) {
+          const dbCategories = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setCategories(dbCategories);
+        }
+
+        const kitSnap = await getDocs(collection(db, 'cushionKit'));
+        if (!kitSnap.empty) {
+          const kitDoc = kitSnap.docs[0];
+          setCushionKit({ id: kitDoc.id, ...kitDoc.data() });
+        }
+      } catch {
+        // DB unavailable, use localStorage/fallback data
+      }
+    }
+    loadFromDB();
+  }, []);
+
+  // Filter out almofadas products from the regular product list
+  // (they are now shown via the CushionKitBanner)
+  const displayProducts = products.filter(p => p.category !== 'almofadas');
+
+  return (
+    <UserProvider>
+      <CartProvider>
+        <div className="app-wrapper">
+          <AppCatalog
+            categories={categories}
+            products={displayProducts}
+            cushionKit={cushionKit}
+          />
+        </div>
+      </CartProvider>
+    </UserProvider>
+  );
 }
 
 export default App;
