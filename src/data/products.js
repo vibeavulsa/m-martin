@@ -156,16 +156,18 @@ export const products = [
     category: 'almofadas',
     name: 'Kit Refil de Almofada 45x45 ou 50x50',
     description: 'Kit com 5 almofadas em tecido Oxford, fibra siliconada 500g. Escolha as cores de cada uma!',
-    price: 'R$ 48,00',
-    priceInstallment: 'R$ 53,90',
+    price: 'R$ 329,50',
+    priceInstallment: 'R$ 349,50',
     installments: 5,
-    priceCash: 'R$ 48,00',
+    priceCash: 'R$ 329,50',
+    unitPriceCash: 'R$ 65,90',
+    unitPriceInstallment: 'R$ 69,90',
     image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=600',
     features: ['Kit com 5 unidades', 'Tecido Oxford', 'Fibra siliconada 500g', 'Cores variadas'],
     isKit: true,
     kitQuantity: 5,
     sizes: ['45x45', '50x50'],
-    colors: ['Preto', 'Branco', 'Azul Marinho', 'Cinza Rato', 'Rosê', 'Terracota', 'Bege', 'Bordô']
+    colors: ['Preto', 'Branco', 'Azul Royal', 'Cinza Rato', 'Malva', 'Terracota', 'Bege', 'Bordô']
   },
 
   // Colchão para Acamados

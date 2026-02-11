@@ -116,10 +116,71 @@
 .cushion-kit-banner-visual {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
+  width: 280px;
+  height: 280px;
+}
+
+.cushion-video-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid rgba(217, 177, 84, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.cushion-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cushion-video-overlay {
+  position: absolute;
+  inset: 0;
   display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  max-width: 200px;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  pointer-events: none;
+}
+
+.cushion-video-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(217, 177, 84, 0.6),
+    0 0 40px rgba(217, 177, 84, 0.4);
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+  margin: 0;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.8),
+      0 0 20px rgba(217, 177, 84, 0.6),
+      0 0 40px rgba(217, 177, 84, 0.4);
+  }
+  to {
+    text-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.8),
+      0 0 30px rgba(217, 177, 84, 0.8),
+      0 0 60px rgba(217, 177, 84, 0.6);
+  }
 }
 
 .cushion-preview-item {
@@ -310,8 +371,13 @@
   }
 
   .cushion-kit-banner-visual {
-    justify-content: center;
-    max-width: none;
+    width: 100%;
+    max-width: 320px;
+    height: 240px;
+  }
+
+  .cushion-video-text {
+    font-size: 1.4rem;
   }
 
   .cushion-kit-dialog {

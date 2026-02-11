@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// motion and AnimatePresence are used in JSX, eslint doesn't detect JSX usage
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import {
   IconPalette,
   IconCheck,
@@ -11,8 +12,9 @@ import {
 import { useCart } from '../context/CartContext';
 import CushionKitSelector from './CushionKitSelector';
 import './CushionKitBanner.css';
+import coresVideo from '../assets/almofadas/cores.mp4';
 
-const defaultColors = ['Preto', 'Branco', 'Azul Marinho', 'Cinza Rato', 'Rosê', 'Terracota', 'Bege', 'Bordô'];
+const defaultColors = ['Preto', 'Branco', 'Azul Royal', 'Cinza Rato', 'Malva', 'Terracota', 'Bege', 'Bordô'];
 const defaultSizes = ['45x45', '50x50'];
 
 const defaultKitProduct = {
@@ -20,25 +22,16 @@ const defaultKitProduct = {
   category: 'almofadas',
   name: 'Kit Refil de Almofada 45x45 ou 50x50',
   description: 'Kit com 5 almofadas em tecido Oxford, fibra siliconada 500g. Escolha as cores de cada uma!',
-  price: 'R$ 48,00',
-  priceInstallment: 'R$ 53,90',
+  price: 'R$ 329,50',
+  priceInstallment: 'R$ 349,50',
   installments: 5,
-  priceCash: 'R$ 48,00',
+  priceCash: 'R$ 329,50',
+  unitPriceCash: 'R$ 65,90',
+  unitPriceInstallment: 'R$ 69,90',
   image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=600',
   features: ['Kit com 5 unidades', 'Tecido Oxford', 'Fibra siliconada 500g', 'Cores variadas'],
   isKit: true,
   kitQuantity: 5,
-};
-
-const colorGradients = {
-  'Preto': 'linear-gradient(135deg, #2c2c2c 0%, #000000 100%)',
-  'Branco': 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
-  'Azul Marinho': 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)',
-  'Cinza Rato': 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-  'Rosê': 'linear-gradient(135deg, #fda4af 0%, #fb7185 100%)',
-  'Terracota': 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
-  'Bege': 'linear-gradient(135deg, #e7d4b5 0%, #d4b896 100%)',
-  'Bordô': 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)',
 };
 
 const CushionKitBanner = ({ kitConfig }) => {
@@ -94,8 +87,6 @@ const CushionKitBanner = ({ kitConfig }) => {
     return () => document.removeEventListener('keydown', handleKey);
   }, [dialogOpen]);
 
-  const previewColors = colors.slice(0, 6);
-
   return (
     <>
       <motion.div
@@ -141,17 +132,22 @@ const CushionKitBanner = ({ kitConfig }) => {
           </motion.button>
         </div>
         <div className="cushion-kit-banner-visual">
-          {previewColors.map((color, i) => (
-            <motion.div
-              key={color}
-              className="cushion-preview-item"
-              style={{ background: colorGradients[color] || '#999' }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
+          <div className="cushion-video-container">
+            <video 
+              className="cushion-video"
+              src={coresVideo}
+              autoPlay
+              loop
+              muted
+              playsInline
             />
-          ))}
+            <div className="cushion-video-overlay">
+              <h3 className="cushion-video-text">
+                ESCOLHA AS CORES<br />
+                DO SEU KIT!
+              </h3>
+            </div>
+          </div>
         </div>
       </motion.div>
 
