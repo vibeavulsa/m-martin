@@ -11,7 +11,7 @@ const STORAGE_KEY_STOCK = 'mmartin_admin_stock';
 const STORAGE_KEY_CUSHION_KIT = 'mmartin_cushion_kit';
 
 const defaultCushionKit = {
-  colors: ['Azul', 'Verde', 'Vermelho', 'Amarelo', 'Rosa', 'Cinza', 'Bege', 'Preto'],
+  colors: ['Preto', 'Branco', 'Azul Marinho', 'Cinza Rato', 'Rosê', 'Terracota', 'Bege', 'Bordô'],
   sizes: ['45x45', '50x50'],
   product: {
     id: 'cushion-kit',
