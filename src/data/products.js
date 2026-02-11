@@ -165,7 +165,7 @@ export const products = [
     isKit: true,
     kitQuantity: 5,
     sizes: ['45x45', '50x50'],
-    colors: ['Azul', 'Verde', 'Vermelho', 'Amarelo', 'Rosa', 'Cinza', 'Bege', 'Preto']
+    colors: ['Preto', 'Branco', 'Azul Marinho', 'Cinza Rato', 'Rosê', 'Terracota', 'Bege', 'Bordô']
   },
 
   // Colchão para Acamados

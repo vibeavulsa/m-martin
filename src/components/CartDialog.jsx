@@ -4,6 +4,21 @@ import { IconX, IconTrash, IconMinus, IconPlus, IconShoppingCart } from '@tabler
 import { useCart } from '../context/CartContext';
 import './CartDialog.css';
 
+// Color gradients for cushion thumbnails
+const getColorGradient = (colorName) => {
+  const colorMap = {
+    'Preto': 'linear-gradient(135deg, #2c2c2c 0%, #000000 100%)',
+    'Branco': 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
+    'Azul Marinho': 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)',
+    'Cinza Rato': 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+    'Rosê': 'linear-gradient(135deg, #fda4af 0%, #fb7185 100%)',
+    'Terracota': 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
+    'Bege': 'linear-gradient(135deg, #e7d4b5 0%, #d4b896 100%)',
+    'Bordô': 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)',
+  };
+  return colorMap[colorName] || '#999';
+};
+
 const overlayVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
@@ -109,6 +124,26 @@ const CartDialog = ({ isOpen, onClose, onCheckout }) => {
                     >
                       <div className="cart-item-info">
                         <h4 className="cart-item-name">{item.name}</h4>
+                        {item.cushionColors && item.cushionColors.length > 0 && (
+                          <div className="cart-item-cushions">
+                            {item.cushionColors.map((color, index) => (
+                              color ? (
+                                <div
+                                  key={index}
+                                  className="cart-cushion-thumb"
+                                  style={{ background: getColorGradient(color) }}
+                                  title={color}
+                                />
+                              ) : (
+                                <div
+                                  key={index}
+                                  className="cart-cushion-thumb cart-cushion-empty"
+                                  title="Sem cor selecionada"
+                                />
+                              )
+                            ))}
+                          </div>
+                        )}
                         <span className="cart-item-price">{item.price}</span>
                       </div>
                       <div className="cart-item-actions">

@@ -10,18 +10,14 @@ import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
 
 const colorGradients = {
-  'Azul': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-  'Verde': 'linear-gradient(135deg, #5ecc7b 0%, #0ba360 100%)',
-  'Vermelho': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-  'Amarelo': 'linear-gradient(135deg, #fad961 0%, #f76b1c 100%)',
-  'Rosa': 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-  'Cinza': 'linear-gradient(135deg, #a8a8a8 0%, #5a5a5a 100%)',
-  'Bege': 'linear-gradient(135deg, #e0c3a3 0%, #c9a27b 100%)',
-  'Preto': 'linear-gradient(135deg, #434343 0%, #000000 100%)',
-  'Branco': 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
-  'Marrom': 'linear-gradient(135deg, #8B6914 0%, #5C4033 100%)',
-  'Lilás': 'linear-gradient(135deg, #C8A2C8 0%, #9B59B6 100%)',
-  'Terracota': 'linear-gradient(135deg, #E2725B 0%, #C04000 100%)',
+  'Preto': 'linear-gradient(135deg, #2c2c2c 0%, #000000 100%)',
+  'Branco': 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
+  'Azul Marinho': 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)',
+  'Cinza Rato': 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+  'Rosê': 'linear-gradient(135deg, #fda4af 0%, #fb7185 100%)',
+  'Terracota': 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
+  'Bege': 'linear-gradient(135deg, #e7d4b5 0%, #d4b896 100%)',
+  'Bordô': 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)',
 };
 
 const CushionKitPage = () => {
