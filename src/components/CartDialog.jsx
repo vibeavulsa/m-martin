@@ -123,7 +123,18 @@ const CartDialog = ({ isOpen, onClose, onCheckout }) => {
                       layout
                     >
                       <div className="cart-item-info">
-                        <h4 className="cart-item-name">{item.name}</h4>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <h4 className="cart-item-name">{item.name}</h4>
+                          <motion.button
+                            className="cart-item-remove"
+                            onClick={() => removeItem(item.id)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            aria-label="Remover item"
+                          >
+                            <IconTrash size={16} />
+                          </motion.button>
+                        </div>
                         {item.cushionColors && item.cushionColors.length > 0 && (
                           <div className="cart-item-cushions">
                             {item.cushionColors.map((color, index) => (
@@ -153,6 +164,7 @@ const CartDialog = ({ isOpen, onClose, onCheckout }) => {
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
+                            aria-label="Diminuir quantidade"
                           >
                             <IconMinus size={14} />
                           </motion.button>
@@ -162,6 +174,7 @@ const CartDialog = ({ isOpen, onClose, onCheckout }) => {
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
+                            aria-label="Aumentar quantidade"
                           >
                             <IconPlus size={14} />
                           </motion.button>
@@ -169,14 +182,6 @@ const CartDialog = ({ isOpen, onClose, onCheckout }) => {
                         <span className="cart-item-subtotal">
                           {formatPrice(parsePrice(item.price) * item.quantity)}
                         </span>
-                        <motion.button
-                          className="cart-item-remove"
-                          onClick={() => removeItem(item.id)}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <IconTrash size={16} />
-                        </motion.button>
                       </div>
                     </motion.div>
                   ))
