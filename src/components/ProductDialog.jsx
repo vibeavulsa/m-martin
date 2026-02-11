@@ -66,14 +66,38 @@ const DialogInner = ({ product, onClose }) => {
   const [paymentType, setPaymentType] = useState('cash');
   const { addItem } = useCart();
 
+  // Reset states when product changes
+  useEffect(() => {
+    setSelectedSize(product.sizes ? product.sizes[0] : null);
+    setSelectedFoam(product.foamOptions ? product.foamOptions[0] : null);
+    setCushionColors([]);
+    setPaymentType('cash');
+    setQuantity(1);
+    setImageError(false);
+  }, [product]);
+
   const handleAddToCart = () => {
-    addItem(product, quantity);
+    const itemData = {
+      ...product,
+      selectedSize,
+      selectedFoam,
+      cushionColors: cushionColors.length > 0 ? cushionColors : undefined,
+      paymentType
+    };
+    addItem(itemData, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
-    addItem(product, quantity);
+    const itemData = {
+      ...product,
+      selectedSize,
+      selectedFoam,
+      cushionColors: cushionColors.length > 0 ? cushionColors : undefined,
+      paymentType
+    };
+    addItem(itemData, quantity);
     onClose();
   };
 
