@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// motion and AnimatePresence are used in JSX, eslint doesn't detect JSX usage
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import {
   IconPalette,
   IconCheck,
