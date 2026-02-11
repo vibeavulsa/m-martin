@@ -1,6 +1,8 @@
 .cushion-kit-banner {
   position: relative;
-  background: linear-gradient(158deg, #3a2d20 0%, #1e150e 100%);
+  background: linear-gradient(158deg, rgba(58, 45, 32, 0.85) 0%, rgba(30, 21, 14, 0.95) 100%), 
+              url('../assets/almofadas_bg.jpeg') center/cover;
+  background-blend-mode: overlay;
   border: 1px solid rgba(217, 177, 84, 0.18);
   border-radius: 22px;
   padding: 3rem 2.5rem;
