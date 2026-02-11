@@ -3,6 +3,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { IconCheck } from '@tabler/icons-react';
 import './CushionKitSelector.css';
 
+// Import texture images
+import blackTexture from '../assets/almofadas/black.png';
+import begeTexture from '../assets/almofadas/bege.png';
+import azulRoyalTexture from '../assets/almofadas/azul-royal.png';
+import malvaTexture from '../assets/almofadas/malve.png';
+import terracotaTexture from '../assets/almofadas/terra.png';
+import offWhiteTexture from '../assets/almofadas/off-white.png';
+import cinzaTexture from '../assets/almofadas/cinza-rato.png';
+import bordoTexture from '../assets/almofadas/bordô.png';
+
+// Map color names to texture images
+const colorTextureMap = {
+  'Preto': blackTexture,
+  'Branco': offWhiteTexture,
+  'Azul Royal': azulRoyalTexture,
+  'Cinza Rato': cinzaTexture,
+  'Malva': malvaTexture,
+  'Terracota': terracotaTexture,
+  'Bege': begeTexture,
+  'Bordô': bordoTexture,
+  // Keep backward compatibility with old names
+  'Azul Marinho': azulRoyalTexture,
+  'Rosê': malvaTexture,
+};
+
 const CushionKitSelector = ({ colors, onChange }) => {
   const [selectedCushion, setSelectedCushion] = useState(null);
   const [cushionColors, setCushionColors] = useState(Array(5).fill(null));
@@ -44,7 +69,9 @@ const CushionKitSelector = ({ colors, onChange }) => {
                   key="colored"
                   className="cushion-colored"
                   style={{ 
-                    background: getColorGradient(cushionColors[index])
+                    backgroundImage: `url(${getColorTexture(cushionColors[index])})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
                   }}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -88,7 +115,11 @@ const CushionKitSelector = ({ colors, onChange }) => {
                 <motion.button
                   key={color}
                   className={`color-option ${cushionColors[selectedCushion] === color ? 'color-selected' : ''}`}
-                  style={{ background: getColorGradient(color) }}
+                  style={{ 
+                    backgroundImage: `url(${getColorTexture(color)})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
                   onClick={() => handleColorSelect(color)}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
@@ -119,19 +150,9 @@ const CushionKitSelector = ({ colors, onChange }) => {
   );
 };
 
-// Helper function to get color gradients
-const getColorGradient = (colorName) => {
-  const colorMap = {
-    'Preto': 'linear-gradient(135deg, #2c2c2c 0%, #000000 100%)',
-    'Branco': 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
-    'Azul Marinho': 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)',
-    'Cinza Rato': 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-    'Rosê': 'linear-gradient(135deg, #fda4af 0%, #fb7185 100%)',
-    'Terracota': 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
-    'Bege': 'linear-gradient(135deg, #e7d4b5 0%, #d4b896 100%)',
-    'Bordô': 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)',
-  };
-  return colorMap[colorName] || '#999';
+// Helper function to get color texture images
+const getColorTexture = (colorName) => {
+  return colorTextureMap[colorName] || blackTexture;
 };
 
 export default CushionKitSelector;
