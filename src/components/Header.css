@@ -20,18 +20,9 @@
 }
 
 .logo .logo-image {
-  height: 50px;
+  height: 65px;
   width: auto;
   display: block;
-}
-
-.logo .tagline {
-  margin: 0;
-  font-size: 0.875rem;
-  color: #bfb3a2;
-  font-weight: 300;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
 }
 
 .nav {
