@@ -25,7 +25,7 @@ function loadFromStorage(key, fallback) {
   try {
     const stored = localStorage.getItem(key);
     if (stored) return JSON.parse(stored);
-  } catch { /* ignore */ }
+  } catch { /* localStorage unavailable or corrupt, use fallback */ }
   return fallback;
 }
 
@@ -269,7 +269,7 @@ function App() {
           setCushionKit({ id: kitDoc.id, ...kitDoc.data() });
         }
       } catch {
-        // DB unavailable, use localStorage/fallback data
+        // DB unavailable (offline, no credentials, etc.), use localStorage/fallback data
       }
     }
     loadFromDB();
