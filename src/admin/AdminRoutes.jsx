@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage';
 import ProductsPage from './pages/ProductsPage';
 import StockPage from './pages/StockPage';
 import OrdersPage from './pages/OrdersPage';
+import CushionKitPage from './pages/CushionKitPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAdmin();
@@ -34,6 +35,7 @@ const AdminRoutes = () => {
         >
           <Route index element={<DashboardPage />} />
           <Route path="produtos" element={<ProductsPage />} />
+          <Route path="almofadas" element={<CushionKitPage />} />
           <Route path="estoque" element={<StockPage />} />
           <Route path="pedidos" element={<OrdersPage />} />
         </Route>

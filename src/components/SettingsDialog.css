@@ -1,11 +1,9 @@
 .settings-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 2000;
 }
 
@@ -16,9 +14,9 @@
   bottom: 0;
   width: 100%;
   max-width: 420px;
-  background: linear-gradient(168deg, #2a1f18 0%, #1e1510 100%);
-  border-left: 1px solid rgba(217, 177, 84, 0.12);
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(158deg, #3a2d20 0%, #1e150e 100%);
+  border-left: 1px solid rgba(217, 177, 84, 0.18);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -52,11 +50,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(217, 177, 84, 0.1);
-  border: 1px solid rgba(217, 177, 84, 0.15);
-  border-radius: 10px;
+  background: rgba(217, 177, 84, 0.12);
+  border: 1px solid rgba(217, 177, 84, 0.18);
+  border-radius: 50%;
   color: #d9b154;
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.settings-close:hover {
+  background: rgba(217, 177, 84, 0.25);
 }
 
 .settings-body {

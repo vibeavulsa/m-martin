@@ -23,6 +23,12 @@ export const categories = [
     name: 'Homecare e Hospitalar',
     description: 'Linha especializada para cama e travesseiro',
     iconName: 'IconHeartbeat'
+  },
+  {
+    id: 'pet',
+    name: 'Pet',
+    description: 'Conforto e qualidade para seu melhor amigo',
+    iconName: 'IconPaw'
   }
 ];
 
@@ -142,5 +148,52 @@ export const products = [
     price: 'R$ 2.500,00',
     image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600',
     features: ['Kit completo', 'Normas ANVISA', 'Alta durabilidade']
+  },
+
+  // Refil de Almofada - Kit de 5
+  {
+    id: 13,
+    category: 'almofadas',
+    name: 'Kit Refil de Almofada 45x45 ou 50x50',
+    description: 'Kit com 5 almofadas em tecido Oxford, fibra siliconada 500g. Escolha as cores de cada uma!',
+    price: 'R$ 48,00',
+    priceInstallment: 'R$ 53,90',
+    installments: 5,
+    priceCash: 'R$ 48,00',
+    image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=600',
+    features: ['Kit com 5 unidades', 'Tecido Oxford', 'Fibra siliconada 500g', 'Cores variadas'],
+    isKit: true,
+    kitQuantity: 5,
+    sizes: ['45x45', '50x50'],
+    colors: ['Azul', 'Verde', 'Vermelho', 'Amarelo', 'Rosa', 'Cinza', 'Bege', 'Preto']
+  },
+
+  // Colchão para Acamados
+  {
+    id: 14,
+    category: 'homecare-hospitalar',
+    name: 'Colchão para Acamados 1,88x88x14',
+    description: 'Colchão especial para acamados com espuma D33 ou soft D30, capa com zíper em courino azul padrão da indústria',
+    price: 'R$ 807,90',
+    priceInstallment: 'R$ 179,90',
+    installments: 5,
+    priceCash: 'R$ 807,90',
+    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=600',
+    features: ['1,88m x 88cm x 14cm', 'Espuma D33 ou D30 soft', 'Capa courino azul', 'Zíper para fácil limpeza', 'Padrão industrial'],
+    foamOptions: ['D33', 'D30 Soft']
+  },
+
+  // Cama para Pet
+  {
+    id: 15,
+    category: 'pet',
+    name: 'Cama para Pet 70x90',
+    description: 'Cama confortável para seu pet com material sintético, fácil limpeza, 500g de isopor moído e zíper',
+    price: 'R$ 130,00',
+    priceInstallment: 'R$ 139,90',
+    installments: 5,
+    priceCash: 'R$ 130,00',
+    image: 'https://images.unsplash.com/photo-1615751072497-5f5169febe17?w=600',
+    features: ['70cm x 90cm', 'Material sintético', 'Fácil limpeza', '500g isopor moído', 'Zíper removível']
   }
 ];

@@ -1,13 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconArmchair, IconPalette, IconMoon, IconHeartbeat } from '@tabler/icons-react';
+import { IconArmchair, IconPalette, IconMoon, IconHeartbeat, IconPaw } from '@tabler/icons-react';
 import './CategorySection.css';
 
 const mapeadorDeIcones = {
   IconArmchair: IconArmchair,
   IconPalette: IconPalette,
   IconMoon: IconMoon,
-  IconHeartbeat: IconHeartbeat
+  IconHeartbeat: IconHeartbeat,
+  IconPaw: IconPaw
 };
 
 const sectionVariants = {

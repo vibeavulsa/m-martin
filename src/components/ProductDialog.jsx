@@ -13,6 +13,7 @@ import {
   IconStar,
 } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
+import CushionKitSelector from './CushionKitSelector';
 import './ProductDialog.css';
 
 const overlayVariants = {
@@ -59,16 +60,44 @@ const DialogInner = ({ product, onClose }) => {
   const [imageError, setImageError] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(product.sizes ? product.sizes[0] : null);
+  const [selectedFoam, setSelectedFoam] = useState(product.foamOptions ? product.foamOptions[0] : null);
+  const [cushionColors, setCushionColors] = useState([]);
+  const [paymentType, setPaymentType] = useState('cash');
   const { addItem } = useCart();
 
+  // Reset states when product changes
+  useEffect(() => {
+    setSelectedSize(product.sizes ? product.sizes[0] : null);
+    setSelectedFoam(product.foamOptions ? product.foamOptions[0] : null);
+    setCushionColors([]);
+    setPaymentType('cash');
+    setQuantity(1);
+    setImageError(false);
+  }, [product]);
+
   const handleAddToCart = () => {
-    addItem(product, quantity);
+    const itemData = {
+      ...product,
+      selectedSize,
+      selectedFoam,
+      cushionColors: cushionColors.length > 0 ? cushionColors : undefined,
+      paymentType
+    };
+    addItem(itemData, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
-    addItem(product, quantity);
+    const itemData = {
+      ...product,
+      selectedSize,
+      selectedFoam,
+      cushionColors: cushionColors.length > 0 ? cushionColors : undefined,
+      paymentType
+    };
+    addItem(itemData, quantity);
     onClose();
   };
 
@@ -158,11 +187,82 @@ const DialogInner = ({ product, onClose }) => {
             </div>
           </motion.div>
 
+          {/* Size selection for cushions */}
+          {product.sizes && (
+            <motion.div className="dialog-options-section" variants={itemVariants}>
+              <h4 className="dialog-section-label">Tamanho</h4>
+              <div className="dialog-option-buttons">
+                {product.sizes.map((size) => (
+                  <motion.button
+                    key={size}
+                    className={`dialog-option-btn ${selectedSize === size ? 'option-btn-active' : ''}`}
+                    onClick={() => setSelectedSize(size)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {size}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Foam selection for mattress */}
+          {product.foamOptions && (
+            <motion.div className="dialog-options-section" variants={itemVariants}>
+              <h4 className="dialog-section-label">Tipo de Espuma</h4>
+              <div className="dialog-option-buttons">
+                {product.foamOptions.map((foam) => (
+                  <motion.button
+                    key={foam}
+                    className={`dialog-option-btn ${selectedFoam === foam ? 'option-btn-active' : ''}`}
+                    onClick={() => setSelectedFoam(foam)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {foam}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Cushion kit color selector */}
+          {product.isKit && product.colors && (
+            <motion.div variants={itemVariants}>
+              <CushionKitSelector
+                colors={product.colors}
+                onChange={setCushionColors}
+              />
+            </motion.div>
+          )}
+
           <motion.div className="dialog-price-section" variants={itemVariants}>
-            <span className="dialog-price">{product.price}</span>
-            <span className="dialog-installments">
-              ou até 10x sem juros
-            </span>
+            {product.priceInstallment ? (
+              <div className="dialog-price-options">
+                <div 
+                  className={`dialog-price-option ${paymentType === 'cash' ? 'price-option-active' : ''}`}
+                  onClick={() => setPaymentType('cash')}
+                >
+                  <span className="price-option-label">À vista</span>
+                  <span className="dialog-price">{product.priceCash || product.price}</span>
+                </div>
+                <div 
+                  className={`dialog-price-option ${paymentType === 'installment' ? 'price-option-active' : ''}`}
+                  onClick={() => setPaymentType('installment')}
+                >
+                  <span className="price-option-label">Parcelado</span>
+                  <span className="dialog-price">{product.installments}x {product.priceInstallment}</span>
+                </div>
+              </div>
+            ) : (
+              <>
+                <span className="dialog-price">{product.price}</span>
+                <span className="dialog-installments">
+                  ou até 10x sem juros
+                </span>
+              </>
+            )}
           </motion.div>
 
           <motion.div className="dialog-quantity-section" variants={itemVariants}>
