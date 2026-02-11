@@ -123,7 +123,7 @@ const CartDialog = ({ isOpen, onClose, onCheckout }) => {
                       layout
                     >
                       <div className="cart-item-info">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div className="cart-item-header">
                           <h4 className="cart-item-name">{item.name}</h4>
                           <motion.button
                             className="cart-item-remove"

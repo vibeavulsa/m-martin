@@ -110,6 +110,12 @@
   flex: 1;
 }
 
+.cart-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .cart-item-name {
   margin: 0;
   font-size: 1rem;
