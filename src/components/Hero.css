@@ -17,19 +17,10 @@
 }
 
 .hero-logo {
-  width: 300px;
+  width: 400px;
   height: auto;
-  margin: 0 auto 1rem;
+  margin: 0 auto 2rem;
   display: block;
-}
-
-.hero-subtitle {
-  font-size: 2rem;
-  color: #d9b154;
-  margin: 0 0 2rem;
-  font-weight: 300;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
 }
 
 .hero-description {

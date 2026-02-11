@@ -35,9 +35,6 @@ const Hero = () => {
           className="hero-logo"
           variants={itemVariants}
         />
-        <motion.p className="hero-subtitle" variants={itemVariants}>
-          Estofados Finos
-        </motion.p>
         <motion.p className="hero-description" variants={itemVariants}>
           Catálogo moderno de sofás, almofadas, travesseiros e produtos para homecare e hospitalar.
           Qualidade e conforto para seu lar e bem-estar.

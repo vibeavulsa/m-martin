@@ -196,6 +196,7 @@ class AppCatalog extends Component {
     if (exposicao.metadadosLinha.id === 'almofadas') {
       return (
         <section key={`expositor-numero-${numeroExposicao}`} className="category-group">
+          <CategorySection category={exposicao.metadadosLinha} />
           <CushionKitBanner kitConfig={this.props.cushionKit} />
         </section>
       );

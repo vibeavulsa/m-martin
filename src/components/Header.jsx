@@ -28,7 +28,6 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick }) => {
       <div className="header-container">
         <div className="logo">
           <img src={logo} alt="M'Martin" className="logo-image" />
-          <p className="tagline">ESTOFADOS FINOS</p>
         </div>
         <nav className="nav">
           <a href="#sofas" className="nav-link" onClick={(e) => handleNavClick(e, 'sofas')}>Sofás</a>
