@@ -53,10 +53,16 @@ function hasRequiredOrderFields(data) {
 #### `isValidTotal(data)`
 ```javascript
 function isValidTotal(data) {
-  return data.total is number && data.total > 0;
+  return data.total is number 
+    && data.total > 0
+    && data.items is list
+    && data.items.size() > 0;
 }
 ```
-**Propósito**: Garante que o total do pedido é um número positivo.
+**Propósito**: 
+- Garante que o total do pedido é um número positivo
+- Verifica que items é uma lista/array
+- Verifica que items contém pelo menos 1 item (não está vazio)
 
 ---
 
