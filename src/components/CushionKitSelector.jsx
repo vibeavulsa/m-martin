@@ -90,7 +90,7 @@ const CushionKitSelector = ({ colors, onChange }) => {
                       </div>
                     </motion.div>
                   );
-                })())
+                })()
               ) : (
                 <motion.div
                   key="uncovered"
