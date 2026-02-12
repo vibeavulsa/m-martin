@@ -24,7 +24,40 @@
 
 ## ⚙️ CONFIGURAÇÃO NECESSÁRIA
 
-### Passo 1: Criar Usuário Admin no Firebase Console
+### ⚠️ Passo 0: Configurar Variáveis de Ambiente (OBRIGATÓRIO)
+
+**ESTE É O PRIMEIRO PASSO CRÍTICO**. Sem isso, você verá erros como `auth/api-key-not-valid`.
+
+1. Copie o arquivo de exemplo:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Obtenha suas credenciais do Firebase:
+   - Acesse o [Firebase Console](https://console.firebase.google.com)
+   - Selecione o projeto `m-martin-estofados`
+   - Vá em **Project Settings** (⚙️ ícone de engrenagem)
+   - Na seção **General**, role até **Your apps**
+   - Se ainda não tiver um app web, clique em **Add app** (</>) e selecione **Web**
+   - Copie as credenciais mostradas
+
+3. Edite o arquivo `.env` e adicione suas credenciais:
+   ```env
+   VITE_FIREBASE_API_KEY=AIzaSyD...sua_chave_real_aqui
+   VITE_FIREBASE_APP_ID=1:178643...seu_app_id_aqui
+   VITE_ADMIN_USER=admin
+   VITE_ADMIN_PASS=your_admin_password_here
+   VITE_WHATSAPP_NUMBER=5500000000000
+   ```
+
+4. **Reinicie o servidor de desenvolvimento** após criar/editar o `.env`:
+   ```bash
+   npm run dev
+   ```
+
+> **💡 Nota**: Nunca commite o arquivo `.env` no Git. Ele já está no `.gitignore`.
+
+### Passo 2: Criar Usuário Admin no Firebase Console
 
 **OBRIGATÓRIO**: Você precisa criar manualmente o usuário admin:
 
@@ -40,7 +73,7 @@
 
 ✅ Pronto! Agora você pode fazer login em `/login` com essas credenciais.
 
-### Passo 2: Deploy das Regras de Segurança
+### Passo 3: Deploy das Regras de Segurança
 
 Para aplicar as novas regras de segurança do Firestore:
 
@@ -53,7 +86,7 @@ Ou, se preferir deploy completo:
 firebase deploy
 ```
 
-### Passo 3: Inicializar Produtos no Firestore
+### Passo 4: Inicializar Produtos no Firestore
 
 Certifique-se de que seus produtos no Firestore têm o campo `quantity`:
 
@@ -117,6 +150,9 @@ Você pode testar no **Rules Playground** do Firebase Console:
 
 ## 📋 Checklist de Implantação
 
+- [ ] Arquivo `.env` criado a partir de `.env.example`
+- [ ] Credenciais Firebase configuradas no `.env`
+- [ ] Servidor de desenvolvimento reiniciado após configurar `.env`
 - [ ] Usuário admin criado no Firebase Console
 - [ ] Regras de segurança deployadas (`firebase deploy --only firestore:rules`)
 - [ ] Produtos no Firestore têm campo `quantity`
@@ -173,6 +209,14 @@ Para detalhes técnicos completos, consulte: `SECURITY_IMPLEMENTATION.md`
 ---
 
 ## 🆘 Problemas Comuns
+
+### Erro: "auth/api-key-not-valid" ou "YOUR_API_KEY"
+- **Causa**: Arquivo `.env` não existe ou está com credenciais inválidas
+- **Solução**: 
+  1. Certifique-se de que o arquivo `.env` existe (copie de `.env.example`)
+  2. Adicione suas credenciais Firebase reais no `.env`
+  3. Reinicie o servidor de desenvolvimento (`npm run dev`)
+  4. Veja o Passo 0 acima para instruções detalhadas
 
 ### Erro: "Permission denied" ao criar pedido
 - Verifique se as regras foram deployadas
