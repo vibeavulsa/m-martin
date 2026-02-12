@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconX, IconCheck, IconUser, IconMapPin, IconPhone } from '@tabler/icons-react';
+import { IconX, IconCheck, IconUser, IconMapPin, IconPhone, IconBrandWhatsapp } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import './CheckoutDialog.css';
 
@@ -39,6 +39,8 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } }
 };
 
+const WHATSAPP_NUMBER = '5500000000000';
+
 const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
   const { items, customer, totalPrice, formatPrice, parsePrice } = useCart();
 
@@ -55,6 +57,41 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
       document.body.style.overflow = '';
     };
   }, [isOpen, onClose]);
+
+  const handleWhatsAppCheckout = () => {
+    if (!customer || !customer.name?.trim() || !customer.phone?.trim() || !customer.address?.trim()) {
+      alert('Por favor, preencha os campos de Nome, Telefone e Endereço antes de finalizar.');
+      return;
+    }
+
+    const itemLines = items.map((item) => {
+      const subtotal = parsePrice(item.price) * item.quantity;
+      return `• ${item.name} x${item.quantity} (${formatPrice(parsePrice(item.price))}) = ${formatPrice(subtotal)}`;
+    });
+
+    const messageParts = [
+      "Olá, M'Martin! Gostaria de finalizar meu pedido:",
+      '',
+      '*Itens do Pedido:*',
+      ...itemLines,
+      '',
+      `*Total: ${formatPrice(totalPrice)}*`,
+      '',
+      '*Dados de Entrega:*',
+      `Nome: ${customer.name}`,
+      `Telefone: ${customer.phone}`,
+      `Endereço: ${customer.address}${customer.city ? ', ' + customer.city : ''}`,
+    ];
+
+    if (customer.notes) {
+      messageParts.push(`Observações: ${customer.notes}`);
+    }
+
+    const message = encodeURIComponent(messageParts.join('\n'));
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+
+    onConfirm();
+  };
 
   return (
     <AnimatePresence>
@@ -150,12 +187,13 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
                   Voltar
                 </button>
                 <motion.button
-                  className="btn-confirm"
-                  onClick={onConfirm}
+                  className="btn-confirm btn-whatsapp-checkout"
+                  onClick={handleWhatsAppCheckout}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  Confirmar Pedido
+                  <IconBrandWhatsapp size={20} stroke={2} />
+                  Enviar Pedido via WhatsApp
                 </motion.button>
               </motion.div>
             </motion.div>
