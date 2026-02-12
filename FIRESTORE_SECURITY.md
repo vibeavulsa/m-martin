@@ -8,8 +8,25 @@ Este documento descreve as regras de segurança do Firestore implementadas para 
 
 1. **Proteção de Dados**: Impedir acesso não autorizado a pedidos e informações sensíveis
 2. **Integridade de Preços**: Bloquear manipulação de preços, nomes e descrições de produtos
-3. **Controle de Estoque**: Permitir apenas atualizações legítimas de inventário
-4. **Validação de Pedidos**: Garantir que pedidos tenham dados válidos e completos
+3. **Controle de Estoque**: Permitir apenas atualizações legítimas de inventário (somente decrementos)
+4. **Validação de Pedidos**: Garantir que pedidos tenham dados válidos (campos obrigatórios, items não vazio, total positivo)
+
+## ⚠️ Limitações e Considerações Importantes
+
+### 🔴 CRÍTICO - Implementação Simplificada de Admin
+A função `isAdmin()` atual considera QUALQUER usuário autenticado como administrador. Isto é adequado APENAS para desenvolvimento. **ANTES DE PRODUÇÃO**, você DEVE implementar verificação real de roles (custom claims ou lista de UIDs).
+
+### 🔴 Validação de Preços no Cliente
+As regras atuais validam campos obrigatórios mas **NÃO verificam se o total do pedido corresponde à soma dos preços dos itens**. Isto é uma limitação das Firestore Rules. Para produção, recomenda-se:
+- Usar Cloud Functions para validar preços no servidor
+- Recalcular totais no backend antes de processar pagamentos
+- **NUNCA confie nos valores de `total` enviados pelo cliente sem validação**
+
+### 🔴 Clientes Não Veem Próprios Pedidos
+Por padrão, clientes não conseguem ler seus pedidos após criação (nem mesmo os próprios). Isso protege contra vazamento de dados mas impacta a UX. Para permitir que clientes vejam seu histórico, veja a seção "Melhorias Futuras" abaixo.
+
+### 🔴 Atualização de Estoque Não Autenticada
+A regra permite que usuários não autenticados decrementem estoque durante checkout. Para produção, considere usar Cloud Functions para gerenciar estoque de forma mais segura.
 
 ## 📚 Estrutura das Regras
 
@@ -62,7 +79,8 @@ A regra mais importante usa `affectedKeys()` para proteger contra manipulação 
 ```javascript
 allow update: if !isAdmin() 
   && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['quantity'])
-  && request.resource.data.quantity >= 0;
+  && request.resource.data.quantity >= 0
+  && request.resource.data.quantity < resource.data.quantity; // Apenas decrementos
 ```
 
 **Como funciona:**
@@ -70,13 +88,16 @@ allow update: if !isAdmin()
 2. `diff(resource.data).affectedKeys()` - Identifica quais campos foram modificados
 3. `.hasOnly(['quantity'])` - BLOQUEIA se qualquer outro campo além de `quantity` for alterado
 4. `quantity >= 0` - Previne valores negativos de estoque
+5. `quantity < resource.data.quantity` - PERMITE APENAS DECREMENTOS (não pode aumentar estoque)
 
 **Campos protegidos:**
 - ❌ `price` - Preço não pode ser alterado
 - ❌ `name` - Nome não pode ser alterado
 - ❌ `description` - Descrição não pode ser alterada
 - ❌ `category`, `image`, `features`, etc.
-- ✅ `quantity` - Único campo permitido
+- ✅ `quantity` - Único campo permitido (somente decrementos)
+
+**⚠️ Nota de Segurança:** Esta implementação permite que usuários não autenticados decrementem estoque. Para maior segurança em produção, considere usar Cloud Functions para gerenciar estoque.
 
 ---
 
@@ -102,13 +123,19 @@ allow create: if hasRequiredOrderFields(request.resource.data)
 
 **Campos obrigatórios:**
 - `total` - Valor total do pedido (number > 0)
-- `items` - Array de itens do pedido
+- `items` - Array de itens do pedido (não pode ser vazio)
 - `customer` - Dados do cliente
 
 **Proteções:**
-- Cliente NÃO pode ler pedidos após criação
+- Cliente NÃO pode ler pedidos após criação (nem mesmo os próprios)
 - Cliente NÃO pode editar seu próprio pedido
 - Apenas Admin visualiza e gerencia todos os pedidos
+- Items deve conter pelo menos 1 item
+
+**⚠️ IMPORTANTE - Limitação de Validação de Preços:**
+As Firestore Rules não verificam se o `total` corresponde à soma dos preços dos items. Esta validação deve ser feita:
+- No backend usando Cloud Functions antes de processar pagamentos
+- NUNCA confie no valor de `total` enviado pelo cliente sem recalcular no servidor
 
 ---
 
@@ -202,15 +229,22 @@ await updateDoc(doc(db, 'products', 'product123'), {
 **Cenário**: Durante checkout, cliente reduz quantidade disponível
 
 ```javascript
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
-// Operação legítima durante compra
-await updateDoc(doc(db, 'products', 'product123'), {
-  quantity: 45  // APENAS quantity
+// Primeiro, obter quantidade atual
+const docRef = doc(db, 'products', 'product123');
+const docSnap = await getDoc(docRef);
+const currentQuantity = docSnap.data().quantity;
+
+// Operação legítima durante compra - APENAS decremento
+await updateDoc(docRef, {
+  quantity: currentQuantity - 1  // Decrementar
 });
 ```
 
 **Resultado Esperado**: ✅ Sucesso - estoque atualizado
+
+**⚠️ Nota**: A regra agora PERMITE APENAS DECREMENTOS. Tentar aumentar o estoque falhará.
 
 ---
 
@@ -257,6 +291,13 @@ await addDoc(collection(db, 'orders'), {
 ```
 
 **Resultado Esperado**: ✅ Sucesso - pedido criado
+
+**⚠️ IMPORTANTE**: As Firestore Rules validam que:
+- Campos obrigatórios existem (total, items, customer)
+- Total é um número positivo
+- Items não está vazio
+
+**MAS NÃO VALIDAM** se o total corresponde à soma dos preços. Esta validação DEVE ser feita no backend com Cloud Functions antes de processar pagamentos!
 
 ---
 
@@ -359,7 +400,7 @@ firebase deploy --only firestore:rules
 
 ## 🔄 Melhorias Futuras (Produção)
 
-### 1. Admin com Custom Claims
+### 1. Admin com Custom Claims (CRÍTICO)
 
 Substitua `isAdmin()` por verificação de claims:
 
@@ -370,19 +411,117 @@ function isAdmin() {
 }
 ```
 
+**Como configurar Custom Claims:**
+```javascript
+// No Admin SDK (Node.js/Cloud Functions)
+const admin = require('firebase-admin');
+
+await admin.auth().setCustomUserClaims(uid, { admin: true });
+```
+
 ### 2. Cliente Lê Próprios Pedidos
 
-Se quiser permitir que clientes vejam seus pedidos:
+Se quiser permitir que clientes vejam seus pedidos (melhor UX):
 
 ```javascript
 match /orders/{orderId} {
   allow read: if isAdmin() 
     || (request.auth != null 
         && resource.data.userId == request.auth.uid);
+  
+  // Para isso funcionar, adicione userId ao criar o pedido
+  allow create: if hasRequiredOrderFields(request.resource.data)
+    && isValidTotal(request.resource.data)
+    && request.auth != null
+    && request.resource.data.userId == request.auth.uid;
 }
 ```
 
-### 3. Validações Mais Complexas
+### 3. Validação de Preços com Cloud Functions (ESSENCIAL)
+
+**Problema**: Firestore Rules não podem recalcular totais ou consultar preços de produtos.
+
+**Solução**: Use Cloud Functions para validar e processar pedidos:
+
+```javascript
+// functions/index.js
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp();
+
+exports.validateAndProcessOrder = functions.firestore
+  .document('orders/{orderId}')
+  .onCreate(async (snap, context) => {
+    const order = snap.data();
+    const db = admin.firestore();
+    
+    // 1. Recalcular total baseado nos preços reais dos produtos
+    let calculatedTotal = 0;
+    for (const item of order.items) {
+      const productDoc = await db.collection('products').doc(item.productId).get();
+      const product = productDoc.data();
+      
+      if (!product) {
+        // Produto não existe - marcar pedido como inválido
+        await snap.ref.update({ status: 'invalido', reason: 'Produto não encontrado' });
+        return;
+      }
+      
+      calculatedTotal += product.price * item.quantity;
+    }
+    
+    // 2. Verificar se o total está correto
+    const tolerance = 0.01; // Tolerância para erros de arredondamento
+    if (Math.abs(order.total - calculatedTotal) > tolerance) {
+      // Total incorreto - possível tentativa de fraude
+      await snap.ref.update({ 
+        status: 'invalido', 
+        reason: 'Total não corresponde aos preços dos produtos',
+        calculatedTotal: calculatedTotal 
+      });
+      return;
+    }
+    
+    // 3. Decrementar estoque (transação atômica)
+    const batch = db.batch();
+    for (const item of order.items) {
+      const productRef = db.collection('products').doc(item.productId);
+      batch.update(productRef, {
+        quantity: admin.firestore.FieldValue.increment(-item.quantity)
+      });
+    }
+    
+    // 4. Marcar pedido como validado
+    batch.update(snap.ref, { 
+      status: 'validado',
+      validatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    await batch.commit();
+  });
+```
+
+**Com esta Cloud Function:**
+- ✅ Preços são recalculados no servidor (não confia no cliente)
+- ✅ Estoque é gerenciado atomicamente
+- ✅ Pedidos fraudulentos são detectados e marcados
+- ✅ Não há necessidade de permitir updates de estoque por clientes
+
+**Atualizar Firestore Rules se usar Cloud Functions:**
+```javascript
+match /products/{productId} {
+  allow read: if true;
+  allow write: if isAdmin();
+  // REMOVER a regra de update para clientes não-autenticados
+}
+
+match /orders/{orderId} {
+  allow create: if hasRequiredOrderFields(request.resource.data);
+  allow read, update: if isAdmin();
+}
+```
+
+### 4. Validações Mais Complexas
 
 ```javascript
 function isValidProduct() {
@@ -406,16 +545,51 @@ function isValidProduct() {
 
 Antes de ir para produção:
 
+### 🔴 CRÍTICO (Obrigatório)
+- [ ] **Implementar verificação real de Admin** - Substituir `isAdmin()` por Custom Claims ou lista de UIDs
+- [ ] **Validar preços no servidor** - Implementar Cloud Function para recalcular totais
+- [ ] **Gerenciar estoque via Cloud Function** - Remover permissão de update de clientes não-autenticados
+- [ ] **Testar scenarios de ataque** - Tentar manipular preços, totais, estoque
+- [ ] **Configurar Firebase Auth** - Definir admins com Custom Claims
+
+### 🟡 Importante (Recomendado)
 - [ ] Testar TODAS as regras no emulador
-- [ ] Configurar Firebase Auth com Admin Custom Claims
-- [ ] Substituir `isAdmin()` por verificação real de roles
-- [ ] Testar scenarios de ataque (price manipulation, etc.)
 - [ ] Validar que clientes não conseguem ler orders de outros
-- [ ] Confirmar que apenas `quantity` pode ser alterada por não-admins
+- [ ] Confirmar que apenas `quantity` pode ser alterada por não-admins (se mantiver essa permissão)
 - [ ] Testar criação de orders com dados inválidos
-- [ ] Configurar alertas de segurança no Firebase Console
+- [ ] Adicionar userId aos pedidos para histórico do cliente
+- [ ] Implementar rate limiting para operações sensíveis
 - [ ] Revisar logs de acesso negado no Firestore
+
+### 🟢 Opcional (Melhorias)
+- [ ] Configurar alertas de segurança no Firebase Console
 - [ ] Documentar UIDs de admins autorizados
+- [ ] Adicionar validação de estoque mínimo
+- [ ] Implementar logs de auditoria para operações de admin
+- [ ] Configurar backup automático do Firestore
+
+### 📊 Validações de Segurança Recomendadas
+
+Execute estes testes antes de produção:
+
+```bash
+# 1. Teste de manipulação de preços
+# Tentar atualizar preço sem ser admin - deve falhar
+
+# 2. Teste de ordem com total incorreto
+# Criar pedido com total diferente da soma dos itens
+# Cloud Function deve marcar como inválido
+
+# 3. Teste de acesso a pedidos
+# Usuário não-admin tentar ler orders - deve falhar
+
+# 4. Teste de decremento de estoque
+# Tentar incrementar estoque sem ser admin - deve falhar
+# Tentar decrementar - deve funcionar (se permitido nas rules)
+
+# 5. Teste de autenticação
+# Verificar que apenas admins verdadeiros têm acesso total
+```
 
 ---
 

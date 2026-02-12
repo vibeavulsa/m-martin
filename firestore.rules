@@ -9,11 +9,28 @@ service cloud.firestore {
     
     /**
      * Verifica se o usuário atual é um administrador autenticado.
-     * Para simplificar, considera qualquer usuário autenticado como admin.
-     * Para produção, você pode adicionar verificação de UID específico ou claims customizados.
+     * 
+     * IMPORTANTE: Esta implementação simplificada considera qualquer usuário 
+     * autenticado como admin. Isso é adequado APENAS para desenvolvimento/testes.
+     * 
+     * PARA PRODUÇÃO, VOCÊ DEVE implementar uma das seguintes opções:
+     * 
+     * Opção 1 - Custom Claims (RECOMENDADO):
+     *   function isAdmin() {
+     *     return request.auth != null && request.auth.token.admin == true;
+     *   }
+     * 
+     * Opção 2 - Lista de UIDs específicos:
+     *   function isAdmin() {
+     *     return request.auth != null && 
+     *            request.auth.uid in ['uid-admin-1', 'uid-admin-2'];
+     *   }
+     * 
+     * Sem essa mudança, QUALQUER usuário autenticado terá privilégios de admin!
      */
     function isAdmin() {
       return request.auth != null;
+      // TODO: Substituir por verificação real de admin antes de produção
     }
     
     /**
@@ -24,10 +41,13 @@ service cloud.firestore {
     }
     
     /**
-     * Verifica se o total do pedido é um número positivo.
+     * Verifica se o total do pedido é um número positivo e se items não está vazio.
      */
     function isValidTotal(data) {
-      return data.total is number && data.total > 0;
+      return data.total is number 
+        && data.total > 0
+        && data.items is list
+        && data.items.size() > 0;
     }
     
     // ============================================
@@ -53,9 +73,16 @@ service cloud.firestore {
       
       // Atualização: Cliente pode APENAS modificar o campo quantity/inventory
       // Usa affectedKeys() para garantir que SOMENTE o estoque seja alterado
+      // 
+      // NOTA DE SEGURANÇA: Esta regra permite que usuários não autenticados
+      // decrementem o estoque durante o checkout. Para produção, considere:
+      // 1. Usar Cloud Functions para gerenciar estoque (mais seguro)
+      // 2. Ou exigir autenticação básica mesmo para checkouts
+      // 3. Ou implementar rate limiting e só permitir decrementos
       allow update: if !isAdmin() 
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['quantity'])
-        && request.resource.data.quantity >= 0;
+        && request.resource.data.quantity >= 0
+        && request.resource.data.quantity < resource.data.quantity; // Apenas decrementos
     }
     
     // ============================================
