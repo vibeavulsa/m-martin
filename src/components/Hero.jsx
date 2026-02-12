@@ -36,8 +36,8 @@ const Hero = () => {
           variants={itemVariants}
         />
         <motion.p className="hero-description" variants={itemVariants}>
-          Catálogo moderno de sofás, almofadas, travesseiros e produtos para homecare e hospitalar.
-          Qualidade e conforto para seu lar e bem-estar.
+          Linha premium M'Martin de sofás, almofadas com fibra siliconada 500g, travesseiros e produtos para homecare e hospitalar.
+          Qualidade superior e conforto excepcional para seu lar e bem-estar.
         </motion.p>
         <motion.div className="hero-buttons" variants={itemVariants}>
           <motion.a

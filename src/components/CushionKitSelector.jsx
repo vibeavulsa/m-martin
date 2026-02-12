@@ -24,6 +24,7 @@ const colorTextureMap = {
   'Terracota': terracotaTexture,
   'Bege': begeTexture,
   'Bordô': bordoTexture,
+  'Pink': 'pink-gradient', // Temporary gradient until pink.png is added
   // Keep backward compatibility with old names
   'Azul Marinho': azulRoyalTexture,
   'Rosê': malvaTexture,
@@ -70,7 +71,9 @@ const CushionKitSelector = ({ colors, onChange }) => {
                   key="colored"
                   className="cushion-colored"
                   style={{ 
-                    backgroundImage: `url(${getColorTexture(cushionColors[index])})`,
+                    backgroundImage: getColorTexture(cushionColors[index]).startsWith('linear-gradient') 
+                      ? getColorTexture(cushionColors[index])
+                      : `url(${getColorTexture(cushionColors[index])})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
@@ -117,7 +120,9 @@ const CushionKitSelector = ({ colors, onChange }) => {
                   key={color}
                   className={`color-option ${cushionColors[selectedCushion] === color ? 'color-selected' : ''}`}
                   style={{ 
-                    backgroundImage: `url(${getColorTexture(color)})`,
+                    backgroundImage: getColorTexture(color).startsWith('linear-gradient') 
+                      ? getColorTexture(color)
+                      : `url(${getColorTexture(color)})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
@@ -153,7 +158,12 @@ const CushionKitSelector = ({ colors, onChange }) => {
 
 // Helper function to get color texture images
 const getColorTexture = (colorName) => {
-  return colorTextureMap[colorName] || blackTexture;
+  const texture = colorTextureMap[colorName];
+  // If it's the pink gradient marker, return a gradient string
+  if (texture === 'pink-gradient') {
+    return 'linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #c71585 100%)';
+  }
+  return texture || blackTexture;
 };
 
 export default CushionKitSelector;
