@@ -155,7 +155,7 @@ export const products = [
     id: 13,
     category: 'almofadas',
     name: 'Kit Refil de Almofada 45x45 ou 50x50',
-    description: 'Kit com 5 almofadas em tecido Oxford, fibra siliconada 500g. Escolha as cores de cada uma!',
+    description: "Linha Premium M'Martin com fibra siliconada 500g - Tecnologia que garante maciez e conforto duradouros. O enchimento especial mantém o formato, não embola e proporciona sustentação ideal. Perfeito para renovar seus sofás e ambientes com elegância e bem-estar.",
     price: 'R$ 329,50',
     priceInstallment: 'R$ 349,50',
     installments: 5,
@@ -163,11 +163,11 @@ export const products = [
     unitPriceCash: 'R$ 65,90',
     unitPriceInstallment: 'R$ 69,90',
     image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=600',
-    features: ['Kit com 5 unidades', 'Tecido Oxford', 'Fibra siliconada 500g', 'Cores variadas'],
+    features: ['Kit com 5 unidades', 'Tecido Oxford premium', 'Fibra siliconada 500g', 'Não embola', 'Alta durabilidade', 'Cores variadas'],
     isKit: true,
     kitQuantity: 5,
     sizes: ['45x45', '50x50'],
-    colors: ['Preto', 'Branco', 'Azul Royal', 'Cinza Rato', 'Malva', 'Terracota', 'Bege', 'Bordô']
+    colors: ['Preto', 'Branco', 'Azul Royal', 'Cinza Rato', 'Malva', 'Terracota', 'Bege', 'Bordô', 'Pink']
   },
 
   // Colchão para Acamados

@@ -24,6 +24,7 @@ const colorTextureMap = {
   'Terracota': terracotaTexture,
   'Bege': begeTexture,
   'Bordô': bordoTexture,
+  'Pink': 'pink-gradient', // Temporary gradient until pink.png is added
   // Keep backward compatibility with old names
   'Azul Marinho': azulRoyalTexture,
   'Rosê': malvaTexture,
@@ -66,23 +67,30 @@ const CushionKitSelector = ({ colors, onChange }) => {
           >
             <AnimatePresence mode="wait">
               {cushionColors[index] ? (
-                <motion.div
-                  key="colored"
-                  className="cushion-colored"
-                  style={{ 
-                    backgroundImage: `url(${getColorTexture(cushionColors[index])})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="cushion-cover-overlay">
-                    <span className="cushion-color-label">{cushionColors[index]}</span>
-                  </div>
-                </motion.div>
+                (() => {
+                  const colorTexture = getColorTexture(cushionColors[index]);
+                  return (
+                    <motion.div
+                      key="colored"
+                      className="cushion-colored"
+                      style={{ 
+                        backgroundImage: colorTexture.startsWith('linear-gradient') 
+                          ? colorTexture
+                          : `url(${colorTexture})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="cushion-cover-overlay">
+                        <span className="cushion-color-label">{cushionColors[index]}</span>
+                      </div>
+                    </motion.div>
+                  );
+                })())
               ) : (
                 <motion.div
                   key="uncovered"
@@ -112,31 +120,36 @@ const CushionKitSelector = ({ colors, onChange }) => {
               Escolha a cor para almofada {selectedCushion + 1}:
             </p>
             <div className="color-options">
-              {colors.map((color) => (
-                <motion.button
-                  key={color}
-                  className={`color-option ${cushionColors[selectedCushion] === color ? 'color-selected' : ''}`}
-                  style={{ 
-                    backgroundImage: `url(${getColorTexture(color)})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                  onClick={() => handleColorSelect(color)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  title={color}
-                >
-                  {cushionColors[selectedCushion] === color && (
-                    <motion.div
-                      className="color-check"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                    >
-                      <IconCheck size={16} stroke={3} />
-                    </motion.div>
-                  )}
-                </motion.button>
-              ))}
+              {colors.map((color) => {
+                const colorTexture = getColorTexture(color);
+                return (
+                  <motion.button
+                    key={color}
+                    className={`color-option ${cushionColors[selectedCushion] === color ? 'color-selected' : ''}`}
+                    style={{ 
+                      backgroundImage: colorTexture.startsWith('linear-gradient') 
+                        ? colorTexture
+                        : `url(${colorTexture})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                    onClick={() => handleColorSelect(color)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    title={color}
+                  >
+                    {cushionColors[selectedCushion] === color && (
+                      <motion.div
+                        className="color-check"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                      >
+                        <IconCheck size={16} stroke={3} />
+                      </motion.div>
+                    )}
+                  </motion.button>
+                );
+              })}
             </div>
           </motion.div>
         )}
@@ -153,7 +166,12 @@ const CushionKitSelector = ({ colors, onChange }) => {
 
 // Helper function to get color texture images
 const getColorTexture = (colorName) => {
-  return colorTextureMap[colorName] || blackTexture;
+  const texture = colorTextureMap[colorName];
+  // If it's the pink gradient marker, return a gradient string
+  if (texture === 'pink-gradient') {
+    return 'linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #c71585 100%)';
+  }
+  return texture || blackTexture;
 };
 
 export default CushionKitSelector;
