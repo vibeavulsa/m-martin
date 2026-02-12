@@ -12,7 +12,7 @@ import {
 import { useCart } from '../context/CartContext';
 import CushionKitSelector from './CushionKitSelector';
 import './CushionKitBanner.css';
-import coresVideo from '../assets/almofadas/cores.mp4';
+import coresVideo from '../assets/almofadas/cores2.mp4';
 
 const defaultColors = ['Preto', 'Branco', 'Azul Royal', 'Cinza Rato', 'Malva', 'Terracota', 'Bege', 'Bordô'];
 const defaultSizes = ['45x45', '50x50'];
@@ -132,7 +132,7 @@ const CushionKitBanner = ({ kitConfig }) => {
           </motion.button>
         </div>
         <div className="cushion-kit-banner-visual">
-          <div className="cushion-video-container">
+          <div className="cushion-video-container" onClick={handleOpenDialog} style={{ cursor: 'pointer' }}>
             <video 
               className="cushion-video"
               src={coresVideo}
