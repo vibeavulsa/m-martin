@@ -46,11 +46,17 @@ export async function createOrder(
         }
       }
 
-      // 3. Se passar todas as verificações, decrementar o estoque
+      // 3. If passar todas as verificações, decrementar o estoque
       for (let i = 0; i < productRefs.length; i++) {
         const productSnap = productSnapshots[i];
         const item = orderData.items[i];
+        
+        // Safe to access data here since we already validated existence in step 2
         const productData = productSnap.data();
+        if (!productData) {
+          throw new Error(`Dados do produto não disponíveis: ${item.name}`);
+        }
+        
         const newQuantity = (productData.quantity || 0) - item.quantity;
 
         transaction.update(productRefs[i], {
