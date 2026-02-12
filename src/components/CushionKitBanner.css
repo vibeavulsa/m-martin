@@ -1,8 +1,5 @@
 .cushion-kit-banner {
   position: relative;
-  background: linear-gradient(158deg, rgba(58, 45, 32, 0.85) 0%, rgba(30, 21, 14, 0.95) 100%), 
-              url('../assets/almofadas_bg.jpeg') center/cover;
-  background-blend-mode: overlay;
   border: 1px solid rgba(217, 177, 84, 0.18);
   border-radius: 22px;
   padding: 3rem 2.5rem;
@@ -17,8 +14,21 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 80% 50%, rgba(217, 177, 84, 0.08) 0%, transparent 60%);
+  background: url('../assets/almofadas_bg.jpeg') center/cover;
+  filter: blur(8px);
+  border-radius: 22px;
   pointer-events: none;
+  z-index: 0;
+}
+
+.cushion-kit-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 22px;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .cushion-kit-banner-content {
@@ -117,14 +127,13 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  width: 240px;
-  height: 426px;
+  width: 320px;
 }
 
 .cushion-video-container {
   position: relative;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 16 / 9;
   border-radius: 16px;
   overflow: hidden;
   border: 2px solid rgba(217, 177, 84, 0.3);
@@ -143,12 +152,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.3) 0%,
-    rgba(0, 0, 0, 0.7) 50%,
-    rgba(0, 0, 0, 0.85) 100%
-  );
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   pointer-events: none;
@@ -374,8 +378,7 @@
 
   .cushion-kit-banner-visual {
     width: 100%;
-    max-width: 200px;
-    height: 355px;
+    max-width: 280px;
   }
 
   .cushion-video-text {
