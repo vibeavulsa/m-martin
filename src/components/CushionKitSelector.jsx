@@ -67,25 +67,30 @@ const CushionKitSelector = ({ colors, onChange }) => {
           >
             <AnimatePresence mode="wait">
               {cushionColors[index] ? (
-                <motion.div
-                  key="colored"
-                  className="cushion-colored"
-                  style={{ 
-                    backgroundImage: getColorTexture(cushionColors[index]).startsWith('linear-gradient') 
-                      ? getColorTexture(cushionColors[index])
-                      : `url(${getColorTexture(cushionColors[index])})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="cushion-cover-overlay">
-                    <span className="cushion-color-label">{cushionColors[index]}</span>
-                  </div>
-                </motion.div>
+                (() => {
+                  const colorTexture = getColorTexture(cushionColors[index]);
+                  return (
+                    <motion.div
+                      key="colored"
+                      className="cushion-colored"
+                      style={{ 
+                        backgroundImage: colorTexture.startsWith('linear-gradient') 
+                          ? colorTexture
+                          : `url(${colorTexture})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="cushion-cover-overlay">
+                        <span className="cushion-color-label">{cushionColors[index]}</span>
+                      </div>
+                    </motion.div>
+                  );
+                })())
               ) : (
                 <motion.div
                   key="uncovered"
@@ -115,33 +120,36 @@ const CushionKitSelector = ({ colors, onChange }) => {
               Escolha a cor para almofada {selectedCushion + 1}:
             </p>
             <div className="color-options">
-              {colors.map((color) => (
-                <motion.button
-                  key={color}
-                  className={`color-option ${cushionColors[selectedCushion] === color ? 'color-selected' : ''}`}
-                  style={{ 
-                    backgroundImage: getColorTexture(color).startsWith('linear-gradient') 
-                      ? getColorTexture(color)
-                      : `url(${getColorTexture(color)})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                  onClick={() => handleColorSelect(color)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  title={color}
-                >
-                  {cushionColors[selectedCushion] === color && (
-                    <motion.div
-                      className="color-check"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                    >
-                      <IconCheck size={16} stroke={3} />
-                    </motion.div>
-                  )}
-                </motion.button>
-              ))}
+              {colors.map((color) => {
+                const colorTexture = getColorTexture(color);
+                return (
+                  <motion.button
+                    key={color}
+                    className={`color-option ${cushionColors[selectedCushion] === color ? 'color-selected' : ''}`}
+                    style={{ 
+                      backgroundImage: colorTexture.startsWith('linear-gradient') 
+                        ? colorTexture
+                        : `url(${colorTexture})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                    onClick={() => handleColorSelect(color)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    title={color}
+                  >
+                    {cushionColors[selectedCushion] === color && (
+                      <motion.div
+                        className="color-check"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                      >
+                        <IconCheck size={16} stroke={3} />
+                      </motion.div>
+                    )}
+                  </motion.button>
+                );
+              })}
             </div>
           </motion.div>
         )}
