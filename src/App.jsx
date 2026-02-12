@@ -78,11 +78,10 @@ function SalesDialogs() {
     setCustomerOpen(true);
   }, []);
 
-  const handleConfirmOrder = useCallback(() => {
-    const num = Math.floor(100000 + Math.random() * 900000);
+  const handleConfirmOrder = useCallback((orderId) => {
     setCheckoutOpen(false);
     setConfirmationOpen(true);
-    setOrderNumber(num.toString());
+    setOrderNumber(orderId || Math.floor(100000 + Math.random() * 900000).toString());
     clearCart();
   }, [clearCart]);
 
