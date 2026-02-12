@@ -8,16 +8,16 @@ import {
   IconLogout,
   IconPalette,
 } from '@tabler/icons-react';
-import { useAdmin } from '../context/AdminContext';
+import { useAuth } from '../../context/AuthContext';
 import '../Admin.css';
 
 const AdminLayout = () => {
-  const { logout } = useAdmin();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/admin');
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
   };
 
   return (

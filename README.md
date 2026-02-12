@@ -2,6 +2,33 @@
 
 Catálogo moderno de produtos para estofados, desenvolvido com React e liquid-glass-react.
 
+## 🔒 Núcleo de Segurança e Integridade (Novo!)
+
+Este projeto agora inclui um sistema completo de segurança e integridade:
+
+- ✅ **Autenticação Firebase** - Login seguro para administradores
+- ✅ **Transações Atômicas** - Controle de estoque sem risco de overselling
+- ✅ **Regras de Segurança** - Proteção de dados sensíveis no Firestore
+
+📖 **[Instruções de Configuração Completas →](SETUP_INSTRUCTIONS.md)**
+📚 **[Documentação Técnica →](SECURITY_IMPLEMENTATION.md)**
+
+### ⚙️ Configuração Rápida
+
+1. **Criar usuário admin no Firebase Console:**
+   - Authentication → Users → Add user
+   - Email: `admin@mmartin.com` (ou outro de sua escolha)
+   - Senha: Escolha uma senha forte
+
+2. **Deploy das regras de segurança:**
+   ```bash
+   firebase deploy --only firestore:rules
+   ```
+
+3. **Acessar painel admin:**
+   - Acesse `/login` e use as credenciais criadas
+   - Ou vá direto para `/admin` (redirecionará para login se necessário)
+
 ## 📋 Informações do Projeto
 
 - **Nome:** M'Martin
