@@ -54,6 +54,13 @@ const CushionKitBanner = ({ kitConfig }) => {
     document.body.style.overflow = 'hidden';
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleOpenDialog();
+    }
+  };
+
   const handleCloseDialog = () => {
     setDialogOpen(false);
     document.body.style.overflow = '';
@@ -132,7 +139,14 @@ const CushionKitBanner = ({ kitConfig }) => {
           </motion.button>
         </div>
         <div className="cushion-kit-banner-visual">
-          <div className="cushion-video-container" onClick={handleOpenDialog} style={{ cursor: 'pointer' }}>
+          <div 
+            className="cushion-video-container" 
+            onClick={handleOpenDialog}
+            onKeyDown={handleKeyPress}
+            tabIndex={0}
+            role="button"
+            aria-label="Abrir seletor de cores de almofadas"
+          >
             <video 
               className="cushion-video"
               src={coresVideo}
