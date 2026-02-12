@@ -27,7 +27,7 @@ const Login = () => {
       // Check for specific Firebase errors
       const errorMessage = result.error || '';
       
-      if (errorMessage.includes('api-key-not-valid') || errorMessage.includes('YOUR_API_KEY')) {
+      if (errorMessage.includes('api-key-not-valid')) {
         setError('Erro de configuração do Firebase. Verifique o arquivo .env e reinicie o servidor. Consulte FIREBASE_SETUP.md para mais detalhes.');
       } else if (errorMessage.includes('user-not-found') || errorMessage.includes('wrong-password') || errorMessage.includes('invalid-credential')) {
         setError('Email ou senha inválidos. Verifique suas credenciais.');

@@ -43,8 +43,8 @@
 
 3. Edite o arquivo `.env` e adicione suas credenciais:
    ```env
-   VITE_FIREBASE_API_KEY=AIzaSyD...sua_chave_real_aqui
-   VITE_FIREBASE_APP_ID=1:178643...seu_app_id_aqui
+   VITE_FIREBASE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   VITE_FIREBASE_APP_ID=1:123456789:web:abcdef123456
    VITE_ADMIN_USER=admin
    VITE_ADMIN_PASS=your_admin_password_here
    VITE_WHATSAPP_NUMBER=5500000000000

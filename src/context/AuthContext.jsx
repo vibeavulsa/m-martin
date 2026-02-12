@@ -33,7 +33,7 @@ export function AuthProvider({ children }) {
       let errorMessage = error.message;
       
       // Check for Firebase configuration errors
-      if (error.code === 'auth/api-key-not-valid' || errorMessage.includes('YOUR_API_KEY')) {
+      if (error.code === 'auth/api-key-not-valid') {
         errorMessage = 'Firebase não está configurado corretamente. Verifique o arquivo .env e consulte FIREBASE_SETUP.md';
       }
       

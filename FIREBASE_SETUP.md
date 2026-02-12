@@ -48,8 +48,8 @@ const firebaseConfig = {
 
 3. Replace the placeholder values with your Firebase credentials:
    ```env
-   VITE_FIREBASE_API_KEY=AIzaSyD...  # Copy from firebaseConfig.apiKey
-   VITE_FIREBASE_APP_ID=1:123456789:web:abc123...  # Copy from firebaseConfig.appId
+   VITE_FIREBASE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  # Copy from firebaseConfig.apiKey
+   VITE_FIREBASE_APP_ID=1:123456789:web:abcdef123456  # Copy from firebaseConfig.appId
    VITE_ADMIN_USER=admin
    VITE_ADMIN_PASS=your_strong_password_here
    VITE_WHATSAPP_NUMBER=5500000000000
