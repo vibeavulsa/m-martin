@@ -127,7 +127,7 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  width: 320px;
+  width: 380px;
 }
 
 .cushion-video-container {
@@ -153,8 +153,6 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   pointer-events: none;
 }
 
