@@ -28,7 +28,16 @@ export function AuthProvider({ children }) {
       return { success: true, user: userCredential.user };
     } catch (error) {
       console.error('[AuthContext] Login error:', error);
-      return { success: false, error: error.message };
+      
+      // Provide detailed error message
+      let errorMessage = error.message;
+      
+      // Check for Firebase configuration errors
+      if (error.code === 'auth/api-key-not-valid' || errorMessage.includes('YOUR_API_KEY')) {
+        errorMessage = 'Firebase não está configurado corretamente. Verifique o arquivo .env e consulte FIREBASE_SETUP.md';
+      }
+      
+      return { success: false, error: errorMessage, code: error.code };
     }
   };
 

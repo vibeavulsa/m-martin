@@ -24,7 +24,20 @@ const Login = () => {
     if (result.success) {
       navigate('/admin');
     } else {
-      setError('Email ou senha inválidos. Verifique suas credenciais.');
+      // Check for specific Firebase errors
+      const errorMessage = result.error || '';
+      
+      if (errorMessage.includes('api-key-not-valid') || errorMessage.includes('YOUR_API_KEY')) {
+        setError('Erro de configuração do Firebase. Verifique o arquivo .env e reinicie o servidor. Consulte FIREBASE_SETUP.md para mais detalhes.');
+      } else if (errorMessage.includes('user-not-found') || errorMessage.includes('wrong-password') || errorMessage.includes('invalid-credential')) {
+        setError('Email ou senha inválidos. Verifique suas credenciais.');
+      } else if (errorMessage.includes('too-many-requests')) {
+        setError('Muitas tentativas de login. Tente novamente mais tarde.');
+      } else if (errorMessage.includes('network')) {
+        setError('Erro de conexão. Verifique sua internet e tente novamente.');
+      } else {
+        setError('Email ou senha inválidos. Verifique suas credenciais.');
+      }
     }
   };
 
