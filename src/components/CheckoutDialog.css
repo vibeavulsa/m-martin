@@ -236,6 +236,19 @@
   box-shadow: 0 7px 18px rgba(0, 0, 0, 0.32), 0 0 14px rgba(217, 177, 84, 0.32);
 }
 
+.btn-whatsapp-checkout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(148deg, #25d366 0%, #128c7e 100%);
+  color: #fff;
+}
+
+.btn-whatsapp-checkout:hover {
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.32), 0 0 14px rgba(37, 211, 102, 0.35);
+}
+
 @media (max-width: 768px) {
   .checkout-overlay {
     padding: 1rem;
