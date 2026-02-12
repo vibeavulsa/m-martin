@@ -21,7 +21,7 @@ const defaultKitProduct = {
   id: 'cushion-kit',
   category: 'almofadas',
   name: 'Kit Refil de Almofada 45x45 ou 50x50',
-  description: 'Linha Premium M\'Martin com fibra siliconada 500g - Tecnologia que garante maciez e conforto duradouros. O enchimento especial mantém o formato, não embola e proporciona sustentação ideal. Perfeito para renovar seus sofás e ambientes com elegância e bem-estar.',
+  description: "Linha Premium M'Martin com fibra siliconada 500g - Tecnologia que garante maciez e conforto duradouros. O enchimento especial mantém o formato, não embola e proporciona sustentação ideal. Perfeito para renovar seus sofás e ambientes com elegância e bem-estar.",
   price: 'R$ 329,50',
   priceInstallment: 'R$ 349,50',
   installments: 5,
