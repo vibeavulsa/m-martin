@@ -12,7 +12,7 @@ import {
 import { useCart } from '../context/CartContext';
 import CushionKitSelector from './CushionKitSelector';
 import './CushionKitBanner.css';
-import coresVideo from '../assets/almofadas/cores.mp4';
+import coresVideo from '../assets/almofadas/cores2.mp4';
 
 const defaultColors = ['Preto', 'Branco', 'Azul Royal', 'Cinza Rato', 'Malva', 'Terracota', 'Bege', 'Bordô'];
 const defaultSizes = ['45x45', '50x50'];
@@ -52,6 +52,13 @@ const CushionKitBanner = ({ kitConfig }) => {
   const handleOpenDialog = () => {
     setDialogOpen(true);
     document.body.style.overflow = 'hidden';
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleOpenDialog();
+    }
   };
 
   const handleCloseDialog = () => {
@@ -132,7 +139,14 @@ const CushionKitBanner = ({ kitConfig }) => {
           </motion.button>
         </div>
         <div className="cushion-kit-banner-visual">
-          <div className="cushion-video-container">
+          <div 
+            className="cushion-video-container" 
+            onClick={handleOpenDialog}
+            onKeyDown={handleKeyPress}
+            tabIndex={0}
+            role="button"
+            aria-label="Abrir seletor de cores de almofadas"
+          >
             <video 
               className="cushion-video"
               src={coresVideo}

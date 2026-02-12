@@ -127,7 +127,7 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  width: 380px;
+  width: 475px;
 }
 
 .cushion-video-container {
@@ -138,6 +138,7 @@
   overflow: hidden;
   border: 2px solid rgba(217, 177, 84, 0.3);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 
 .cushion-video {
