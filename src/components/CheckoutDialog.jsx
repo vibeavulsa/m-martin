@@ -116,7 +116,8 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
 
       // Notifica o componente pai (limpa carrinho + exibe confirmação)
       onConfirm(orderId);
-    } catch {
+    } catch (error) {
+      console.error('[CheckoutDialog] Falha no checkout:', error);
       alert('Erro ao registrar o pedido. Por favor, tente novamente.');
     } finally {
       setLoading(false);
