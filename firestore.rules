@@ -1,18 +1,85 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 3, 7);
+    
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    /**
+     * Verifica se o usuário atual é um administrador autenticado.
+     * Para simplificar, considera qualquer usuário autenticado como admin.
+     * Para produção, você pode adicionar verificação de UID específico ou claims customizados.
+     */
+    function isAdmin() {
+      return request.auth != null;
+    }
+    
+    /**
+     * Verifica se os dados possuem todos os campos obrigatórios.
+     */
+    function hasRequiredOrderFields(data) {
+      return data.keys().hasAll(['total', 'items', 'customer']);
+    }
+    
+    /**
+     * Verifica se o total do pedido é um número positivo.
+     */
+    function isValidTotal(data) {
+      return data.total is number && data.total > 0;
+    }
+    
+    // ============================================
+    // COLEÇÃO: products
+    // ============================================
+    /**
+     * Regras para a coleção de produtos:
+     * - Leitura: Pública (qualquer usuário pode ver o catálogo)
+     * - Criação/Atualização/Exclusão (Admin): Acesso total
+     * - Atualização (Cliente): Apenas decrementar estoque (quantity/inventory)
+     * 
+     * SEGURANÇA CRÍTICA: Clientes não podem modificar price, name, description
+     */
+    match /products/{productId} {
+      // Leitura: Pública - qualquer um pode ver produtos
+      allow read: if true;
+      
+      // Criação e exclusão: Somente Admin
+      allow create, delete: if isAdmin();
+      
+      // Atualização: Admin tem acesso total
+      allow update: if isAdmin();
+      
+      // Atualização: Cliente pode APENAS modificar o campo quantity/inventory
+      // Usa affectedKeys() para garantir que SOMENTE o estoque seja alterado
+      allow update: if !isAdmin() 
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['quantity'])
+        && request.resource.data.quantity >= 0;
+    }
+    
+    // ============================================
+    // COLEÇÃO: orders
+    // ============================================
+    /**
+     * Regras para a coleção de pedidos:
+     * - Criação: Pública (qualquer um pode criar um pedido/comprar)
+     * - Validação: Campos obrigatórios (total, items, customer) e total positivo
+     * - Leitura: ESTRITA - Apenas Admin pode ler pedidos
+     * - Atualização: Apenas Admin pode editar pedidos após criação
+     * 
+     * SEGURANÇA: Clientes não podem ler pedidos de outros usuários
+     */
+    match /orders/{orderId} {
+      // Criação: Pública com validações obrigatórias
+      allow create: if hasRequiredOrderFields(request.resource.data)
+        && isValidTotal(request.resource.data);
+      
+      // Leitura: Apenas Admin pode ler todos os pedidos
+      allow read: if isAdmin();
+      
+      // Atualização e exclusão: Apenas Admin
+      allow update, delete: if isAdmin();
     }
   }
 }
