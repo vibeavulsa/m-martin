@@ -39,7 +39,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } }
 };
 
-const WHATSAPP_NUMBER = '5500000000000';
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '5500000000000';
 
 const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
   const { items, customer, totalPrice, formatPrice, parsePrice } = useCart();
