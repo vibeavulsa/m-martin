@@ -116,7 +116,7 @@ const CushionKitBanner = ({ kitConfig }) => {
           </p>
           <div className="cushion-kit-banner-price">
             {kitProduct.installments && kitProduct.priceInstallment && (
-              <>{kitProduct.installments}x de <strong>{kitProduct.priceInstallment}</strong></>
+              <>{kitProduct.installments}x de <strong>{kitProduct.priceInstallment}</strong> <span style={{ fontSize: '0.85em', color: '#bfb3a2' }}>(total {kitProduct.price})</span></>
             )}
           </div>
           <div className="cushion-kit-banner-features">
