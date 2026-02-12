@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconX, IconCheck, IconUser, IconMapPin, IconPhone, IconBrandWhatsapp } from '@tabler/icons-react';
+import { IconX, IconCheck, IconUser, IconMapPin, IconPhone, IconBrandWhatsapp, IconLoader2 } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
+import { createOrder } from '../services/orderService';
+import { generateWhatsAppLink } from '../utils/whatsappGenerator';
 import './CheckoutDialog.css';
 
 const overlayVariants = {
@@ -39,14 +41,13 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } }
 };
 
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '5500000000000';
-
 const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
-  const { items, customer, totalPrice, formatPrice, parsePrice } = useCart();
+  const { items, customer, totalPrice, totalItems, formatPrice, parsePrice } = useCart();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const handleKey = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && !loading) onClose();
     };
     if (isOpen) {
       document.addEventListener('keydown', handleKey);
@@ -56,41 +57,70 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
       document.removeEventListener('keydown', handleKey);
       document.body.style.overflow = '';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, loading]);
 
-  const handleWhatsAppCheckout = () => {
+  /**
+   * Fluxo assíncrono do checkout híbrido:
+   * 1. Valida dados do cliente
+   * 2. Persiste o pedido no Firestore (createOrder)
+   * 3. Gera link do WhatsApp com o ID do pedido
+   * 4. Abre WhatsApp e notifica o componente pai para limpar o carrinho
+   */
+  const handleWhatsAppCheckout = async () => {
     if (!customer || !customer.name?.trim() || !customer.phone?.trim() || !customer.address?.trim()) {
       alert('Por favor, preencha os campos de Nome, Telefone e Endereço antes de finalizar.');
       return;
     }
 
-    const itemLines = items.map((item) => {
-      const subtotal = parsePrice(item.price) * item.quantity;
-      return `• ${item.name} x${item.quantity} (${formatPrice(parsePrice(item.price))}) = ${formatPrice(subtotal)}`;
-    });
+    setLoading(true);
 
-    const messageParts = [
-      "Olá, M'Martin! Gostaria de finalizar meu pedido:",
-      '',
-      '*Itens do Pedido:*',
-      ...itemLines,
-      '',
-      `*Total: ${formatPrice(totalPrice)}*`,
-      '',
-      '*Dados de Entrega:*',
-      `Nome: ${customer.name}`,
-      `Telefone: ${customer.phone}`,
-      `Endereço: ${customer.address}${customer.city ? ', ' + customer.city : ''}`,
-    ];
+    try {
+      // Monta o snapshot dos itens com preço congelado
+      const orderItems = items.map((item) => {
+        const unitPrice = parsePrice(item.price);
+        return {
+          productId: item.id,
+          name: item.name,
+          price: unitPrice,
+          quantity: item.quantity,
+          imageUrl: item.image || item.imageUrl || '',
+          subtotal: unitPrice * item.quantity,
+        };
+      });
 
-    if (customer.notes) {
-      messageParts.push(`Observações: ${customer.notes}`);
+      const orderData = {
+        customer: {
+          name: customer.name,
+          email: customer.email || '',
+          phone: customer.phone,
+          address: customer.address,
+          city: customer.city || '',
+          notes: customer.notes || '',
+        },
+        items: orderItems,
+        totalItems,
+        totalPrice,
+        status: 'pending',
+        paymentMethod: 'whatsapp_checkout',
+      };
+
+      // Persiste no Firestore e obtém o ID gerado
+      const orderId = await createOrder(orderData);
+
+      // Gera o link do WhatsApp com o ID real do pedido
+      const whatsappUrl = generateWhatsAppLink(
+        { ...orderData, createdAt: new Date() },
+        orderId
+      );
+      window.open(whatsappUrl, '_blank');
+
+      // Notifica o componente pai (limpa carrinho + exibe confirmação)
+      onConfirm(orderId);
+    } catch {
+      alert('Erro ao registrar o pedido. Por favor, tente novamente.');
+    } finally {
+      setLoading(false);
     }
-
-    const message = encodeURIComponent(messageParts.join('\n'));
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
-
-    onConfirm();
   };
 
   return (
@@ -183,17 +213,27 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
               </motion.div>
 
               <motion.div className="checkout-actions" variants={itemVariants}>
-                <button type="button" className="btn-back" onClick={onBack}>
+                <button type="button" className="btn-back" onClick={onBack} disabled={loading}>
                   Voltar
                 </button>
                 <motion.button
                   className="btn-confirm btn-whatsapp-checkout"
                   onClick={handleWhatsAppCheckout}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={loading ? {} : { scale: 1.03 }}
+                  whileTap={loading ? {} : { scale: 0.97 }}
+                  disabled={loading}
                 >
-                  <IconBrandWhatsapp size={20} stroke={2} />
-                  Enviar Pedido via WhatsApp
+                  {loading ? (
+                    <>
+                      <IconLoader2 size={20} stroke={2} className="spin-icon" />
+                      Salvando pedido...
+                    </>
+                  ) : (
+                    <>
+                      <IconBrandWhatsapp size={20} stroke={2} />
+                      Finalizar Pedido
+                    </>
+                  )}
                 </motion.button>
               </motion.div>
             </motion.div>
