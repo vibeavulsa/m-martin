@@ -22,14 +22,14 @@ const defaultKitProduct = {
   category: 'almofadas',
   name: 'Kit Refil de Almofada 45x45 ou 50x50',
   description: "Linha Premium M'Martin com fibra siliconada 500g - Tecnologia que garante maciez e conforto duradouros. O enchimento especial mantém o formato, não embola e proporciona sustentação ideal. Perfeito para renovar seus sofás e ambientes com elegância e bem-estar.",
-  price: 'R$ 329,50',
-  priceInstallment: 'R$ 349,50',
+  price: 'R$ 349,50',
+  priceInstallment: 'R$ 69,90',
   installments: 5,
-  priceCash: 'R$ 329,50',
-  unitPriceCash: 'R$ 65,90',
+  priceCash: 'R$ 349,50',
+  unitPriceCash: 'R$ 69,90',
   unitPriceInstallment: 'R$ 69,90',
   image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=600',
-  features: ['Kit com 5 unidades', 'Tecido Oxford premium', 'Fibra siliconada 500g', 'Não embola', 'Alta durabilidade', 'Cores variadas'],
+  features: ['Kit com 5 unidades personalizáveis', 'Tecido Oxford premium', 'Fibra siliconada 500g', 'Não embola', 'Alta durabilidade', 'Escolha cada cor'],
   isKit: true,
   kitQuantity: 5,
 };
@@ -79,7 +79,7 @@ const CushionKitBanner = ({ kitConfig }) => {
 
   const handleWhatsApp = () => {
     const message = encodeURIComponent(
-      `Olá! Gostaria de montar meu Kit de Almofadas Personalizáveis (${selectedSize}). Podem me ajudar?`
+      `Olá! Gostaria de montar meu Kit de 5 Almofadas Personalizáveis (${selectedSize}). Podem me ajudar?`
     );
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
@@ -109,15 +109,14 @@ const CushionKitBanner = ({ kitConfig }) => {
           </span>
           <h2 className="cushion-kit-banner-title">
             Linha Premium <span>M'Martin</span><br />
-            Almofadas personalizáveis com fibra 500g
+            Kits de 5 almofadas personalizáveis com fibra siliconada
           </h2>
           <p className="cushion-kit-banner-description">
             {kitProduct.description}
           </p>
           <div className="cushion-kit-banner-price">
-            A partir de <strong>{kitProduct.priceCash || kitProduct.price}</strong>{' '}
             {kitProduct.installments && kitProduct.priceInstallment && (
-              <>ou {kitProduct.installments}x de {kitProduct.priceInstallment}</>
+              <>{kitProduct.installments}x de <strong>{kitProduct.priceInstallment}</strong> <span style={{ fontSize: '0.85em', color: '#bfb3a2' }}>(total {kitProduct.price})</span></>
             )}
           </div>
           <div className="cushion-kit-banner-features">
