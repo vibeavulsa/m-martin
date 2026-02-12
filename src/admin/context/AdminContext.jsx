@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { categories as defaultCategories, products as defaultProducts } from '../../data/products';
 
 const AdminContext = createContext(null);
@@ -51,9 +52,7 @@ function initStock(products) {
 }
 
 export function AdminProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_ADMIN, false);
-  });
+  const { isAuthenticated } = useAuth();
 
   const [products, setProducts] = useState(() => {
     return loadFromStorage(STORAGE_KEY_PRODUCTS, defaultProducts);
@@ -76,10 +75,6 @@ export function AdminProvider({ children }) {
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_ADMIN, JSON.stringify(isAuthenticated));
-  }, [isAuthenticated]);
-
-  useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
   }, [products]);
 
@@ -95,17 +90,17 @@ export function AdminProvider({ children }) {
     localStorage.setItem(STORAGE_KEY_CUSHION_KIT, JSON.stringify(cushionKit));
   }, [cushionKit]);
 
-  const login = useCallback((user, pass) => {
-    if (user === ADMIN_CREDENTIALS.user && pass === ADMIN_CREDENTIALS.pass) {
-      setIsAuthenticated(true);
-      return true;
-    }
+  const login = useCallback(() => {
+    // This function is now deprecated as we use Firebase Auth
+    // Kept for backward compatibility but does nothing
+    console.warn('[AdminContext] login() is deprecated. Use AuthContext instead.');
     return false;
   }, []);
 
   const logout = useCallback(() => {
-    setIsAuthenticated(false);
-    localStorage.removeItem(STORAGE_KEY_ADMIN);
+    // This function is now deprecated as we use Firebase Auth
+    // Kept for backward compatibility but does nothing
+    console.warn('[AdminContext] logout() is deprecated. Use AuthContext instead.');
   }, []);
 
   const addProduct = useCallback((product) => {

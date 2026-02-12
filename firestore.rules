@@ -34,20 +34,30 @@ service cloud.firestore {
     }
     
     /**
-     * Verifica se os dados possuem todos os campos obrigatórios.
+     * Verifica se os dados possuem todos os campos obrigatórios de um pedido.
      */
     function hasRequiredOrderFields(data) {
-      return data.keys().hasAll(['total', 'items', 'customer']);
+      return data.keys().hasAll(['totalPrice', 'items', 'customer']);
     }
     
     /**
      * Verifica se o total do pedido é um número positivo e se items não está vazio.
      */
     function isValidTotal(data) {
-      return data.total is number 
-        && data.total > 0
+      return data.totalPrice is number 
+        && data.totalPrice > 0
         && data.items is list
         && data.items.size() > 0;
+    }
+    
+    /**
+     * Verifica se a atualização é apenas uma decrementação válida de estoque.
+     * Usado para permitir que transações de pedido decrementem o estoque.
+     */
+    function isValidStockDecrement(before, after) {
+      return after.quantity >= 0
+        && after.quantity < before.quantity
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['quantity']);
     }
     
     // ============================================
@@ -56,10 +66,17 @@ service cloud.firestore {
     /**
      * Regras para a coleção de produtos:
      * - Leitura: Pública (qualquer usuário pode ver o catálogo)
-     * - Criação/Atualização/Exclusão (Admin): Acesso total
-     * - Atualização (Cliente): Apenas decrementar estoque (quantity/inventory)
+     * - Criação/Exclusão: Apenas Admin autenticado
+     * - Atualização (Admin): Acesso total
+     * - Atualização (Transação): Permite decrementar estoque durante checkout
      * 
      * SEGURANÇA CRÍTICA: Clientes não podem modificar price, name, description
+     * 
+     * NOTA DE SEGURANÇA: A regra de atualização pública permite decrementos de estoque
+     * durante transações de checkout. Para produção, considere:
+     * 1. Usar Cloud Functions para gerenciar estoque (mais seguro)
+     * 2. Implementar rate limiting
+     * 3. Adicionar validações adicionais no código do servidor
      */
     match /products/{productId} {
       // Leitura: Pública - qualquer um pode ver produtos
@@ -68,21 +85,8 @@ service cloud.firestore {
       // Criação e exclusão: Somente Admin
       allow create, delete: if isAdmin();
       
-      // Atualização: Admin tem acesso total
-      allow update: if isAdmin();
-      
-      // Atualização: Cliente pode APENAS modificar o campo quantity/inventory
-      // Usa affectedKeys() para garantir que SOMENTE o estoque seja alterado
-      // 
-      // NOTA DE SEGURANÇA: Esta regra permite que usuários não autenticados
-      // decrementem o estoque durante o checkout. Para produção, considere:
-      // 1. Usar Cloud Functions para gerenciar estoque (mais seguro)
-      // 2. Ou exigir autenticação básica mesmo para checkouts
-      // 3. Ou implementar rate limiting e só permitir decrementos
-      allow update: if !isAdmin() 
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['quantity'])
-        && request.resource.data.quantity >= 0
-        && request.resource.data.quantity < resource.data.quantity; // Apenas decrementos
+      // Atualização: Admin tem acesso total OU é uma decrementação válida de estoque
+      allow update: if isAdmin() || isValidStockDecrement(resource.data, request.resource.data);
     }
     
     // ============================================
@@ -91,9 +95,9 @@ service cloud.firestore {
     /**
      * Regras para a coleção de pedidos:
      * - Criação: Pública (qualquer um pode criar um pedido/comprar)
-     * - Validação: Campos obrigatórios (total, items, customer) e total positivo
+     * - Validação: Campos obrigatórios (totalPrice, items, customer) e total positivo
      * - Leitura: ESTRITA - Apenas Admin pode ler pedidos
-     * - Atualização: Apenas Admin pode editar pedidos após criação
+     * - Atualização/Exclusão: Apenas Admin pode editar ou deletar pedidos
      * 
      * SEGURANÇA: Clientes não podem ler pedidos de outros usuários
      */
@@ -107,6 +111,32 @@ service cloud.firestore {
       
       // Atualização e exclusão: Apenas Admin
       allow update, delete: if isAdmin();
+    }
+    
+    // ============================================
+    // COLEÇÃO: categories
+    // ============================================
+    /**
+     * Regras para a coleção de categorias:
+     * - Leitura: Pública
+     * - Escrita: Apenas Admin
+     */
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // ============================================
+    // COLEÇÃO: cushionKit
+    // ============================================
+    /**
+     * Regras para a configuração do kit de almofadas:
+     * - Leitura: Pública
+     * - Escrita: Apenas Admin
+     */
+    match /cushionKit/{kitId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }

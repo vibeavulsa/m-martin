@@ -44,6 +44,7 @@ const itemVariants = {
 const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
   const { items, customer, totalPrice, totalItems, formatPrice, parsePrice } = useCart();
   const [loading, setLoading] = useState(false);
+  const [stockError, setStockError] = useState(null);
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -52,6 +53,8 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
     if (isOpen) {
       document.addEventListener('keydown', handleKey);
       document.body.style.overflow = 'hidden';
+      // Clear stock error when dialog opens
+      setStockError(null);
     }
     return () => {
       document.removeEventListener('keydown', handleKey);
@@ -62,7 +65,7 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
   /**
    * Fluxo assíncrono do checkout híbrido:
    * 1. Valida dados do cliente
-   * 2. Persiste o pedido no Firestore (createOrder)
+   * 2. Persiste o pedido no Firestore (createOrder) com verificação de estoque
    * 3. Gera link do WhatsApp com o ID do pedido
    * 4. Abre WhatsApp e notifica o componente pai para limpar o carrinho
    */
@@ -73,6 +76,7 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
     }
 
     setLoading(true);
+    setStockError(null);
 
     try {
       // Monta o snapshot dos itens com preço congelado
@@ -105,6 +109,7 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
       };
 
       // Persiste no Firestore e obtém o ID gerado
+      // Isso também verifica e decrementa o estoque atomicamente
       const orderId = await createOrder(orderData);
 
       // Gera o link do WhatsApp com o ID real do pedido
@@ -118,7 +123,13 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
       onConfirm(orderId);
     } catch (error) {
       console.error('[CheckoutDialog] Falha no checkout:', error);
-      alert('Erro ao registrar o pedido. Por favor, tente novamente.');
+      
+      // Verificar se é um erro de estoque
+      if (error instanceof Error && error.message.includes('Estoque insuficiente')) {
+        setStockError(error.message);
+      } else {
+        alert('Erro ao registrar o pedido. Por favor, tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
@@ -165,6 +176,17 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
                 <h2>Resumo do Pedido</h2>
                 <p>Confira seus dados e itens antes de confirmar</p>
               </motion.div>
+
+              {stockError && (
+                <motion.div 
+                  className="checkout-stock-error" 
+                  variants={itemVariants}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <strong>⚠️ Atenção:</strong> {stockError}
+                </motion.div>
+              )}
 
               {customer && (
                 <motion.div className="checkout-customer" variants={itemVariants}>
