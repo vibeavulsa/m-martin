@@ -10,6 +10,7 @@ Este projeto agora inclui um sistema completo de segurança e integridade:
 - ✅ **Transações Atômicas** - Controle de estoque sem risco de overselling
 - ✅ **Regras de Segurança** - Proteção de dados sensíveis no Firestore
 
+📖 **[Guia de Configuração Firebase →](FIREBASE_SETUP.md)** ⭐ **COMECE AQUI**
 📖 **[Instruções de Configuração Completas →](SETUP_INSTRUCTIONS.md)**
 📚 **[Documentação Técnica →](SECURITY_IMPLEMENTATION.md)**
 
@@ -41,6 +42,7 @@ Este projeto agora inclui um sistema completo de segurança e integridade:
 ### Pré-requisitos
 - Node.js (versão 18 ou superior)
 - npm ou yarn
+- Conta Firebase com projeto configurado
 
 ### Instalação
 
@@ -48,10 +50,13 @@ Este projeto agora inclui um sistema completo de segurança e integridade:
 # Instalar dependências
 npm install
 
-# Configurar variáveis de ambiente
+# ⚠️ IMPORTANTE: Configurar variáveis de ambiente
 cp .env.example .env
 # Edite o arquivo .env com suas credenciais do Firebase
+# Obtenha as credenciais no Firebase Console: Project Settings > General > Your apps
 ```
+
+> **⚠️ CONFIGURAÇÃO OBRIGATÓRIA**: Antes de executar o projeto, você DEVE configurar o arquivo `.env` com suas credenciais Firebase reais. Sem isso, você verá erros de autenticação como `auth/api-key-not-valid`. Veja [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) para detalhes.
 
 ### Desenvolvimento
 
