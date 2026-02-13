@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
+import { getAnalytics } from 'firebase/analytics';
 
 // Validate required environment variables
 const VITE_FIREBASE_API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
@@ -38,15 +39,19 @@ if (!VITE_FIREBASE_APP_ID || VITE_FIREBASE_APP_ID === 'YOUR_APP_ID' || VITE_FIRE
 // Project Number: 178643218861
 const firebaseConfig = {
   apiKey: VITE_FIREBASE_API_KEY || "YOUR_API_KEY",
-  authDomain: `m-martin-estofados.firebaseapp.com`,
+  authDomain: "m-martin-estofados.firebaseapp.com",
   projectId: "m-martin-estofados",
-  storageBucket: `m-martin-estofados.firebasestorage.app`,
+  storageBucket: "m-martin-estofados.firebasestorage.app",
   messagingSenderId: "178643218861",
-  appId: VITE_FIREBASE_APP_ID || "YOUR_APP_ID"
+  appId: VITE_FIREBASE_APP_ID || "YOUR_APP_ID",
+  measurementId: "G-17R6CV7B47"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Analytics
+export const analytics = getAnalytics(app);
 
 // Initialize Firestore
 export const db = getFirestore(app);
