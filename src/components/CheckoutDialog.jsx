@@ -51,6 +51,10 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
   const [pixCode, setPixCode] = useState(null);
 
   useEffect(() => {
+    setPixCode(null);
+  }, [paymentMethod]);
+
+  useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'Escape' && !loading) onClose();
     };
