@@ -21,7 +21,16 @@ const db = getFirestore();
 // RATE LIMITING (em memória por instância)
 // ============================================
 
-/** Mapa de IP → timestamps de requisições recentes */
+/**
+ * Mapa de IP → timestamps de requisições recentes.
+ *
+ * NOTA: Rate limiting em memória é por instância de Cloud Function.
+ * Em ambientes com múltiplas instâncias, o limite efetivo é multiplicado
+ * pelo número de instâncias ativas. Para rate limiting distribuído mais
+ * rigoroso, considere usar Firestore ou Redis como store compartilhado.
+ * A abordagem em memória já oferece proteção significativa contra abuso
+ * e não adiciona latência extra por requisição.
+ */
 const rateLimitMap = new Map<string, number[]>();
 
 /** Máximo de requisições por janela de tempo */
@@ -91,7 +100,9 @@ interface CreateOrderData {
 export const createOrder = onCall(
   {maxInstances: 10},
   async (request) => {
-    const ip = request.rawRequest?.ip || "unknown";
+    const ip = request.rawRequest?.ip ||
+      request.rawRequest?.headers?.["x-forwarded-for"]?.toString() ||
+      `anon-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     // 1. Rate limiting
     if (!checkRateLimit(ip)) {
@@ -139,6 +150,9 @@ export const createOrder = onCall(
 
     try {
       // 3–6. Transação atômica: ler preços, validar estoque, decrementar, criar pedido
+      // NOTA: Firestore transactions são serializáveis — se outro processo modificar
+      // os mesmos documentos durante a transação, ela será automaticamente re-executada,
+      // garantindo que a validação de estoque e o decremento ocorram atomicamente.
       const orderId = await db.runTransaction(async (transaction) => {
         // 3. Ler todos os produtos do Firestore para obter preços reais
         const productRefs = data.items.map((item) =>
