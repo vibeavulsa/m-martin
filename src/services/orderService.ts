@@ -1,86 +1,84 @@
 /**
- * Camada de serviço para persistência de pedidos no Firestore.
- * Implementa transações atômicas para garantir integridade de estoque.
+ * Camada de serviço para persistência de pedidos via Cloud Functions.
+ * A Cloud Function valida preços no servidor, decrementa estoque e cria o pedido.
  */
-import { collection, addDoc, serverTimestamp, runTransaction, doc } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import app from '../config/firebase';
 import type { Order } from '../types/order';
 
+const functions = getFunctions(app);
+
+/** Dados enviados para a Cloud Function (sem preços — o servidor calcula) */
+interface CreateOrderInput {
+  items: Array<{
+    productId: string;
+    name: string;
+    quantity: number;
+    imageUrl?: string;
+  }>;
+  customer: {
+    name: string;
+    email?: string;
+    phone: string;
+    address: string;
+    city?: string;
+    notes?: string;
+  };
+}
+
 /**
- * Salva um novo pedido na coleção `orders` do Firestore usando transações atômicas.
- * Verifica e decrementa o estoque dos produtos antes de criar o pedido.
+ * Cria um pedido via Cloud Function.
+ * Os preços são validados e calculados no servidor para evitar manipulação.
+ * O estoque é decrementado atomicamente pela Cloud Function.
  * 
- * @param orderData - Dados completos do pedido (sem o campo createdAt, que é gerado pelo servidor).
+ * @param orderData - Dados do pedido (preços do cliente são ignorados pelo servidor).
  * @returns O ID do documento gerado pelo Firestore.
- * @throws Error se algum produto estiver fora de estoque ou se houver falha na transação.
+ * @throws Error se algum produto estiver fora de estoque ou se houver falha.
  */
 export async function createOrder(
   orderData: Omit<Order, 'createdAt'>
 ): Promise<string> {
   try {
-    // Execute a transação atômica
-    const orderId = await runTransaction(db, async (transaction) => {
-      // 1. Ler as referências de todos os produtos no carrinho
-      const productRefs = orderData.items.map(item => 
-        doc(db, 'products', item.productId)
-      );
-      
-      const productSnapshots = await Promise.all(
-        productRefs.map(ref => transaction.get(ref))
-      );
+    const createOrderFn = httpsCallable<CreateOrderInput, { orderId: string }>(
+      functions,
+      'createOrder'
+    );
 
-      // 2. Verificar se todos os produtos existem e têm estoque suficiente
-      for (let i = 0; i < productSnapshots.length; i++) {
-        const productSnap = productSnapshots[i];
-        const item = orderData.items[i];
-        
-        if (!productSnap.exists()) {
-          throw new Error(`Produto não encontrado: ${item.name}`);
-        }
+    // Enviar apenas os dados necessários (preços são calculados no servidor)
+    const input: CreateOrderInput = {
+      items: orderData.items.map(item => ({
+        productId: item.productId,
+        name: item.name,
+        quantity: item.quantity,
+        imageUrl: item.imageUrl,
+      })),
+      customer: {
+        name: orderData.customer.name,
+        email: orderData.customer.email,
+        phone: orderData.customer.phone,
+        address: orderData.customer.address,
+        city: orderData.customer.city,
+        notes: orderData.customer.notes,
+      },
+    };
 
-        const productData = productSnap.data();
-        const currentQuantity = productData.quantity || 0;
-
-        if (currentQuantity < item.quantity) {
-          throw new Error(`Estoque insuficiente: ${item.name}. Disponível: ${currentQuantity}, Solicitado: ${item.quantity}`);
-        }
-      }
-
-      // 3. If passar todas as verificações, decrementar o estoque
-      for (let i = 0; i < productRefs.length; i++) {
-        const productSnap = productSnapshots[i];
-        const item = orderData.items[i];
-        
-        // Safe to access data here since we already validated existence in step 2
-        const productData = productSnap.data();
-        if (!productData) {
-          throw new Error(`Dados do produto não disponíveis: ${item.name}`);
-        }
-        
-        const newQuantity = (productData.quantity || 0) - item.quantity;
-
-        transaction.update(productRefs[i], {
-          quantity: newQuantity
-        });
-      }
-
-      // 4. Criar o pedido com timestamp do servidor
-      const orderRef = doc(collection(db, 'orders'));
-      transaction.set(orderRef, {
-        ...orderData,
-        createdAt: serverTimestamp(),
-      });
-
-      return orderRef.id;
-    });
-
-    return orderId;
-  } catch (error) {
+    const result = await createOrderFn(input);
+    return result.data.orderId;
+  } catch (error: unknown) {
     console.error('[orderService] Falha ao salvar pedido:', error);
     
+    // Extrair mensagem de erro da Cloud Function
+    const firebaseError = error as { code?: string; message?: string };
+    const message = firebaseError.message || '';
+    
     // Propagar erros específicos de estoque
-    if (error instanceof Error && error.message.includes('Estoque insuficiente')) {
-      throw error;
+    if (message.includes('Estoque insuficiente')) {
+      throw new Error(message);
+    }
+
+    // Propagar erros de rate limiting
+    if (firebaseError.code === 'functions/resource-exhausted') {
+      throw new Error(message || 'Muitas requisições. Aguarde um momento.');
     }
     
     throw new Error(

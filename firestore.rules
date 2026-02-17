@@ -33,32 +33,9 @@ service cloud.firestore {
       // TODO: Substituir por verificação real de admin antes de produção
     }
     
-    /**
-     * Verifica se os dados possuem todos os campos obrigatórios de um pedido.
-     */
-    function hasRequiredOrderFields(data) {
-      return data.keys().hasAll(['totalPrice', 'items', 'customer']);
-    }
-    
-    /**
-     * Verifica se o total do pedido é um número positivo e se items não está vazio.
-     */
-    function isValidTotal(data) {
-      return data.totalPrice is number 
-        && data.totalPrice > 0
-        && data.items is list
-        && data.items.size() > 0;
-    }
-    
-    /**
-     * Verifica se a atualização é apenas uma decrementação válida de estoque.
-     * Usado para permitir que transações de pedido decrementem o estoque.
-     */
-    function isValidStockDecrement(before, after) {
-      return after.quantity >= 0
-        && after.quantity < before.quantity
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['quantity']);
-    }
+    // NOTA: Validações de pedido (campos obrigatórios, preços, estoque)
+    // são agora realizadas pela Cloud Function createOrder no servidor,
+    // garantindo que preços não possam ser manipulados pelo cliente.
     
     // ============================================
     // COLEÇÃO: products
@@ -66,27 +43,18 @@ service cloud.firestore {
     /**
      * Regras para a coleção de produtos:
      * - Leitura: Pública (qualquer usuário pode ver o catálogo)
-     * - Criação/Exclusão: Apenas Admin autenticado
-     * - Atualização (Admin): Acesso total
-     * - Atualização (Transação): Permite decrementar estoque durante checkout
+     * - Escrita: Apenas Admin autenticado
      * 
-     * SEGURANÇA CRÍTICA: Clientes não podem modificar price, name, description
-     * 
-     * NOTA DE SEGURANÇA: A regra de atualização pública permite decrementos de estoque
-     * durante transações de checkout. Para produção, considere:
-     * 1. Usar Cloud Functions para gerenciar estoque (mais seguro)
-     * 2. Implementar rate limiting
-     * 3. Adicionar validações adicionais no código do servidor
+     * SEGURANÇA: Decrementos de estoque são gerenciados exclusivamente
+     * via Cloud Functions (createOrder), eliminando a possibilidade de
+     * manipulação direta por clientes não-autenticados.
      */
     match /products/{productId} {
       // Leitura: Pública - qualquer um pode ver produtos
       allow read: if true;
       
-      // Criação e exclusão: Somente Admin
-      allow create, delete: if isAdmin();
-      
-      // Atualização: Admin tem acesso total OU é uma decrementação válida de estoque
-      allow update: if isAdmin() || isValidStockDecrement(resource.data, request.resource.data);
+      // Escrita completa: Somente Admin (estoque gerenciado via Cloud Functions)
+      allow create, update, delete: if isAdmin();
     }
     
     // ============================================
@@ -94,23 +62,18 @@ service cloud.firestore {
     // ============================================
     /**
      * Regras para a coleção de pedidos:
-     * - Criação: Pública (qualquer um pode criar um pedido/comprar)
-     * - Validação: Campos obrigatórios (totalPrice, items, customer) e total positivo
+     * - Criação: Apenas via Cloud Functions (Admin SDK) — não há permissão direta
      * - Leitura: ESTRITA - Apenas Admin pode ler pedidos
      * - Atualização/Exclusão: Apenas Admin pode editar ou deletar pedidos
      * 
-     * SEGURANÇA: Clientes não podem ler pedidos de outros usuários
+     * SEGURANÇA: Pedidos são criados exclusivamente pela Cloud Function createOrder,
+     * que valida preços no servidor e gerencia estoque atomicamente.
+     * Clientes não podem criar, ler ou modificar pedidos diretamente.
      */
     match /orders/{orderId} {
-      // Criação: Pública com validações obrigatórias
-      allow create: if hasRequiredOrderFields(request.resource.data)
-        && isValidTotal(request.resource.data);
-      
-      // Leitura: Apenas Admin pode ler todos os pedidos
-      allow read: if isAdmin();
-      
-      // Atualização e exclusão: Apenas Admin
-      allow update, delete: if isAdmin();
+      // Todas as operações: Apenas Admin
+      // Criação de pedidos é feita via Cloud Functions (Admin SDK bypassa estas regras)
+      allow read, write: if isAdmin();
     }
     
     // ============================================
