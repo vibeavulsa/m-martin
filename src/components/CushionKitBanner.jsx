@@ -29,7 +29,7 @@ const defaultKitProduct = {
   unitPriceCash: 'R$ 69,90',
   unitPriceInstallment: 'R$ 69,90',
   image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=600',
-  features: ['Kit com 5 unidades personalizáveis', 'Tecido Oxford premium', 'Fibra siliconada 500g', 'Não embola', 'Alta durabilidade', 'Escolha cada cor'],
+  features: ['Kit com 5 unidades', 'Tecido Oxford premium', 'Fibra siliconada 500g', 'Não embola', 'Alta durabilidade', 'Escolha cada cor'],
   isKit: true,
   kitQuantity: 5,
 };
@@ -79,7 +79,7 @@ const CushionKitBanner = ({ kitConfig }) => {
 
   const handleWhatsApp = () => {
     const message = encodeURIComponent(
-      `Olá! Gostaria de montar meu Kit de 5 Almofadas Personalizáveis (${selectedSize}). Podem me ajudar?`
+      `Olá! Gostaria de montar meu Kit de 5 Almofadas (${selectedSize}). Podem me ajudar?`
     );
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
@@ -105,11 +105,11 @@ const CushionKitBanner = ({ kitConfig }) => {
       >
         <div className="cushion-kit-banner-content">
           <span className="cushion-kit-banner-badge">
-            <IconSparkles size={12} stroke={2} /> Personalizável
+            <IconSparkles size={12} stroke={2} /> Escolha suas cores
           </span>
           <h2 className="cushion-kit-banner-title">
             Linha Premium <span>M'Martin</span><br />
-            Kits de 5 almofadas personalizáveis com fibra siliconada
+            Kits de 5 almofadas com fibra siliconada
           </h2>
           <p className="cushion-kit-banner-description">
             {kitProduct.description}
