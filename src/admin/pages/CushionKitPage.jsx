@@ -87,7 +87,7 @@ const CushionKitPage = () => {
     <>
       <div className="admin-page-header">
         <h1>Kit de Almofadas</h1>
-        <p>Gerencie as cores disponíveis e informações do kit de almofadas personalizáveis</p>
+        <p>Gerencie as cores disponíveis e informações do kit de almofadas</p>
       </div>
 
       <div className="dashboard-sections" style={{ gridTemplateColumns: '1fr' }}>
