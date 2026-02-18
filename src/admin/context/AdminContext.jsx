@@ -14,6 +14,17 @@ const STORAGE_KEY_CUSHION_KIT = 'mmartin_cushion_kit';
 const defaultCushionKit = {
   colors: ['Preto', 'Branco', 'Azul Marinho', 'Cinza Rato', 'Rosê', 'Terracota', 'Bege', 'Bordô'],
   sizes: ['45x45', '50x50'],
+  stockCapas: {
+    'Preto': 0,
+    'Branco': 0,
+    'Azul Marinho': 0,
+    'Cinza Rato': 0,
+    'Rosê': 0,
+    'Terracota': 0,
+    'Bege': 0,
+    'Bordô': 0,
+  },
+  stockRefis: 0,
   product: {
     id: 'cushion-kit',
     category: 'almofadas',
@@ -72,7 +83,18 @@ export function AdminProvider({ children }) {
   const [categories] = useState(defaultCategories);
 
   const [cushionKit, setCushionKit] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_CUSHION_KIT, defaultCushionKit);
+    const loaded = loadFromStorage(STORAGE_KEY_CUSHION_KIT, defaultCushionKit);
+    // Ensure backward compatibility: add stockCapas and stockRefis if missing
+    if (!loaded.stockCapas) {
+      loaded.stockCapas = {};
+      for (const color of loaded.colors) {
+        loaded.stockCapas[color] = 0;
+      }
+    }
+    if (loaded.stockRefis === undefined) {
+      loaded.stockRefis = 0;
+    }
+    return loaded;
   });
 
   useEffect(() => {
@@ -177,7 +199,49 @@ export function AdminProvider({ children }) {
   }, []);
 
   const updateCushionKit = useCallback((newConfig) => {
-    setCushionKit(prev => ({ ...prev, ...newConfig }));
+    setCushionKit(prev => {
+      const updated = { ...prev, ...newConfig };
+      
+      // If colors changed, update stockCapas accordingly
+      if (newConfig.colors) {
+        const newStockCapas = { ...prev.stockCapas };
+        
+        // Add new colors with stock 0
+        for (const color of newConfig.colors) {
+          if (!newStockCapas[color]) {
+            newStockCapas[color] = 0;
+          }
+        }
+        
+        // Remove colors that are no longer in the list
+        for (const color of Object.keys(newStockCapas)) {
+          if (!newConfig.colors.includes(color)) {
+            delete newStockCapas[color];
+          }
+        }
+        
+        updated.stockCapas = newStockCapas;
+      }
+      
+      return updated;
+    });
+  }, []);
+
+  const updateCapaStock = useCallback((color, quantity) => {
+    setCushionKit(prev => ({
+      ...prev,
+      stockCapas: {
+        ...prev.stockCapas,
+        [color]: Math.max(0, quantity)
+      }
+    }));
+  }, []);
+
+  const updateRefilStock = useCallback((quantity) => {
+    setCushionKit(prev => ({
+      ...prev,
+      stockRefis: Math.max(0, quantity)
+    }));
   }, []);
 
   const getLowStockProducts = useCallback(() => {
@@ -231,6 +295,8 @@ export function AdminProvider({ children }) {
     getTotalStockValue,
     cushionKit,
     updateCushionKit,
+    updateCapaStock,
+    updateRefilStock,
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

@@ -71,6 +71,7 @@ const CushionKitBanner = ({ kitConfig }) => {
       ...kitProduct,
       selectedSize,
       cushionColors: cushionColors.length > 0 ? cushionColors : undefined,
+      coverType: cushionColors.length > 0 ? 'com-capa' : 'refil-only',
     };
     addItem(itemData);
     setAdded(true);
@@ -78,9 +79,17 @@ const CushionKitBanner = ({ kitConfig }) => {
   };
 
   const handleWhatsApp = () => {
-    const message = encodeURIComponent(
-      `Olá! Gostaria de montar meu Kit de 5 Almofadas (${selectedSize}). Podem me ajudar?`
-    );
+    let message;
+    if (cushionColors.length === 0) {
+      message = encodeURIComponent(
+        `Olá! Gostaria de comprar refis de almofada (sem capa) no tamanho ${selectedSize}. Podem me ajudar?`
+      );
+    } else {
+      const colorsText = cushionColors.join(', ');
+      message = encodeURIComponent(
+        `Olá! Gostaria de montar meu Kit de 5 Almofadas (${selectedSize}) nas cores: ${colorsText}. Podem me ajudar?`
+      );
+    }
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
 
