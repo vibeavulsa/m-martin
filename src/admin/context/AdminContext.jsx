@@ -183,15 +183,20 @@ export function AdminProvider({ children }) {
   const getLowStockProducts = useCallback(() => {
     return products.filter(p => {
       const s = stock[p.id];
-      return s && s.quantity <= s.minStock;
+      return s && s.quantity > 0 && s.quantity <= s.minStock;
     });
   }, [products, stock]);
 
   const getOutOfStockProducts = useCallback(() => {
-    return products.filter(p => {
+    const outOfStock = products.filter(p => {
       const s = stock[p.id];
       return s && s.quantity <= 0;
     });
+    const cushionKitStock = stock['cushion-kit'];
+    if (cushionKitStock && cushionKitStock.quantity <= 0 && !products.some(p => p.id === 'cushion-kit')) {
+      outOfStock.push({ id: 'cushion-kit', name: 'Kit Almofadas' });
+    }
+    return outOfStock;
   }, [products, stock]);
 
   const getTotalStockValue = useCallback(() => {

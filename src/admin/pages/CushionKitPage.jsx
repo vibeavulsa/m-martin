@@ -30,7 +30,7 @@ const CushionKitPage = () => {
 
   const kitId = cushionKit.product.id || 'cushion-kit';
   const kitStock = stock[kitId] || { quantity: 0, minStock: 5 };
-  const isLowStock = kitStock.quantity <= kitStock.minStock;
+  const isLowStock = kitStock.quantity > 0 && kitStock.quantity <= kitStock.minStock;
   const isOutOfStock = kitStock.quantity <= 0;
   const [productForm, setProductForm] = useState({
     name: cushionKit.product.name,
