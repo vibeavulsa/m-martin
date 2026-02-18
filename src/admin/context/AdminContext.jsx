@@ -85,16 +85,17 @@ export function AdminProvider({ children }) {
   const [cushionKit, setCushionKit] = useState(() => {
     const loaded = loadFromStorage(STORAGE_KEY_CUSHION_KIT, defaultCushionKit);
     // Ensure backward compatibility: add stockCapas and stockRefis if missing
-    if (!loaded.stockCapas) {
-      loaded.stockCapas = {};
-      for (const color of loaded.colors) {
-        loaded.stockCapas[color] = 0;
+    const migrated = { ...loaded };
+    if (!migrated.stockCapas) {
+      migrated.stockCapas = {};
+      for (const color of migrated.colors) {
+        migrated.stockCapas[color] = 0;
       }
     }
-    if (loaded.stockRefis === undefined) {
-      loaded.stockRefis = 0;
+    if (migrated.stockRefis === undefined) {
+      migrated.stockRefis = 0;
     }
-    return loaded;
+    return migrated;
   });
 
   useEffect(() => {
