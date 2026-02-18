@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconX, IconCheck, IconUser, IconMapPin, IconPhone, IconBrandWhatsapp, IconLoader2, IconQrcode, IconCreditCard } from '@tabler/icons-react';
+import { IconX, IconCheck, IconUser, IconMapPin, IconPhone, IconBrandWhatsapp, IconLoader2, IconQrcode, IconCreditCard, IconWallet } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import { createOrder } from '../services/orderService';
 import { generateWhatsAppLink } from '../utils/whatsappGenerator';
@@ -184,6 +184,13 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
           <>
             <IconCreditCard size={20} stroke={2} />
             Pagar com Cartão
+          </>
+        );
+      case 'mercado_pago':
+        return (
+          <>
+            <IconWallet size={20} stroke={2} />
+            Pagar com Mercado Pago
           </>
         );
       default:

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconBrandWhatsapp, IconQrcode, IconCreditCard } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconQrcode, IconCreditCard, IconWallet } from '@tabler/icons-react';
 import './PaymentMethodSelector.css';
 
 const methods = [
@@ -8,6 +8,12 @@ const methods = [
     label: 'WhatsApp',
     description: 'Finalize pelo WhatsApp',
     Icon: IconBrandWhatsapp,
+  },
+  {
+    id: 'mercado_pago',
+    label: 'Mercado Pago',
+    description: 'Pague com Mercado Pago',
+    Icon: IconWallet,
   },
   {
     id: 'pix',
