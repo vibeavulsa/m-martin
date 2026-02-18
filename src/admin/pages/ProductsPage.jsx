@@ -112,7 +112,7 @@ const ProductsPage = () => {
       unit: form.unit,
       costPrice: form.costPrice,
       wholesalePrice: form.wholesalePrice,
-      maxStock: form.maxStock,
+      maxStock: form.maxStock ? parseInt(form.maxStock, 10) : '',
     };
 
     if (editing !== null) {
@@ -339,7 +339,7 @@ const ProductsPage = () => {
                       
                       {form.image && (
                         <div className="product-image-preview">
-                          <img src={form.image} alt="Preview" onError={(e) => e.target.style.display = 'none'} />
+                          <img src={form.image} alt={form.name ? `Preview de ${form.name}` : 'Preview da imagem do produto'} onError={(e) => e.target.style.display = 'none'} />
                         </div>
                       )}
                       

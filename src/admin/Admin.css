@@ -973,7 +973,7 @@
 
 .product-form-layout {
   display: grid;
-  grid-template-columns: 58% 40%;
+  grid-template-columns: 1.45fr 1fr;
   gap: 1.5rem;
   margin-bottom: 1rem;
 }
