@@ -101,5 +101,17 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    
+    // ============================================
+    // COLEÇÃO: paymentSettings
+    // ============================================
+    /**
+     * Regras para configurações de pagamento (Mercado Pago, etc.):
+     * - Leitura: Apenas Admin (contém configurações sensíveis)
+     * - Escrita: Apenas Admin
+     */
+    match /paymentSettings/{settingId} {
+      allow read, write: if isAdmin();
+    }
   }
 }

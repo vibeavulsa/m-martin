@@ -7,6 +7,7 @@ import {
   IconArrowLeft,
   IconLogout,
   IconPalette,
+  IconCreditCard,
 } from '@tabler/icons-react';
 import { useAuth } from '../../context/AuthContext';
 import '../Admin.css';
@@ -47,6 +48,10 @@ const AdminLayout = () => {
           <NavLink to="/admin/pedidos" className={({ isActive }) => `admin-nav-link${isActive ? ' active' : ''}`}>
             <IconReceipt size={20} stroke={1.6} />
             <span>Pedidos</span>
+          </NavLink>
+          <NavLink to="/admin/pagamentos" className={({ isActive }) => `admin-nav-link${isActive ? ' active' : ''}`}>
+            <IconCreditCard size={20} stroke={1.6} />
+            <span>Pagamentos</span>
           </NavLink>
         </nav>
         <div className="admin-sidebar-footer">

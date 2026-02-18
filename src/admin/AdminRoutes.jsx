@@ -6,6 +6,7 @@ import ProductsPage from './pages/ProductsPage';
 import StockPage from './pages/StockPage';
 import OrdersPage from './pages/OrdersPage';
 import CushionKitPage from './pages/CushionKitPage';
+import PaymentSettingsPage from './pages/PaymentSettingsPage';
 
 const AdminRoutes = () => {
   return (
@@ -17,6 +18,7 @@ const AdminRoutes = () => {
           <Route path="almofadas" element={<CushionKitPage />} />
           <Route path="estoque" element={<StockPage />} />
           <Route path="pedidos" element={<OrdersPage />} />
+          <Route path="pagamentos" element={<PaymentSettingsPage />} />
         </Route>
       </Routes>
     </AdminProvider>

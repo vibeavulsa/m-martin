@@ -27,7 +27,7 @@ export interface OrderItem {
 export type OrderStatus = 'pending' | 'confirmed' | 'shipped';
 
 /** Método de pagamento utilizado */
-export type PaymentMethod = 'whatsapp_checkout' | 'pix' | 'credit_card';
+export type PaymentMethod = 'whatsapp_checkout' | 'pix' | 'credit_card' | 'mercado_pago';
 
 /** Documento persistido na coleção `orders` do Firestore */
 export interface Order {
