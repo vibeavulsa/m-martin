@@ -7,6 +7,10 @@ import {
   IconX,
   IconPackage,
   IconAlertTriangle,
+  IconInfoCircle,
+  IconCurrencyDollar,
+  IconStack2,
+  IconPhoto,
 } from '@tabler/icons-react';
 import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
@@ -20,6 +24,12 @@ const emptyProduct = {
   features: '',
   stockQuantity: 50,
   minStock: 5,
+  barcode: '',
+  supplier: '',
+  unit: 'UNIDADE',
+  costPrice: '',
+  wholesalePrice: '',
+  maxStock: '',
 };
 
 const ProductsPage = () => {
@@ -55,6 +65,12 @@ const ProductsPage = () => {
       features: Array.isArray(product.features) ? product.features.join(', ') : product.features || '',
       stockQuantity: stock[product.id]?.quantity ?? 0,
       minStock: stock[product.id]?.minStock ?? 5,
+      barcode: product.barcode || '',
+      supplier: product.supplier || '',
+      unit: product.unit || 'UNIDADE',
+      costPrice: product.costPrice || '',
+      wholesalePrice: product.wholesalePrice || '',
+      maxStock: product.maxStock || '',
     });
     setModalOpen(true);
   };
@@ -91,6 +107,12 @@ const ProductsPage = () => {
       features: featuresArr,
       stockQuantity: parseInt(form.stockQuantity, 10) || 0,
       minStock: parseInt(form.minStock, 10) || 5,
+      barcode: form.barcode,
+      supplier: form.supplier,
+      unit: form.unit,
+      costPrice: form.costPrice,
+      wholesalePrice: form.wholesalePrice,
+      maxStock: form.maxStock,
     };
 
     if (editing !== null) {
@@ -190,7 +212,7 @@ const ProductsPage = () => {
 
       {modalOpen && (
         <div className="admin-modal-overlay" onClick={() => setModalOpen(false)}>
-          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="admin-modal admin-modal-wide" onClick={(e) => e.stopPropagation()}>
             <button className="admin-modal-close" onClick={() => setModalOpen(false)} aria-label="Fechar">
               <IconX size={18} stroke={2} />
             </button>
@@ -201,49 +223,131 @@ const ProductsPage = () => {
                 <p>{editing !== null ? 'Atualize as informações do produto' : 'Preencha os dados para cadastrar um novo produto'}</p>
               </div>
               <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label htmlFor="prod-name">Nome do Produto</label>
-                  <input id="prod-name" name="name" value={form.name} onChange={handleChange} placeholder="Ex: Sofá Premium" required />
-                </div>
+                <div className="product-form-layout">
+                  {/* Left Column - Product Information */}
+                  <div className="product-form-column">
+                    <div className="product-form-section">
+                      <div className="product-form-section-header">
+                        <IconInfoCircle size={20} stroke={1.8} />
+                        <h3>Informações do Produto</h3>
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="prod-name">Nome do Produto</label>
+                        <input id="prod-name" name="name" value={form.name} onChange={handleChange} placeholder="Ex: Sofá Premium" required />
+                      </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="prod-category">Categoria</label>
-                    <select id="prod-category" name="category" value={form.category} onChange={handleChange}>
-                      {categories.map((c) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label htmlFor="prod-barcode">Código de Barras / SKU</label>
+                          <input id="prod-barcode" name="barcode" value={form.barcode} onChange={handleChange} placeholder="Ex: 7891234567890" />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="prod-category">Categoria</label>
+                          <select id="prod-category" name="category" value={form.category} onChange={handleChange}>
+                            {categories.map((c) => (
+                              <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label htmlFor="prod-supplier">Fornecedor</label>
+                          <input id="prod-supplier" name="supplier" value={form.supplier} onChange={handleChange} placeholder="Nome do fornecedor" />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="prod-unit">Unidade</label>
+                          <select id="prod-unit" name="unit" value={form.unit} onChange={handleChange}>
+                            <option value="UNIDADE">Unidade</option>
+                            <option value="KG">Quilograma (KG)</option>
+                            <option value="METRO">Metro</option>
+                            <option value="PEÇA">Peça</option>
+                            <option value="CAIXA">Caixa</option>
+                            <option value="PACOTE">Pacote</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="prod-desc">Descrição</label>
+                        <textarea id="prod-desc" name="description" value={form.description} onChange={handleChange} rows="3" placeholder="Descreva o produto..." />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="prod-features">Características (separadas por vírgula)</label>
+                        <input id="prod-features" name="features" value={form.features} onChange={handleChange} placeholder="Tecido premium, Design moderno" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="prod-price">Preço</label>
-                    <input id="prod-price" name="price" value={form.price} onChange={handleChange} placeholder="R$ 0,00" required />
-                  </div>
-                </div>
 
-                <div className="form-group">
-                  <label htmlFor="prod-desc">Descrição</label>
-                  <textarea id="prod-desc" name="description" value={form.description} onChange={handleChange} rows="3" placeholder="Descreva o produto..." />
-                </div>
+                  {/* Right Column - Price, Stock, Image */}
+                  <div className="product-form-column">
+                    {/* Price Section */}
+                    <div className="product-form-section">
+                      <div className="product-form-section-header">
+                        <IconCurrencyDollar size={20} stroke={1.8} />
+                        <h3>Preço</h3>
+                      </div>
+                      
+                      <div className="form-row-3">
+                        <div className="form-group">
+                          <label htmlFor="prod-cost">Custo</label>
+                          <input id="prod-cost" name="costPrice" value={form.costPrice} onChange={handleChange} placeholder="R$ 0,00" />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="prod-price">Varejo</label>
+                          <input id="prod-price" name="price" value={form.price} onChange={handleChange} placeholder="R$ 0,00" required />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="prod-wholesale">Atacado</label>
+                          <input id="prod-wholesale" name="wholesalePrice" value={form.wholesalePrice} onChange={handleChange} placeholder="R$ 0,00" />
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="form-group">
-                  <label htmlFor="prod-image">URL da Imagem</label>
-                  <input id="prod-image" name="image" value={form.image} onChange={handleChange} placeholder="https://..." />
-                </div>
+                    {/* Stock Section */}
+                    <div className="product-form-section">
+                      <div className="product-form-section-header">
+                        <IconStack2 size={20} stroke={1.8} />
+                        <h3>Estoque</h3>
+                      </div>
+                      
+                      <div className="form-row-3">
+                        <div className="form-group">
+                          <label htmlFor="prod-max">Máximo</label>
+                          <input id="prod-max" name="maxStock" type="number" min="0" value={form.maxStock} onChange={handleChange} placeholder="100" />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="prod-min">Mínimo</label>
+                          <input id="prod-min" name="minStock" type="number" min="0" value={form.minStock} onChange={handleChange} placeholder="5" />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="prod-stock">Atual</label>
+                          <input id="prod-stock" name="stockQuantity" type="number" min="0" value={form.stockQuantity} onChange={handleChange} placeholder="50" />
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="form-group">
-                  <label htmlFor="prod-features">Características (separadas por vírgula)</label>
-                  <input id="prod-features" name="features" value={form.features} onChange={handleChange} placeholder="Tecido premium, Design moderno" />
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="prod-stock">Quantidade em Estoque</label>
-                    <input id="prod-stock" name="stockQuantity" type="number" min="0" value={form.stockQuantity} onChange={handleChange} />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="prod-min">Estoque Mínimo</label>
-                    <input id="prod-min" name="minStock" type="number" min="0" value={form.minStock} onChange={handleChange} />
+                    {/* Image Section */}
+                    <div className="product-form-section">
+                      <div className="product-form-section-header">
+                        <IconPhoto size={20} stroke={1.8} />
+                        <h3>Imagem</h3>
+                      </div>
+                      
+                      {form.image && (
+                        <div className="product-image-preview">
+                          <img src={form.image} alt="Preview" onError={(e) => e.target.style.display = 'none'} />
+                        </div>
+                      )}
+                      
+                      <div className="form-group">
+                        <label htmlFor="prod-image">URL da Imagem</label>
+                        <input id="prod-image" name="image" value={form.image} onChange={handleChange} placeholder="https://..." />
+                      </div>
+                    </div>
                   </div>
                 </div>
 

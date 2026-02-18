@@ -595,6 +595,10 @@
   animation: adminModalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.admin-modal-wide {
+  max-width: 960px;
+}
+
 .admin-modal-body {
   padding: 2rem;
   display: flex;
@@ -953,6 +957,84 @@
   .admin-confirm-actions {
     flex-direction: column;
   }
+
+  .product-form-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   PRODUCT FORM LAYOUT (ERP/PDV Style)
+   ============================================ */
+
+.product-form-layout {
+  display: grid;
+  grid-template-columns: 58% 40%;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.product-form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.product-form-section {
+  background: rgba(72, 55, 38, 0.2);
+  border: 1px solid rgba(217, 177, 84, 0.12);
+  border-radius: 14px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.product-form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #d9b154;
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(217, 177, 84, 0.12);
+}
+
+.product-form-section-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #d9b154;
+  letter-spacing: 0.02em;
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.product-image-preview {
+  width: 100%;
+  height: 160px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(217, 177, 84, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.product-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ============================================
