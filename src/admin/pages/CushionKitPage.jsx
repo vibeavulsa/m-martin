@@ -8,8 +8,10 @@ import {
   IconMinus,
   IconBoxSeam,
   IconAlertTriangle,
+  IconArmchair,
 } from '@tabler/icons-react';
 import { useAdmin } from '../context/AdminContext';
+import SofaPreview from '../components/SofaPreview';
 import '../Admin.css';
 
 const colorGradients = {
@@ -27,6 +29,8 @@ const CushionKitPage = () => {
   const { cushionKit, updateCushionKit, stock, updateStock, updateMinStock } = useAdmin();
   const [newColor, setNewColor] = useState('');
   const [saved, setSaved] = useState(false);
+  const [previewColors, setPreviewColors] = useState(Array(5).fill(null));
+  const [selectedPreviewCushion, setSelectedPreviewCushion] = useState(null);
 
   const kitId = cushionKit.product.id || 'cushion-kit';
   const kitStock = stock[kitId] || { quantity: 0, minStock: 5 };
@@ -54,6 +58,14 @@ const CushionKitPage = () => {
 
   const handleRemoveColor = (color) => {
     updateCushionKit({ colors: cushionKit.colors.filter(c => c !== color) });
+  };
+
+  const handlePreviewColorSelect = (color) => {
+    if (selectedPreviewCushion !== null) {
+      const newColors = [...previewColors];
+      newColors[selectedPreviewCushion] = color;
+      setPreviewColors(newColors);
+    }
   };
 
   const handleProductChange = (e) => {
@@ -270,6 +282,116 @@ const CushionKitPage = () => {
               Estoque baixo! Apenas {kitStock.quantity} kit(s) restante(s).
             </div>
           )}
+        </div>
+
+        {/* Sofa Preview Section */}
+        <div className="dashboard-section">
+          <h2>
+            <IconArmchair size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#d9b154' }} />
+            Pré-visualização do Sofá
+          </h2>
+          <p style={{ color: '#bfb3a2', fontSize: '0.85rem', marginBottom: '1rem' }}>
+            Selecione uma posição no sofá e escolha uma cor para visualizar como as almofadas ficarão.
+          </p>
+
+          <SofaPreview cushionColors={previewColors} colorGradients={colorGradients} />
+
+          <div style={{ marginTop: '1rem' }}>
+            <p style={{ color: '#bfb3a2', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+              Selecione a almofada (1-5):
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+              {[0, 1, 2, 3, 4].map((index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedPreviewCushion(index)}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '10px',
+                    border: selectedPreviewCushion === index
+                      ? '2px solid #d9b154'
+                      : '1px solid rgba(217, 177, 84, 0.15)',
+                    background: previewColors[index]
+                      ? (colorGradients[previewColors[index]] || 'rgba(72, 55, 38, 0.35)')
+                      : 'rgba(72, 55, 38, 0.35)',
+                    color: selectedPreviewCushion === index ? '#d9b154' : '#bfb3a2',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+
+            {selectedPreviewCushion !== null && (
+              <>
+                <p style={{ color: '#e8e1d4', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+                  Escolha a cor para almofada {selectedPreviewCushion + 1}:
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {cushionKit.colors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => handlePreviewColorSelect(color)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.35rem 0.7rem',
+                        borderRadius: '8px',
+                        border: previewColors[selectedPreviewCushion] === color
+                          ? '2px solid #d9b154'
+                          : '1px solid rgba(217, 177, 84, 0.12)',
+                        background: 'rgba(72, 55, 38, 0.2)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '4px',
+                          background: colorGradients[color] || '#999',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span style={{
+                        fontSize: '0.8rem',
+                        color: previewColors[selectedPreviewCushion] === color ? '#d9b154' : '#e8e1d4',
+                      }}>
+                        {color}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {previewColors.filter(c => c !== null).length > 0 && (
+              <button
+                onClick={() => { setPreviewColors(Array(5).fill(null)); setSelectedPreviewCushion(null); }}
+                style={{
+                  marginTop: '1rem',
+                  padding: '0.5rem 1rem',
+                  background: 'rgba(244, 67, 54, 0.1)',
+                  border: '1px solid rgba(244, 67, 54, 0.2)',
+                  borderRadius: '8px',
+                  color: '#f44336',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                }}
+              >
+                <IconTrash size={14} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.3rem' }} />
+                Limpar visualização
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Product Info Section */}

@@ -17,7 +17,11 @@ const emptyProduct = {
   description: '',
   price: '',
   image: '',
+  additionalImages: '',
   features: '',
+  material: '',
+  dimensions: '',
+  weight: '',
   stockQuantity: 50,
   minStock: 5,
 };
@@ -52,7 +56,11 @@ const ProductsPage = () => {
       description: product.description,
       price: product.price,
       image: product.image,
+      additionalImages: Array.isArray(product.additionalImages) ? product.additionalImages.join(', ') : product.additionalImages || '',
       features: Array.isArray(product.features) ? product.features.join(', ') : product.features || '',
+      material: product.material || '',
+      dimensions: product.dimensions || '',
+      weight: product.weight || '',
       stockQuantity: stock[product.id]?.quantity ?? 0,
       minStock: stock[product.id]?.minStock ?? 5,
     });
@@ -82,13 +90,22 @@ const ProductsPage = () => {
       .map((f) => f.trim())
       .filter(Boolean);
 
+    const additionalImagesArr = form.additionalImages
+      .split(',')
+      .map((url) => url.trim())
+      .filter(Boolean);
+
     const productData = {
       name: form.name,
       category: form.category,
       description: form.description,
       price: form.price,
       image: form.image,
+      additionalImages: additionalImagesArr,
       features: featuresArr,
+      material: form.material,
+      dimensions: form.dimensions,
+      weight: form.weight,
       stockQuantity: parseInt(form.stockQuantity, 10) || 0,
       minStock: parseInt(form.minStock, 10) || 5,
     };
@@ -227,8 +244,46 @@ const ProductsPage = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="prod-image">URL da Imagem</label>
+                  <label htmlFor="prod-image">URL da Imagem Principal</label>
                   <input id="prod-image" name="image" value={form.image} onChange={handleChange} placeholder="https://..." />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="prod-additional-images">Fotos Adicionais (URLs separadas por vírgula)</label>
+                  <textarea id="prod-additional-images" name="additionalImages" value={form.additionalImages} onChange={handleChange} rows="2" placeholder="https://foto2.jpg, https://foto3.jpg, https://foto4.jpg" />
+                </div>
+
+                {(form.image || form.additionalImages) && (
+                  <div className="form-group">
+                    <label style={{ marginBottom: '0.5rem' }}>Pré-visualização das Fotos</label>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      {form.image && (
+                        <img src={form.image} alt="Principal" style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '8px', border: '2px solid rgba(217, 177, 84, 0.3)' }} />
+                      )}
+                      {form.additionalImages && form.additionalImages.split(',').map((url, i) => {
+                        const trimmed = url.trim();
+                        return trimmed ? (
+                          <img key={i} src={trimmed} alt={`Foto ${i + 2}`} style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(217, 177, 84, 0.15)' }} />
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="prod-material">Material</label>
+                    <input id="prod-material" name="material" value={form.material} onChange={handleChange} placeholder="Ex: Tecido Suede, Couro" />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="prod-weight">Peso</label>
+                    <input id="prod-weight" name="weight" value={form.weight} onChange={handleChange} placeholder="Ex: 45kg" />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="prod-dimensions">Dimensões</label>
+                  <input id="prod-dimensions" name="dimensions" value={form.dimensions} onChange={handleChange} placeholder="Ex: 220cm x 95cm x 85cm (L x P x A)" />
                 </div>
 
                 <div className="form-group">

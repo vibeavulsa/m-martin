@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Parse CSS gradient string to extract colors for SVG
 const parseGradient = (gradientStr) => {
   if (!gradientStr) return ['#666', '#444'];
