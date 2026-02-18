@@ -23,6 +23,9 @@ const colorGradients = {
   'Bordô': 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)',
 };
 
+const LOW_STOCK_THRESHOLD_COVERS = 5;
+const LOW_STOCK_THRESHOLD_REFILLS = 10;
+
 const CushionKitPage = () => {
   const { cushionKit, updateCushionKit, updateCapaStock, updateRefilStock } = useAdmin();
   const [newColor, setNewColor] = useState('');
@@ -180,7 +183,7 @@ const CushionKitPage = () => {
                 <button onClick={() => updateRefilStock(cushionKit.stockRefis - 1)} aria-label="Diminuir estoque de refis">
                   <IconMinus size={14} stroke={2} />
                 </button>
-                <span className={`stock-value ${cushionKit.stockRefis <= 0 ? 'stock-low' : cushionKit.stockRefis <= 10 ? 'stock-warning' : 'stock-ok'}`} style={{ fontSize: '1.5rem', minWidth: '48px' }}>
+                <span className={`stock-value ${cushionKit.stockRefis <= 0 ? 'stock-low' : cushionKit.stockRefis <= LOW_STOCK_THRESHOLD_REFILLS ? 'stock-warning' : 'stock-ok'}`} style={{ fontSize: '1.5rem', minWidth: '48px' }}>
                   {cushionKit.stockRefis}
                 </span>
                 <button onClick={() => updateRefilStock(cushionKit.stockRefis + 1)} aria-label="Aumentar estoque de refis">
@@ -223,7 +226,6 @@ const CushionKitPage = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
               {cushionKit.colors.map((color) => {
                 const colorStock = cushionKit.stockCapas[color] || 0;
-                const isLowStockColor = colorStock > 0 && colorStock <= 5;
                 const isOutOfStockColor = colorStock <= 0;
                 
                 return (
@@ -254,7 +256,7 @@ const CushionKitPage = () => {
                       <button onClick={() => updateCapaStock(color, colorStock - 1)} aria-label={`Diminuir estoque de capa ${color}`} style={{ width: '26px', height: '26px' }}>
                         <IconMinus size={12} stroke={2} />
                       </button>
-                      <span className={`stock-value ${isOutOfStockColor ? 'stock-low' : isLowStockColor ? 'stock-warning' : 'stock-ok'}`} style={{ fontSize: '0.95rem', minWidth: '32px' }}>
+                      <span className={`stock-value ${isOutOfStockColor ? 'stock-low' : colorStock > 0 && colorStock <= LOW_STOCK_THRESHOLD_COVERS ? 'stock-warning' : 'stock-ok'}`} style={{ fontSize: '0.95rem', minWidth: '32px' }}>
                         {colorStock}
                       </span>
                       <button onClick={() => updateCapaStock(color, colorStock + 1)} aria-label={`Aumentar estoque de capa ${color}`} style={{ width: '26px', height: '26px' }}>
@@ -288,7 +290,7 @@ const CushionKitPage = () => {
                 `Capas sem estoque: ${Object.entries(cushionKit.stockCapas).filter(([, stock]) => stock <= 0).map(([color]) => color).join(', ')}`}
             </div>
           )}
-          {cushionKit.stockRefis > 0 && cushionKit.stockRefis <= 10 && (
+          {cushionKit.stockRefis > 0 && cushionKit.stockRefis <= LOW_STOCK_THRESHOLD_REFILLS && (
             <div style={{
               display: 'flex',
               alignItems: 'center',
