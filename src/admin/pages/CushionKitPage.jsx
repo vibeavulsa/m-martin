@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   IconPalette,
   IconPlus,
@@ -47,6 +47,19 @@ const CushionKitPage = () => {
     features: cushionKit.product.features.join(', '),
   });
   const [sizesText, setSizesText] = useState(cushionKit.sizes.join(', '));
+
+  // Memoize stock alerts to avoid recalculating on every render
+  const stockAlerts = useMemo(() => {
+    const outOfStockColors = Object.entries(cushionKit.stockCapas)
+      .filter(([, stock]) => stock <= 0)
+      .map(([color]) => color);
+    
+    const lowStockColors = Object.entries(cushionKit.stockCapas)
+      .filter(([, stock]) => stock > 0 && stock <= LOW_STOCK_THRESHOLD_COVERS)
+      .map(([color]) => color);
+
+    return { outOfStockColors, lowStockColors };
+  }, [cushionKit.stockCapas]);
 
   const handleAddColor = () => {
     const color = newColor.trim();
@@ -275,33 +288,45 @@ const CushionKitPage = () => {
           </div>
 
           {/* Stock Alerts */}
-          {(() => {
-            const outOfStockColors = Object.entries(cushionKit.stockCapas)
-              .filter(([, stock]) => stock <= 0)
-              .map(([color]) => color);
-            
-            return (cushionKit.stockRefis <= 0 || outOfStockColors.length > 0) && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.75rem 1rem',
-                background: 'rgba(244, 67, 54, 0.12)',
-                border: '1px solid rgba(244, 67, 54, 0.25)',
-                borderRadius: '10px',
-                color: '#f44336',
-                fontSize: '0.85rem',
-                fontWeight: 500,
-                marginBottom: '0.5rem',
-              }}>
-                <IconAlertTriangle size={16} stroke={2} />
-                {cushionKit.stockRefis <= 0 && 'Refis sem estoque! '}
-                {outOfStockColors.length > 0 && 
-                  `Capas sem estoque: ${outOfStockColors.join(', ')}`}
-              </div>
-            );
-          })()}
+          {(cushionKit.stockRefis <= 0 || stockAlerts.outOfStockColors.length > 0) && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1rem',
+              background: 'rgba(244, 67, 54, 0.12)',
+              border: '1px solid rgba(244, 67, 54, 0.25)',
+              borderRadius: '10px',
+              color: '#f44336',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              marginBottom: '0.5rem',
+            }}>
+              <IconAlertTriangle size={16} stroke={2} />
+              {cushionKit.stockRefis <= 0 && 'Refis sem estoque! '}
+              {stockAlerts.outOfStockColors.length > 0 && 
+                `Capas sem estoque: ${stockAlerts.outOfStockColors.join(', ')}`}
+            </div>
+          )}
           {cushionKit.stockRefis > 0 && cushionKit.stockRefis <= LOW_STOCK_THRESHOLD_REFILLS && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1rem',
+              background: 'rgba(255, 152, 0, 0.12)',
+              border: '1px solid rgba(255, 152, 0, 0.25)',
+              borderRadius: '10px',
+              color: '#ff9800',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              marginBottom: '0.5rem',
+            }}>
+              <IconAlertTriangle size={16} stroke={2} />
+              Estoque baixo de refis! Apenas {cushionKit.stockRefis} restante(s).
+            </div>
+          )}
+          {stockAlerts.lowStockColors.length > 0 && (
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -315,7 +340,7 @@ const CushionKitPage = () => {
               fontWeight: 500,
             }}>
               <IconAlertTriangle size={16} stroke={2} />
-              Estoque baixo de refis! Apenas {cushionKit.stockRefis} restante(s).
+              Estoque baixo de capas: {stockAlerts.lowStockColors.join(', ')}
             </div>
           )}
         </div>
