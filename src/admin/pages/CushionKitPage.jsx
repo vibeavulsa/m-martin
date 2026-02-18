@@ -305,6 +305,8 @@ const CushionKitPage = () => {
                 <button
                   key={index}
                   onClick={() => setSelectedPreviewCushion(index)}
+                  aria-label={`Selecionar posição da almofada ${index + 1}`}
+                  aria-pressed={selectedPreviewCushion === index}
                   style={{
                     width: '40px',
                     height: '40px',
@@ -337,6 +339,8 @@ const CushionKitPage = () => {
                     <button
                       key={color}
                       onClick={() => handlePreviewColorSelect(color)}
+                      aria-label={`Cor ${color}`}
+                      aria-pressed={previewColors[selectedPreviewCushion] === color}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -376,6 +380,7 @@ const CushionKitPage = () => {
             {previewColors.filter(c => c !== null).length > 0 && (
               <button
                 onClick={() => { setPreviewColors(Array(5).fill(null)); setSelectedPreviewCushion(null); }}
+                aria-label="Limpar cores da visualização do sofá"
                 style={{
                   marginTop: '1rem',
                   padding: '0.5rem 1rem',
