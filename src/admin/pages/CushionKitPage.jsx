@@ -5,6 +5,9 @@ import {
   IconTrash,
   IconDeviceFloppy,
   IconCheck,
+  IconMinus,
+  IconBoxSeam,
+  IconAlertTriangle,
 } from '@tabler/icons-react';
 import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
@@ -21,9 +24,14 @@ const colorGradients = {
 };
 
 const CushionKitPage = () => {
-  const { cushionKit, updateCushionKit } = useAdmin();
+  const { cushionKit, updateCushionKit, stock, updateStock, updateMinStock } = useAdmin();
   const [newColor, setNewColor] = useState('');
   const [saved, setSaved] = useState(false);
+
+  const kitId = cushionKit.product.id || 'cushion-kit';
+  const kitStock = stock[kitId] || { quantity: 0, minStock: 5 };
+  const isLowStock = kitStock.quantity <= kitStock.minStock;
+  const isOutOfStock = kitStock.quantity <= 0;
   const [productForm, setProductForm] = useState({
     name: cushionKit.product.name,
     description: cushionKit.product.description,
@@ -155,6 +163,113 @@ const CushionKitPage = () => {
               Adicionar Cor
             </button>
           </div>
+        </div>
+
+        {/* Stock Management Section */}
+        <div className="dashboard-section">
+          <h2>
+            <IconBoxSeam size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#d9b154' }} />
+            Controle de Estoque
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{
+              padding: '1rem',
+              background: 'rgba(72, 55, 38, 0.2)',
+              border: '1px solid rgba(217, 177, 84, 0.08)',
+              borderRadius: '12px',
+            }}>
+              <span style={{ display: 'block', color: '#bfb3a2', fontSize: '0.8rem', fontWeight: 500, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Quantidade em Estoque</span>
+              <div className="stock-controls" style={{ justifyContent: 'center' }}>
+                <button onClick={() => updateStock(kitId, kitStock.quantity - 1)} aria-label="Diminuir estoque">
+                  <IconMinus size={14} stroke={2} />
+                </button>
+                <span className={`stock-value ${isOutOfStock ? 'stock-low' : isLowStock ? 'stock-warning' : 'stock-ok'}`} style={{ fontSize: '1.5rem', minWidth: '48px' }}>
+                  {kitStock.quantity}
+                </span>
+                <button onClick={() => updateStock(kitId, kitStock.quantity + 1)} aria-label="Aumentar estoque">
+                  <IconPlus size={14} stroke={2} />
+                </button>
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+                <input
+                  type="number"
+                  min="0"
+                  style={{
+                    width: '100px',
+                    padding: '0.35rem 0.5rem',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(217,177,84,0.15)',
+                    borderRadius: '8px',
+                    color: '#e8e1d4',
+                    fontSize: '0.85rem',
+                    outline: 'none',
+                    textAlign: 'center',
+                  }}
+                  placeholder="Definir qtd"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const val = parseInt(e.target.value, 10);
+                      if (!isNaN(val)) {
+                        updateStock(kitId, val);
+                        e.target.value = '';
+                      }
+                    }
+                  }}
+                />
+              </div>
+            </div>
+            <div style={{
+              padding: '1rem',
+              background: 'rgba(72, 55, 38, 0.2)',
+              border: '1px solid rgba(217, 177, 84, 0.08)',
+              borderRadius: '12px',
+            }}>
+              <span style={{ display: 'block', color: '#bfb3a2', fontSize: '0.8rem', fontWeight: 500, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Estoque Mínimo</span>
+              <div className="stock-controls" style={{ justifyContent: 'center' }}>
+                <button onClick={() => updateMinStock(kitId, kitStock.minStock - 1)} aria-label="Diminuir estoque mínimo">
+                  <IconMinus size={14} stroke={2} />
+                </button>
+                <span className="stock-value" style={{ fontSize: '1.5rem', minWidth: '48px' }}>{kitStock.minStock}</span>
+                <button onClick={() => updateMinStock(kitId, kitStock.minStock + 1)} aria-label="Aumentar estoque mínimo">
+                  <IconPlus size={14} stroke={2} />
+                </button>
+              </div>
+            </div>
+          </div>
+          {isOutOfStock && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1rem',
+              background: 'rgba(244, 67, 54, 0.12)',
+              border: '1px solid rgba(244, 67, 54, 0.25)',
+              borderRadius: '10px',
+              color: '#f44336',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+            }}>
+              <IconAlertTriangle size={16} stroke={2} />
+              Kit de almofadas sem estoque! Adicione unidades para disponibilizar no catálogo.
+            </div>
+          )}
+          {!isOutOfStock && isLowStock && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1rem',
+              background: 'rgba(255, 152, 0, 0.12)',
+              border: '1px solid rgba(255, 152, 0, 0.25)',
+              borderRadius: '10px',
+              color: '#ff9800',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+            }}>
+              <IconAlertTriangle size={16} stroke={2} />
+              Estoque baixo! Apenas {kitStock.quantity} kit(s) restante(s).
+            </div>
+          )}
         </div>
 
         {/* Product Info Section */}

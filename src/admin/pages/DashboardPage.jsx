@@ -4,16 +4,18 @@ import {
   IconReceipt,
   IconAlertTriangle,
   IconCurrencyReal,
+  IconPackageOff,
 } from '@tabler/icons-react';
 import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
 
 const DashboardPage = () => {
-  const { products, stock, orders, getLowStockProducts, getTotalStockValue } = useAdmin();
+  const { products, stock, orders, getLowStockProducts, getOutOfStockProducts, getTotalStockValue } = useAdmin();
 
   const totalProducts = products.length;
   const totalStock = Object.values(stock).reduce((sum, s) => sum + s.quantity, 0);
   const lowStockProducts = getLowStockProducts();
+  const outOfStockProducts = getOutOfStockProducts();
   const totalStockValue = getTotalStockValue();
 
   const formatCurrency = (value) =>
@@ -64,6 +66,26 @@ const DashboardPage = () => {
           <div className="kpi-info">
             <h3>Valor em Estoque</h3>
             <div className="kpi-value">{formatCurrency(totalStockValue)}</div>
+          </div>
+        </div>
+
+        <div className="kpi-card">
+          <div className="kpi-icon" style={{ background: 'rgba(255, 152, 0, 0.15)', color: '#ff9800' }}>
+            <IconAlertTriangle size={24} stroke={1.6} />
+          </div>
+          <div className="kpi-info">
+            <h3>Estoque Baixo</h3>
+            <div className="kpi-value">{lowStockProducts.length}</div>
+          </div>
+        </div>
+
+        <div className="kpi-card">
+          <div className="kpi-icon" style={{ background: 'rgba(244, 67, 54, 0.15)', color: '#f44336' }}>
+            <IconPackageOff size={24} stroke={1.6} />
+          </div>
+          <div className="kpi-info">
+            <h3>Sem Estoque</h3>
+            <div className="kpi-value">{outOfStockProducts.length}</div>
           </div>
         </div>
       </div>
