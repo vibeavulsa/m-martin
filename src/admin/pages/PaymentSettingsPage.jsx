@@ -24,6 +24,8 @@ const DEFAULT_SETTINGS = {
   publicKey: '',
 };
 
+const PAYMENT_SETTINGS_DOC = 'mercadoPago';
+
 const PaymentSettingsPage = () => {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ const PaymentSettingsPage = () => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const docRef = doc(db, 'paymentSettings', 'mercadoPago');
+        const docRef = doc(db, 'paymentSettings', PAYMENT_SETTINGS_DOC);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setSettings((prev) => ({ ...prev, ...docSnap.data() }));
@@ -57,7 +59,7 @@ const PaymentSettingsPage = () => {
     setSaveMessage(null);
 
     try {
-      const docRef = doc(db, 'paymentSettings', 'mercadoPago');
+      const docRef = doc(db, 'paymentSettings', PAYMENT_SETTINGS_DOC);
       await setDoc(docRef, {
         ...settings,
         updatedAt: new Date().toISOString(),

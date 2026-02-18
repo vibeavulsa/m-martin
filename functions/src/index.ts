@@ -273,6 +273,10 @@ export const createOrder = onCall(
 // INTERFACES: processPayment
 // ============================================
 
+/** Constantes para coleção/documento de configurações de pagamento */
+const PAYMENT_SETTINGS_COLLECTION = "paymentSettings";
+const PAYMENT_SETTINGS_DOC = "mercadoPago";
+
 interface ProcessPaymentInput {
   orderId: string;
   paymentMethod: "pix" | "credit_card" | "mercado_pago";
@@ -386,8 +390,8 @@ export const processPayment = onCall(
 
       // Buscar configurações de pagamento (URLs de retorno, etc.)
       const settingsDoc = await db
-        .collection("paymentSettings")
-        .doc("mercadoPago")
+        .collection(PAYMENT_SETTINGS_COLLECTION)
+        .doc(PAYMENT_SETTINGS_DOC)
         .get();
       const settings = settingsDoc.exists ? settingsDoc.data() : {};
 
@@ -410,7 +414,8 @@ export const processPayment = onCall(
           items,
           payer: {
             name: data.customer.name,
-            email: data.customer.email || "",
+            email: data.customer.email ||
+              `noemail+${data.orderId}@mmartin.com.br`,
           },
           external_reference: data.orderId,
           back_urls: {
@@ -491,14 +496,20 @@ export const processPayment = onCall(
         };
       } else if (data.paymentMethod === "pix") {
         // Criar pagamento PIX via Mercado Pago
+        const nameParts = data.customer.name.trim().split(/\s+/);
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.length > 1 ?
+          nameParts.slice(1).join(" ") : firstName;
+
         const pixBody = {
           transaction_amount: data.amountCents / 100,
           description: `Pedido M'Martin #${data.orderId.slice(0, 8)}`,
           payment_method_id: "pix",
           payer: {
-            email: data.customer.email || "cliente@mmartin.com.br",
-            first_name: data.customer.name.split(" ")[0],
-            last_name: data.customer.name.split(" ").slice(1).join(" ") || "",
+            email: data.customer.email ||
+              `noemail+${data.orderId}@mmartin.com.br`,
+            first_name: firstName,
+            last_name: lastName,
           },
           external_reference: data.orderId,
         };
