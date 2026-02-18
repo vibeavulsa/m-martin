@@ -23,14 +23,61 @@
   display: block;
 }
 
+.hero-slogan {
+  font-size: 2.25rem;
+  font-weight: 700;
+  font-family: 'Cormorant Garamond', serif;
+  background: linear-gradient(138deg, #d9b154 0%, #f7ecc4 48%, #d9b154 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 1.5rem;
+  line-height: 1.3;
+}
+
 .hero-description {
   font-size: 1.25rem;
   color: #bfb3a2;
   line-height: 1.82;
-  margin: 0 0 3rem;
+  margin: 0 0 2rem;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.hero-trust-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.trust-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.trust-number {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-family: 'Cormorant Garamond', serif;
+  color: #d9b154;
+}
+
+.trust-label {
+  font-size: 0.85rem;
+  color: #bfb3a2;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.trust-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(217, 177, 84, 0.25);
 }
 
 .hero-buttons {
@@ -141,12 +188,28 @@
     width: 200px;
   }
   
+  .hero-slogan {
+    font-size: 1.5rem;
+  }
+  
   .hero-subtitle {
     font-size: 1.5rem;
   }
   
   .hero-description {
     font-size: 1rem;
+  }
+  
+  .hero-trust-badges {
+    gap: 1rem;
+  }
+
+  .trust-number {
+    font-size: 1.35rem;
+  }
+
+  .trust-label {
+    font-size: 0.75rem;
   }
   
   .hero-buttons {

@@ -163,11 +163,11 @@ class AppCatalog extends Component {
         <div className="footer-content">
           <div className="footer-info">
             <h3>{corpus.marca}</h3>
-            <p>Projeto: {corpus.identificadorProjeto}</p>
-            <p>ID: {corpus.codigoNumerico}</p>
+            <p className="footer-slogan">Conforto e Elegância em Cada Detalhe</p>
+            <p>Sofás, almofadas, travesseiros e linha hospitalar com qualidade que você sente ao toque.</p>
           </div>
           <div className="footer-contact">
-            <p>Entre em contato para mais informações</p>
+            <p className="footer-cta">Solicite seu orçamento — atendimento personalizado</p>
             <p>© 2026 M&apos;Martin. Todos os direitos reservados.</p>
           </div>
         </div>

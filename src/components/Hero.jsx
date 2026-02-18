@@ -35,10 +35,30 @@ const Hero = () => {
           className="hero-logo"
           variants={itemVariants}
         />
+        <motion.h1 className="hero-slogan" variants={itemVariants}>
+          Conforto e Elegância em Cada Detalhe
+        </motion.h1>
         <motion.p className="hero-description" variants={itemVariants}>
-          Linha premium M'Martin de sofás, almofadas com fibra siliconada 500g, travesseiros e produtos para homecare e hospitalar.
-          Qualidade superior e conforto excepcional para seu lar e bem-estar.
+          Descubra a sofisticação dos estofados M&apos;Martin. Sofás com acabamento artesanal, 
+          almofadas com fibra siliconada 500g e uma linha completa para homecare e hospitalar.
+          Transforme seus ambientes com qualidade que você sente ao toque.
         </motion.p>
+        <motion.div className="hero-trust-badges" variants={itemVariants}>
+          <div className="trust-badge">
+            <span className="trust-number">100%</span>
+            <span className="trust-label">Qualidade Premium</span>
+          </div>
+          <div className="trust-divider" />
+          <div className="trust-badge">
+            <span className="trust-number">5x</span>
+            <span className="trust-label">Sem Juros</span>
+          </div>
+          <div className="trust-divider" />
+          <div className="trust-badge">
+            <span className="trust-number">500g</span>
+            <span className="trust-label">Fibra Siliconada</span>
+          </div>
+        </motion.div>
         <motion.div className="hero-buttons" variants={itemVariants}>
           <motion.a
             href="#sofas"
@@ -46,7 +66,7 @@ const Hero = () => {
             whileHover={{ y: -3, boxShadow: '0 11px 28px rgba(0,0,0,0.38), 0 0 18px rgba(217,177,84,0.42)' }}
             whileTap={{ scale: 0.97 }}
           >
-            Ver Catálogo
+            Explorar Catálogo
           </motion.a>
           <motion.a
             href="#homecare-hospitalar"
