@@ -25,6 +25,16 @@ const defaultCushionKit = {
     'Bordô': 0,
   },
   stockRefis: 0,
+  pricingCapas: {
+    priceCash: '',
+    priceInstallment: '',
+    installments: 5,
+  },
+  pricingRefis: {
+    priceCash: '',
+    priceInstallment: '',
+    installments: 5,
+  },
   product: {
     id: 'cushion-kit',
     category: 'almofadas',
@@ -94,6 +104,12 @@ export function AdminProvider({ children }) {
     }
     if (migrated.stockRefis === undefined) {
       migrated.stockRefis = 0;
+    }
+    if (!migrated.pricingCapas) {
+      migrated.pricingCapas = { priceCash: '', priceInstallment: '', installments: 5 };
+    }
+    if (!migrated.pricingRefis) {
+      migrated.pricingRefis = { priceCash: '', priceInstallment: '', installments: 5 };
     }
     return migrated;
   });

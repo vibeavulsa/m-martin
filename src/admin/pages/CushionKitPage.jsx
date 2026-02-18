@@ -8,6 +8,7 @@ import {
   IconMinus,
   IconBoxSeam,
   IconAlertTriangle,
+  IconCurrencyDollar,
 } from '@tabler/icons-react';
 import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
@@ -47,6 +48,17 @@ const CushionKitPage = () => {
     features: cushionKit.product.features.join(', '),
   });
   const [sizesText, setSizesText] = useState(cushionKit.sizes.join(', '));
+  const [pricingCapasForm, setPricingCapasForm] = useState({
+    priceCash: cushionKit.pricingCapas?.priceCash || '',
+    priceInstallment: cushionKit.pricingCapas?.priceInstallment || '',
+    installments: cushionKit.pricingCapas?.installments || 5,
+  });
+  const [pricingRefisForm, setPricingRefisForm] = useState({
+    priceCash: cushionKit.pricingRefis?.priceCash || '',
+    priceInstallment: cushionKit.pricingRefis?.priceInstallment || '',
+    installments: cushionKit.pricingRefis?.installments || 5,
+  });
+  const [savedPricing, setSavedPricing] = useState(false);
 
   // Memoize stock alerts to avoid recalculating on every render
   const stockAlerts = useMemo(() => {
@@ -76,6 +88,34 @@ const CushionKitPage = () => {
   const handleProductChange = (e) => {
     const { name, value } = e.target;
     setProductForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePricingCapasChange = (e) => {
+    const { name, value } = e.target;
+    setPricingCapasForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePricingRefisChange = (e) => {
+    const { name, value } = e.target;
+    setPricingRefisForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSavePricing = (e) => {
+    e.preventDefault();
+    updateCushionKit({
+      pricingCapas: {
+        priceCash: pricingCapasForm.priceCash,
+        priceInstallment: pricingCapasForm.priceInstallment,
+        installments: parseInt(pricingCapasForm.installments, 10) || 5,
+      },
+      pricingRefis: {
+        priceCash: pricingRefisForm.priceCash,
+        priceInstallment: pricingRefisForm.priceInstallment,
+        installments: parseInt(pricingRefisForm.installments, 10) || 5,
+      },
+    });
+    setSavedPricing(true);
+    setTimeout(() => setSavedPricing(false), 2000);
   };
 
   const handleSaveProduct = (e) => {
@@ -343,6 +383,180 @@ const CushionKitPage = () => {
               Estoque baixo de capas: {stockAlerts.lowStockColors.join(', ')}
             </div>
           )}
+        </div>
+
+        {/* Pricing Section */}
+        <div className="dashboard-section">
+          <h2>
+            <IconCurrencyDollar size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#d9b154' }} />
+            Controle de Preços
+          </h2>
+          <form onSubmit={handleSavePricing} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            {/* Capas Pricing */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ color: '#d9b154', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>Capas</h3>
+              <div style={{
+                padding: '1rem',
+                background: 'rgba(72, 55, 38, 0.2)',
+                border: '1px solid rgba(217, 177, 84, 0.08)',
+                borderRadius: '12px',
+              }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label htmlFor="capa-price-cash" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço à Vista</label>
+                    <input
+                      id="capa-price-cash"
+                      name="priceCash"
+                      value={pricingCapasForm.priceCash}
+                      onChange={handlePricingCapasChange}
+                      placeholder="R$ 0,00"
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        background: 'rgba(72, 55, 38, 0.35)',
+                        border: '1px solid rgba(217, 177, 84, 0.12)',
+                        borderRadius: '10px',
+                        color: '#e8e1d4',
+                        fontSize: '0.95rem',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="capa-price-installment" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço Parcelado</label>
+                    <input
+                      id="capa-price-installment"
+                      name="priceInstallment"
+                      value={pricingCapasForm.priceInstallment}
+                      onChange={handlePricingCapasChange}
+                      placeholder="R$ 0,00"
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        background: 'rgba(72, 55, 38, 0.35)',
+                        border: '1px solid rgba(217, 177, 84, 0.12)',
+                        borderRadius: '10px',
+                        color: '#e8e1d4',
+                        fontSize: '0.95rem',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="capa-installments" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Nº Parcelas</label>
+                    <input
+                      id="capa-installments"
+                      name="installments"
+                      type="number"
+                      min="1"
+                      value={pricingCapasForm.installments}
+                      onChange={handlePricingCapasChange}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        background: 'rgba(72, 55, 38, 0.35)',
+                        border: '1px solid rgba(217, 177, 84, 0.12)',
+                        borderRadius: '10px',
+                        color: '#e8e1d4',
+                        fontSize: '0.95rem',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Refis Pricing */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ color: '#d9b154', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>Refis (Enchimento)</h3>
+              <div style={{
+                padding: '1rem',
+                background: 'rgba(72, 55, 38, 0.2)',
+                border: '1px solid rgba(217, 177, 84, 0.08)',
+                borderRadius: '12px',
+              }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label htmlFor="refil-price-cash" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço à Vista</label>
+                    <input
+                      id="refil-price-cash"
+                      name="priceCash"
+                      value={pricingRefisForm.priceCash}
+                      onChange={handlePricingRefisChange}
+                      placeholder="R$ 0,00"
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        background: 'rgba(72, 55, 38, 0.35)',
+                        border: '1px solid rgba(217, 177, 84, 0.12)',
+                        borderRadius: '10px',
+                        color: '#e8e1d4',
+                        fontSize: '0.95rem',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="refil-price-installment" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço Parcelado</label>
+                    <input
+                      id="refil-price-installment"
+                      name="priceInstallment"
+                      value={pricingRefisForm.priceInstallment}
+                      onChange={handlePricingRefisChange}
+                      placeholder="R$ 0,00"
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        background: 'rgba(72, 55, 38, 0.35)',
+                        border: '1px solid rgba(217, 177, 84, 0.12)',
+                        borderRadius: '10px',
+                        color: '#e8e1d4',
+                        fontSize: '0.95rem',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="refil-installments" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Nº Parcelas</label>
+                    <input
+                      id="refil-installments"
+                      name="installments"
+                      type="number"
+                      min="1"
+                      value={pricingRefisForm.installments}
+                      onChange={handlePricingRefisChange}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        background: 'rgba(72, 55, 38, 0.35)',
+                        border: '1px solid rgba(217, 177, 84, 0.12)',
+                        borderRadius: '10px',
+                        color: '#e8e1d4',
+                        fontSize: '0.95rem',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn-primary"
+              style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              {savedPricing ? <IconCheck size={18} stroke={2} /> : <IconDeviceFloppy size={18} stroke={2} />}
+              {savedPricing ? 'Salvo!' : 'Salvar Preços'}
+            </button>
+          </form>
         </div>
 
         {/* Product Info Section */}
