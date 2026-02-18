@@ -48,6 +48,7 @@ function initStock(products) {
   for (const p of products) {
     stock[p.id] = { quantity: 50, minStock: 5 };
   }
+  stock['cushion-kit'] = { quantity: 50, minStock: 5 };
   return stock;
 }
 
@@ -113,6 +114,15 @@ export function AdminProvider({ children }) {
 
   const updateProduct = useCallback((id, data) => {
     setProducts(prev => prev.map(p => p.id === id ? { ...p, ...data } : p));
+    if (data.stockQuantity !== undefined || data.minStock !== undefined) {
+      setStock(prev => ({
+        ...prev,
+        [id]: {
+          quantity: data.stockQuantity !== undefined ? Math.max(0, parseInt(data.stockQuantity, 10) || 0) : (prev[id]?.quantity ?? 0),
+          minStock: data.minStock !== undefined ? Math.max(0, parseInt(data.minStock, 10) || 5) : (prev[id]?.minStock ?? 5),
+        }
+      }));
+    }
   }, []);
 
   const deleteProduct = useCallback((id) => {
@@ -146,6 +156,19 @@ export function AdminProvider({ children }) {
       status: 'pendente',
     };
     setOrders(prev => [newOrder, ...prev]);
+    if (order.items && Array.isArray(order.items)) {
+      setStock(prev => {
+        const next = { ...prev };
+        for (const item of order.items) {
+          const pid = item.productId || item.id;
+          if (pid && next[pid]) {
+            const qty = item.quantity || 1;
+            next[pid] = { ...next[pid], quantity: Math.max(0, next[pid].quantity - qty) };
+          }
+        }
+        return next;
+      });
+    }
     return newOrder;
   }, []);
 
@@ -160,8 +183,20 @@ export function AdminProvider({ children }) {
   const getLowStockProducts = useCallback(() => {
     return products.filter(p => {
       const s = stock[p.id];
-      return s && s.quantity <= s.minStock;
+      return s && s.quantity > 0 && s.quantity <= s.minStock;
     });
+  }, [products, stock]);
+
+  const getOutOfStockProducts = useCallback(() => {
+    const outOfStock = products.filter(p => {
+      const s = stock[p.id];
+      return s && s.quantity <= 0;
+    });
+    const cushionKitStock = stock['cushion-kit'];
+    if (cushionKitStock && cushionKitStock.quantity <= 0 && !products.some(p => p.id === 'cushion-kit')) {
+      outOfStock.push({ id: 'cushion-kit', name: 'Kit Almofadas' });
+    }
+    return outOfStock;
   }, [products, stock]);
 
   const getTotalStockValue = useCallback(() => {
@@ -192,6 +227,7 @@ export function AdminProvider({ children }) {
     addOrder,
     updateOrderStatus,
     getLowStockProducts,
+    getOutOfStockProducts,
     getTotalStockValue,
     cushionKit,
     updateCushionKit,

@@ -4,18 +4,35 @@ import {
   IconPlus,
   IconSearch,
   IconAlertTriangle,
+  IconBoxSeam,
+  IconPackageOff,
+  IconCurrencyReal,
 } from '@tabler/icons-react';
 import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
 
 const StockPage = () => {
-  const { products, categories, stock, updateStock, updateMinStock } = useAdmin();
+  const { products, categories, stock, updateStock, updateMinStock, cushionKit, getLowStockProducts, getOutOfStockProducts, getTotalStockValue } = useAdmin();
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
 
+  const allProducts = useMemo(() => {
+    const list = [...products];
+    const hasCushionKit = products.some(p => p.id === 'cushion-kit' || (p.isKit && p.category === 'almofadas'));
+    if (!hasCushionKit && cushionKit?.product) {
+      list.push({ ...cushionKit.product, id: cushionKit.product.id || 'cushion-kit' });
+    }
+    return list;
+  }, [products, cushionKit]);
+
+  const totalStock = useMemo(() => Object.values(stock).reduce((sum, s) => sum + s.quantity, 0), [stock]);
+  const lowStockCount = getLowStockProducts().length;
+  const outOfStockCount = getOutOfStockProducts().length;
+  const totalValue = getTotalStockValue();
+
   const filtered = useMemo(() => {
-    let list = products;
+    let list = allProducts;
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter((p) => p.name.toLowerCase().includes(q));
@@ -26,16 +43,24 @@ const StockPage = () => {
     if (filterStatus === 'low') {
       list = list.filter((p) => {
         const s = stock[p.id];
-        return s && s.quantity <= s.minStock;
+        return s && s.quantity > 0 && s.quantity <= s.minStock;
       });
     } else if (filterStatus === 'ok') {
       list = list.filter((p) => {
         const s = stock[p.id];
         return s && s.quantity > s.minStock;
       });
+    } else if (filterStatus === 'out') {
+      list = list.filter((p) => {
+        const s = stock[p.id];
+        return !s || s.quantity <= 0;
+      });
     }
     return list;
-  }, [products, search, filterCategory, filterStatus, stock]);
+  }, [allProducts, search, filterCategory, filterStatus, stock]);
+
+  const formatCurrency = (value) =>
+    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const getCategoryName = (id) => {
     const cat = categories.find((c) => c.id === id);
@@ -55,6 +80,45 @@ const StockPage = () => {
       <div className="admin-page-header">
         <h1>Gerenciamento de Estoque</h1>
         <p>Controle de estoque e alertas de reposição</p>
+      </div>
+
+      <div className="dashboard-kpis" style={{ marginBottom: '1.5rem' }}>
+        <div className="kpi-card">
+          <div className="kpi-icon green">
+            <IconBoxSeam size={24} stroke={1.6} />
+          </div>
+          <div className="kpi-info">
+            <h3>Total em Estoque</h3>
+            <div className="kpi-value">{totalStock}</div>
+          </div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-icon" style={{ background: 'rgba(255, 152, 0, 0.15)', color: '#ff9800' }}>
+            <IconAlertTriangle size={24} stroke={1.6} />
+          </div>
+          <div className="kpi-info">
+            <h3>Estoque Baixo</h3>
+            <div className="kpi-value">{lowStockCount}</div>
+          </div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-icon red">
+            <IconPackageOff size={24} stroke={1.6} />
+          </div>
+          <div className="kpi-info">
+            <h3>Sem Estoque</h3>
+            <div className="kpi-value">{outOfStockCount}</div>
+          </div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-icon gold">
+            <IconCurrencyReal size={24} stroke={1.6} />
+          </div>
+          <div className="kpi-info">
+            <h3>Valor Total</h3>
+            <div className="kpi-value">{formatCurrency(totalValue)}</div>
+          </div>
+        </div>
       </div>
 
       <div className="admin-toolbar">
@@ -87,6 +151,7 @@ const StockPage = () => {
         >
           <option value="all">Todos Status</option>
           <option value="low">Estoque Baixo</option>
+          <option value="out">Sem Estoque</option>
           <option value="ok">Estoque OK</option>
         </select>
       </div>
@@ -143,8 +208,13 @@ const StockPage = () => {
                     </div>
                   </td>
                   <td>
-                    {isLow ? (
+                    {s.quantity <= 0 ? (
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#f44336', fontSize: '0.8rem', fontWeight: 600 }}>
+                        <IconPackageOff size={14} stroke={2} />
+                        Sem Estoque
+                      </span>
+                    ) : isLow ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#ff9800', fontSize: '0.8rem', fontWeight: 600 }}>
                         <IconAlertTriangle size={14} stroke={2} />
                         Baixo
                       </span>
