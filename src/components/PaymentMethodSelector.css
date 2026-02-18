@@ -23,7 +23,7 @@
   padding: 0.75rem 0.5rem;
   border: 1.5px solid rgba(217, 177, 84, 0.25);
   border-radius: 10px;
-  background: rgba(30, 30, 30, 0.5);
+  background: rgba(42, 30, 20, 0.55);
   color: var(--text-secondary, #c9c0b0);
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, transform 0.2s;

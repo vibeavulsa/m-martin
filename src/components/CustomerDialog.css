@@ -81,6 +81,12 @@
   gap: 1rem;
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -185,6 +191,10 @@
 
   .customer-body {
     padding: 1.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
   }
 
   .customer-form-actions {

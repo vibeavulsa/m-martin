@@ -178,60 +178,64 @@ const CustomerDialog = ({ isOpen, onClose, onSubmit }) => {
                   {errors.name && <span className="error-msg">{errors.name}</span>}
                 </motion.div>
 
-                <motion.div className="form-group" variants={itemVariants}>
-                  <label htmlFor="customer-email">E-mail *</label>
-                  <input
-                    id="customer-email"
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="seu@email.com"
-                    className={errors.email ? 'input-error' : ''}
-                  />
-                  {errors.email && <span className="error-msg">{errors.email}</span>}
+                <motion.div className="form-row" variants={itemVariants}>
+                  <div className="form-group">
+                    <label htmlFor="customer-email">E-mail *</label>
+                    <input
+                      id="customer-email"
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="seu@email.com"
+                      className={errors.email ? 'input-error' : ''}
+                    />
+                    {errors.email && <span className="error-msg">{errors.email}</span>}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="customer-phone">Telefone *</label>
+                    <input
+                      id="customer-phone"
+                      type="tel"
+                      name="phone"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder="(00) 00000-0000"
+                      className={errors.phone ? 'input-error' : ''}
+                    />
+                    {errors.phone && <span className="error-msg">{errors.phone}</span>}
+                  </div>
                 </motion.div>
 
-                <motion.div className="form-group" variants={itemVariants}>
-                  <label htmlFor="customer-phone">Telefone *</label>
-                  <input
-                    id="customer-phone"
-                    type="tel"
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="(00) 00000-0000"
-                    className={errors.phone ? 'input-error' : ''}
-                  />
-                  {errors.phone && <span className="error-msg">{errors.phone}</span>}
-                </motion.div>
+                <motion.div className="form-row" variants={itemVariants}>
+                  <div className="form-group">
+                    <label htmlFor="customer-address">Endereço *</label>
+                    <input
+                      id="customer-address"
+                      type="text"
+                      name="address"
+                      value={form.address}
+                      onChange={handleChange}
+                      placeholder="Rua, número, complemento"
+                      className={errors.address ? 'input-error' : ''}
+                    />
+                    {errors.address && <span className="error-msg">{errors.address}</span>}
+                  </div>
 
-                <motion.div className="form-group" variants={itemVariants}>
-                  <label htmlFor="customer-address">Endereço *</label>
-                  <input
-                    id="customer-address"
-                    type="text"
-                    name="address"
-                    value={form.address}
-                    onChange={handleChange}
-                    placeholder="Rua, número, complemento"
-                    className={errors.address ? 'input-error' : ''}
-                  />
-                  {errors.address && <span className="error-msg">{errors.address}</span>}
-                </motion.div>
-
-                <motion.div className="form-group" variants={itemVariants}>
-                  <label htmlFor="customer-city">Cidade *</label>
-                  <input
-                    id="customer-city"
-                    type="text"
-                    name="city"
-                    value={form.city}
-                    onChange={handleChange}
-                    placeholder="Sua cidade"
-                    className={errors.city ? 'input-error' : ''}
-                  />
-                  {errors.city && <span className="error-msg">{errors.city}</span>}
+                  <div className="form-group">
+                    <label htmlFor="customer-city">Cidade *</label>
+                    <input
+                      id="customer-city"
+                      type="text"
+                      name="city"
+                      value={form.city}
+                      onChange={handleChange}
+                      placeholder="Sua cidade"
+                      className={errors.city ? 'input-error' : ''}
+                    />
+                    {errors.city && <span className="error-msg">{errors.city}</span>}
+                  </div>
                 </motion.div>
 
                 <motion.div className="form-group" variants={itemVariants}>
