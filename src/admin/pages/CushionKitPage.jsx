@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   IconPalette,
   IconPlus,
@@ -23,15 +23,19 @@ const colorGradients = {
   'Bordô': 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)',
 };
 
+const LOW_STOCK_THRESHOLD_COVERS = 5;
+const LOW_STOCK_THRESHOLD_REFILLS = 10;
+
+const getStockClassName = (stock, threshold) => {
+  if (stock <= 0) return 'stock-low';
+  if (stock <= threshold) return 'stock-warning';
+  return 'stock-ok';
+};
+
 const CushionKitPage = () => {
-  const { cushionKit, updateCushionKit, stock, updateStock, updateMinStock } = useAdmin();
+  const { cushionKit, updateCushionKit, updateCapaStock, updateRefilStock } = useAdmin();
   const [newColor, setNewColor] = useState('');
   const [saved, setSaved] = useState(false);
-
-  const kitId = cushionKit.product.id || 'cushion-kit';
-  const kitStock = stock[kitId] || { quantity: 0, minStock: 5 };
-  const isLowStock = kitStock.quantity > 0 && kitStock.quantity <= kitStock.minStock;
-  const isOutOfStock = kitStock.quantity <= 0;
   const [productForm, setProductForm] = useState({
     name: cushionKit.product.name,
     description: cushionKit.product.description,
@@ -43,6 +47,19 @@ const CushionKitPage = () => {
     features: cushionKit.product.features.join(', '),
   });
   const [sizesText, setSizesText] = useState(cushionKit.sizes.join(', '));
+
+  // Memoize stock alerts to avoid recalculating on every render
+  const stockAlerts = useMemo(() => {
+    const outOfStockColors = Object.entries(cushionKit.stockCapas)
+      .filter(([, stock]) => stock <= 0)
+      .map(([color]) => color);
+    
+    const lowStockColors = Object.entries(cushionKit.stockCapas)
+      .filter(([, stock]) => stock > 0 && stock <= LOW_STOCK_THRESHOLD_COVERS)
+      .map(([color]) => color);
+
+    return { outOfStockColors, lowStockColors };
+  }, [cushionKit.stockCapas]);
 
   const handleAddColor = () => {
     const color = newColor.trim();
@@ -171,22 +188,24 @@ const CushionKitPage = () => {
             <IconBoxSeam size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#d9b154' }} />
             Controle de Estoque
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+          
+          {/* Refis Stock Control */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h3 style={{ color: '#d9b154', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>Refis (Enchimento)</h3>
             <div style={{
               padding: '1rem',
               background: 'rgba(72, 55, 38, 0.2)',
               border: '1px solid rgba(217, 177, 84, 0.08)',
               borderRadius: '12px',
             }}>
-              <span style={{ display: 'block', color: '#bfb3a2', fontSize: '0.8rem', fontWeight: 500, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Quantidade em Estoque</span>
               <div className="stock-controls" style={{ justifyContent: 'center' }}>
-                <button onClick={() => updateStock(kitId, kitStock.quantity - 1)} aria-label="Diminuir estoque">
+                <button onClick={() => updateRefilStock(cushionKit.stockRefis - 1)} aria-label="Diminuir estoque de refis">
                   <IconMinus size={14} stroke={2} />
                 </button>
-                <span className={`stock-value ${isOutOfStock ? 'stock-low' : isLowStock ? 'stock-warning' : 'stock-ok'}`} style={{ fontSize: '1.5rem', minWidth: '48px' }}>
-                  {kitStock.quantity}
+                <span className={`stock-value ${getStockClassName(cushionKit.stockRefis, LOW_STOCK_THRESHOLD_REFILLS)}`} style={{ fontSize: '1.5rem', minWidth: '48px' }}>
+                  {cushionKit.stockRefis}
                 </span>
-                <button onClick={() => updateStock(kitId, kitStock.quantity + 1)} aria-label="Aumentar estoque">
+                <button onClick={() => updateRefilStock(cushionKit.stockRefis + 1)} aria-label="Aumentar estoque de refis">
                   <IconPlus size={14} stroke={2} />
                 </button>
               </div>
@@ -210,7 +229,7 @@ const CushionKitPage = () => {
                     if (e.key === 'Enter') {
                       const val = parseInt(e.target.value, 10);
                       if (!isNaN(val)) {
-                        updateStock(kitId, val);
+                        updateRefilStock(val);
                         e.target.value = '';
                       }
                     }
@@ -218,25 +237,58 @@ const CushionKitPage = () => {
                 />
               </div>
             </div>
-            <div style={{
-              padding: '1rem',
-              background: 'rgba(72, 55, 38, 0.2)',
-              border: '1px solid rgba(217, 177, 84, 0.08)',
-              borderRadius: '12px',
-            }}>
-              <span style={{ display: 'block', color: '#bfb3a2', fontSize: '0.8rem', fontWeight: 500, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Estoque Mínimo</span>
-              <div className="stock-controls" style={{ justifyContent: 'center' }}>
-                <button onClick={() => updateMinStock(kitId, kitStock.minStock - 1)} aria-label="Diminuir estoque mínimo">
-                  <IconMinus size={14} stroke={2} />
-                </button>
-                <span className="stock-value" style={{ fontSize: '1.5rem', minWidth: '48px' }}>{kitStock.minStock}</span>
-                <button onClick={() => updateMinStock(kitId, kitStock.minStock + 1)} aria-label="Aumentar estoque mínimo">
-                  <IconPlus size={14} stroke={2} />
-                </button>
-              </div>
+          </div>
+
+          {/* Capas por Cor Stock Control */}
+          <div style={{ marginBottom: '1rem' }}>
+            <h3 style={{ color: '#d9b154', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>Capas por Cor</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+              {cushionKit.colors.map((color) => {
+                const colorStock = cushionKit.stockCapas[color] || 0;
+                
+                return (
+                  <div
+                    key={color}
+                    style={{
+                      padding: '0.75rem 1rem',
+                      background: 'rgba(72, 55, 38, 0.2)',
+                      border: '1px solid rgba(217, 177, 84, 0.08)',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        background: colorGradients[color] || '#999',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span style={{ fontSize: '0.85rem', color: '#e8e1d4', flex: 1, fontWeight: 500 }}>{color}</span>
+                    <div className="stock-controls" style={{ gap: '0.4rem' }}>
+                      <button onClick={() => updateCapaStock(color, colorStock - 1)} aria-label={`Diminuir estoque de capa ${color}`} style={{ width: '26px', height: '26px' }}>
+                        <IconMinus size={12} stroke={2} />
+                      </button>
+                      <span className={`stock-value ${getStockClassName(colorStock, LOW_STOCK_THRESHOLD_COVERS)}`} style={{ fontSize: '0.95rem', minWidth: '32px' }}>
+                        {colorStock}
+                      </span>
+                      <button onClick={() => updateCapaStock(color, colorStock + 1)} aria-label={`Aumentar estoque de capa ${color}`} style={{ width: '26px', height: '26px' }}>
+                        <IconPlus size={12} stroke={2} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-          {isOutOfStock && (
+
+          {/* Stock Alerts */}
+          {(cushionKit.stockRefis <= 0 || stockAlerts.outOfStockColors.length > 0) && (
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -248,12 +300,33 @@ const CushionKitPage = () => {
               color: '#f44336',
               fontSize: '0.85rem',
               fontWeight: 500,
+              marginBottom: '0.5rem',
             }}>
               <IconAlertTriangle size={16} stroke={2} />
-              Kit de almofadas sem estoque! Adicione unidades para disponibilizar no catálogo.
+              {cushionKit.stockRefis <= 0 && 'Refis sem estoque! '}
+              {stockAlerts.outOfStockColors.length > 0 && 
+                `Capas sem estoque: ${stockAlerts.outOfStockColors.join(', ')}`}
             </div>
           )}
-          {!isOutOfStock && isLowStock && (
+          {cushionKit.stockRefis > 0 && cushionKit.stockRefis <= LOW_STOCK_THRESHOLD_REFILLS && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1rem',
+              background: 'rgba(255, 152, 0, 0.12)',
+              border: '1px solid rgba(255, 152, 0, 0.25)',
+              borderRadius: '10px',
+              color: '#ff9800',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              marginBottom: '0.5rem',
+            }}>
+              <IconAlertTriangle size={16} stroke={2} />
+              Estoque baixo de refis! Apenas {cushionKit.stockRefis} restante(s).
+            </div>
+          )}
+          {stockAlerts.lowStockColors.length > 0 && (
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -267,7 +340,7 @@ const CushionKitPage = () => {
               fontWeight: 500,
             }}>
               <IconAlertTriangle size={16} stroke={2} />
-              Estoque baixo! Apenas {kitStock.quantity} kit(s) restante(s).
+              Estoque baixo de capas: {stockAlerts.lowStockColors.join(', ')}
             </div>
           )}
         </div>
