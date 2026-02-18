@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconX, IconUser } from '@tabler/icons-react';
+import { IconX, IconUser, IconCheck, IconShoppingCart } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import './CustomerDialog.css';
 
@@ -141,9 +141,25 @@ const CustomerDialog = ({ isOpen, onClose, onSubmit }) => {
               initial="hidden"
               animate="visible"
             >
+              <motion.div className="checkout-steps" variants={itemVariants}>
+                <div className="checkout-step completed">
+                  <span className="step-number"><IconCheck size={14} stroke={2.5} /></span>
+                  <span className="step-label">Carrinho</span>
+                </div>
+                <div className="step-connector active" />
+                <div className="checkout-step active">
+                  <span className="step-number">2</span>
+                  <span className="step-label">Dados</span>
+                </div>
+                <div className="step-connector" />
+                <div className="checkout-step">
+                  <span className="step-number">3</span>
+                  <span className="step-label">Pagamento</span>
+                </div>
+              </motion.div>
+
               <motion.div className="customer-header-section" variants={itemVariants}>
-                <IconUser size={32} stroke={1.5} className="customer-icon" />
-                <h2>Dados do Cliente</h2>
+                <h2>Seus Dados</h2>
                 <p>Preencha seus dados para finalizar a compra</p>
               </motion.div>
 
@@ -240,7 +256,7 @@ const CustomerDialog = ({ isOpen, onClose, onSubmit }) => {
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    Continuar
+                    Ir para Pagamento
                   </motion.button>
                 </motion.div>
               </form>

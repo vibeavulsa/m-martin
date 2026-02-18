@@ -40,7 +40,7 @@ const Hero = () => {
         </motion.h1>
         <motion.p className="hero-description" variants={itemVariants}>
           Descubra a sofisticação dos estofados M&apos;Martin. Sofás com acabamento artesanal, 
-          almofadas com fibra siliconada 500g e uma linha completa para homecare e hospitalar.
+          almofadas com fibra siliconada 500g e uma linha completa para acamados e hospitalar.
           Transforme seus ambientes com qualidade que você sente ao toque.
         </motion.p>
         <motion.div className="hero-trust-badges" variants={itemVariants}>

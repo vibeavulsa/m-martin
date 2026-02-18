@@ -20,7 +20,7 @@ export const categories = [
   },
   {
     id: 'homecare-hospitalar',
-    name: 'Homecare e Hospitalar',
+    name: 'Para Acamados e Hospitalar',
     description: 'Qualidade hospitalar com o cuidado que quem você ama merece',
     iconName: 'IconHeartbeat'
   },
@@ -163,7 +163,7 @@ export const products = [
     unitPriceCash: 'R$ 69,90',
     unitPriceInstallment: 'R$ 69,90',
     image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=600',
-    features: ['Kit com 5 unidades personalizáveis', 'Tecido Oxford premium', 'Fibra siliconada 500g', 'Não embola', 'Alta durabilidade', 'Escolha cada cor'],
+    features: ['Kit com 5 unidades', 'Tecido Oxford premium', 'Fibra siliconada 500g', 'Não embola', 'Alta durabilidade', 'Escolha cada cor'],
     isKit: true,
     kitQuantity: 5,
     sizes: ['45x45', '50x50'],

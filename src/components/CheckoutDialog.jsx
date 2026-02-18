@@ -239,8 +239,24 @@ const CheckoutDialog = ({ isOpen, onClose, onConfirm, onBack }) => {
               initial="hidden"
               animate="visible"
             >
+              <motion.div className="checkout-steps" variants={itemVariants}>
+                <div className="checkout-step completed">
+                  <span className="step-number"><IconCheck size={14} stroke={2.5} /></span>
+                  <span className="step-label">Carrinho</span>
+                </div>
+                <div className="step-connector completed" />
+                <div className="checkout-step completed">
+                  <span className="step-number"><IconCheck size={14} stroke={2.5} /></span>
+                  <span className="step-label">Dados</span>
+                </div>
+                <div className="step-connector active" />
+                <div className="checkout-step active">
+                  <span className="step-number">3</span>
+                  <span className="step-label">Pagamento</span>
+                </div>
+              </motion.div>
+
               <motion.div className="checkout-header-section" variants={itemVariants}>
-                <IconCheck size={32} stroke={1.5} className="checkout-icon" />
                 <h2>Resumo do Pedido</h2>
                 <p>Confira seus dados e itens antes de confirmar</p>
               </motion.div>
