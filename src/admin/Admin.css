@@ -101,6 +101,91 @@
   color: #e8e1d4;
 }
 
+/* Mobile Top Bar */
+.admin-mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: rgba(25, 18, 16, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(217, 177, 84, 0.1);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  z-index: 110;
+}
+
+.admin-menu-toggle {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(217, 177, 84, 0.08);
+  border: 1px solid rgba(217, 177, 84, 0.12);
+  border-radius: 10px;
+  color: #d9b154;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-menu-toggle:hover {
+  background: rgba(217, 177, 84, 0.15);
+}
+
+.admin-mobile-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  color: #e8e1d4;
+  font-weight: 600;
+}
+
+.admin-mobile-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: #d9b154;
+  font-weight: 600;
+}
+
+/* Sidebar Overlay */
+.admin-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 199;
+  animation: adminOverlayIn 0.2s ease;
+}
+
+/* Sidebar Close Button (mobile only) */
+.admin-sidebar-close {
+  display: none;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  background: rgba(217, 177, 84, 0.1);
+  border: 1px solid rgba(217, 177, 84, 0.15);
+  border-radius: 10px;
+  color: #bfb3a2;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-sidebar-close:hover {
+  color: #d9b154;
+  background: rgba(217, 177, 84, 0.2);
+}
+
 .admin-sidebar {
   width: 260px;
   background: rgba(25, 18, 16, 0.96);
@@ -111,12 +196,14 @@
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 200;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .admin-sidebar-header {
   padding: 1.5rem;
   border-bottom: 1px solid rgba(217, 177, 84, 0.1);
+  position: relative;
 }
 
 .admin-sidebar-header h2 {
@@ -476,6 +563,8 @@
   border: 1px solid rgba(217, 177, 84, 0.1);
   border-radius: 16px;
   overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-table {
@@ -888,31 +977,15 @@
   color: #ffc107;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .admin-sidebar {
-    width: 60px;
-    overflow: hidden;
-  }
-
-  .admin-sidebar-header h2,
-  .admin-sidebar-header span,
-  .admin-nav-link span,
-  .admin-sidebar-footer span {
-    display: none;
-  }
-
-  .admin-nav-link {
-    justify-content: center;
-    padding: 0.75rem;
-  }
-
-  .admin-main {
-    margin-left: 60px;
-    padding: 1rem;
-  }
-
+/* ============================================
+   RESPONSIVE - Tablet (max 1024px)
+   ============================================ */
+@media (max-width: 1024px) {
   .dashboard-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-settings-grid {
     grid-template-columns: 1fr;
   }
 
@@ -920,28 +993,225 @@
     grid-template-columns: 1fr;
   }
 
+  .product-form-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Mobile (max 768px)
+   ============================================ */
+@media (max-width: 768px) {
+  /* Show mobile top bar */
+  .admin-mobile-header {
+    display: flex;
+  }
+
+  /* Sidebar becomes a drawer */
+  .admin-sidebar {
+    transform: translateX(-100%);
+    box-shadow: none;
+    width: 280px;
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .admin-sidebar-overlay {
+    display: block;
+  }
+
+  .admin-sidebar-close {
+    display: flex;
+  }
+
+  /* Sidebar text is always visible when drawer is open */
+  .admin-sidebar-header h2,
+  .admin-sidebar-header span,
+  .admin-nav-link span,
+  .admin-sidebar-footer span {
+    display: inline;
+  }
+
+  .admin-nav-link {
+    justify-content: flex-start;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .admin-main {
+    margin-left: 0;
+    padding: 1.25rem 1rem;
+    padding-top: calc(56px + 1.25rem);
+  }
+
+  .admin-page-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .admin-page-header p {
+    font-size: 0.82rem;
+  }
+
+  /* KPI cards: 2-column grid on mobile */
+  .dashboard-kpis {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .kpi-card {
+    padding: 1rem;
+    border-radius: 14px;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .kpi-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .kpi-info .kpi-value {
+    font-size: 1.35rem;
+  }
+
+  .kpi-info h3 {
+    font-size: 0.7rem;
+  }
+
+  /* Toolbar: stack vertically */
   .admin-toolbar {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .admin-toolbar > div {
+    max-width: none !important;
   }
 
   .admin-search {
     max-width: none;
   }
 
+  /* Tables: Responsive card layout */
+  .admin-table-wrapper {
+    background: none;
+    backdrop-filter: none;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .admin-table {
+    display: block;
+  }
+
+  .admin-table thead {
+    display: none;
+  }
+
+  .admin-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .admin-table tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(30, 21, 16, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(217, 177, 84, 0.1);
+    border-radius: 14px;
+    padding: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .admin-table tr:hover {
+    border-color: rgba(217, 177, 84, 0.2);
+  }
+
+  .admin-table tr:hover td {
+    background: none;
+  }
+
+  .admin-table td {
+    padding: 0.25rem 0;
+    border-bottom: none;
+    font-size: 0.85rem;
+  }
+
+  .admin-table td:before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #bfb3a2;
+    font-weight: 600;
+    margin-bottom: 0.15rem;
+  }
+
+  /* Product table card layout */
+  .admin-table td:first-child {
+    width: auto;
+  }
+
+  .admin-table td:last-child {
+    margin-left: auto;
+  }
+
+  .admin-table .table-actions {
+    gap: 0.5rem;
+  }
+
+  .admin-table .table-actions button {
+    padding: 0.5rem;
+    border-radius: 10px;
+  }
+
+  .product-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+  }
+
+  /* Dashboard sections */
+  .dashboard-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-section {
+    border-radius: 14px;
+    padding: 1.25rem;
+  }
+
+  /* Modals */
   .admin-modal-overlay,
   .admin-confirm-overlay {
-    padding: 1rem;
+    padding: 0.75rem;
     align-items: flex-end;
   }
 
   .admin-modal {
-    max-height: 90vh;
+    max-height: 92vh;
     border-radius: 22px 22px 12px 12px;
   }
 
   .admin-modal-body {
     padding: 1.5rem;
+  }
+
+  .admin-modal .form-row {
+    grid-template-columns: 1fr;
   }
 
   .admin-modal .form-actions {
@@ -964,6 +1234,68 @@
 
   .form-row-3 {
     grid-template-columns: 1fr;
+  }
+
+  /* Stock controls */
+  .stock-controls button {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  /* Payment settings */
+  .payment-settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Small Mobile (max 480px)
+   ============================================ */
+@media (max-width: 480px) {
+  .admin-main {
+    padding: 1rem 0.75rem;
+    padding-top: calc(56px + 1rem);
+  }
+
+  .admin-page-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .dashboard-kpis {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .kpi-card {
+    padding: 0.85rem;
+  }
+
+  .kpi-info .kpi-value {
+    font-size: 1.15rem;
+  }
+
+  .admin-table tr {
+    padding: 0.85rem;
+    border-radius: 12px;
+  }
+
+  .btn-primary {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .admin-modal-overlay,
+  .admin-confirm-overlay {
+    padding: 0.5rem;
+  }
+
+  .admin-modal-body {
+    padding: 1.25rem;
+  }
+
+  .admin-modal-header h2 {
+    font-size: 1.25rem;
   }
 }
 
@@ -1280,9 +1612,4 @@
   margin-top: 0.5rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .payment-settings-grid {
-    grid-template-columns: 1fr;
-  }
-}
+/* Responsive (Payment) is handled above in main responsive sections */

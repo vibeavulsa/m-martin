@@ -183,22 +183,22 @@ const ProductsPage = () => {
               const isLow = s && qty <= s.minStock;
               return (
                 <tr key={p.id}>
-                  <td>
+                  <td data-label="Imagem">
                     {p.image ? (
                       <img src={p.image} alt={p.name} className="product-thumb" />
                     ) : (
                       <div className="product-thumb" style={{ background: 'rgba(217,177,84,0.1)' }} />
                     )}
                   </td>
-                  <td>{p.name}</td>
-                  <td><span className="category-badge">{getCategoryName(p.category)}</span></td>
-                  <td>{p.price}</td>
-                  <td>
+                  <td data-label="Nome">{p.name}</td>
+                  <td data-label="Categoria"><span className="category-badge">{getCategoryName(p.category)}</span></td>
+                  <td data-label="Preço">{p.price}</td>
+                  <td data-label="Estoque">
                     <span className={isLow ? 'stock-low' : 'stock-ok'}>
                       {qty} un.
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Ações">
                     <div className="table-actions">
                       <button title="Editar" aria-label="Editar produto" onClick={() => openEdit(p)}>
                         <IconPencil size={16} stroke={1.6} />
