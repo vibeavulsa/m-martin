@@ -18,40 +18,56 @@ const ImagePasteArea = ({ images = [], onChange }) => {
       setIsPasting(true);
       
       const items = e.clipboardData?.items;
-      if (!items) return;
+      if (!items || items.length === 0) {
+        setIsPasting(false);
+        return;
+      }
 
-      const newImages = [];
+      const imagePromises = [];
+      let hasImages = false;
+      
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         
         // Handle image files
         if (item.type.indexOf('image') !== -1) {
+          hasImages = true;
           const file = item.getAsFile();
           if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-              newImages.push(event.target.result);
-              if (newImages.length === items.length || i === items.length - 1) {
-                onChange([...images, ...newImages]);
-                setTimeout(() => setIsPasting(false), 300);
-              }
-            };
-            reader.readAsDataURL(file);
+            const promise = new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = (event) => resolve(event.target.result);
+              reader.onerror = () => resolve(null);
+              reader.readAsDataURL(file);
+            });
+            imagePromises.push(promise);
           }
         }
         // Handle text URLs
         else if (item.type === 'text/plain') {
-          item.getAsString((url) => {
-            if (url.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)/i)) {
-              newImages.push(url);
-              onChange([...images, ...newImages]);
-              setTimeout(() => setIsPasting(false), 300);
-            }
+          const promise = new Promise((resolve) => {
+            item.getAsString((url) => {
+              if (url.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)/i)) {
+                hasImages = true;
+                resolve(url);
+              } else {
+                resolve(null);
+              }
+            });
           });
+          imagePromises.push(promise);
         }
       }
 
-      if (newImages.length === 0) {
+      if (imagePromises.length > 0) {
+        Promise.all(imagePromises).then((results) => {
+          const validImages = results.filter(img => img !== null);
+          if (validImages.length > 0) {
+            onChange([...images, ...validImages]);
+          }
+          setTimeout(() => setIsPasting(false), 300);
+        });
+      } else {
         setTimeout(() => setIsPasting(false), 300);
       }
     };
@@ -78,41 +94,57 @@ const ImagePasteArea = ({ images = [], onChange }) => {
     setIsDragging(false);
 
     const files = e.dataTransfer?.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
-    const newImages = [];
+    const imagePromises = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          newImages.push(event.target.result);
-          if (newImages.length === files.length) {
-            onChange([...images, ...newImages]);
-          }
-        };
-        reader.readAsDataURL(file);
+        const promise = new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (event) => resolve(event.target.result);
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(file);
+        });
+        imagePromises.push(promise);
       }
+    }
+
+    if (imagePromises.length > 0) {
+      Promise.all(imagePromises).then((results) => {
+        const validImages = results.filter(img => img !== null);
+        if (validImages.length > 0) {
+          onChange([...images, ...validImages]);
+        }
+      });
     }
   };
 
   const handleFileSelect = (e) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
-    const newImages = [];
+    const imagePromises = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          newImages.push(event.target.result);
-          if (newImages.length === files.length) {
-            onChange([...images, ...newImages]);
-          }
-        };
-        reader.readAsDataURL(file);
+        const promise = new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (event) => resolve(event.target.result);
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(file);
+        });
+        imagePromises.push(promise);
       }
+    }
+
+    if (imagePromises.length > 0) {
+      Promise.all(imagePromises).then((results) => {
+        const validImages = results.filter(img => img !== null);
+        if (validImages.length > 0) {
+          onChange([...images, ...validImages]);
+        }
+      });
     }
   };
 
