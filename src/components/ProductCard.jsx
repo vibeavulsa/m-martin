@@ -27,6 +27,9 @@ const ProductCard = ({ product }) => {
     setTimeout(() => setAdded(false), 1500);
   };
 
+  const hasMultipleImages = product.images && product.images.length > 1;
+  const displayImage = product.images && product.images.length > 0 ? product.images[0] : product.image;
+
   return (
     <>
       <motion.div
@@ -39,13 +42,21 @@ const ProductCard = ({ product }) => {
         transition={{ duration: 0.28 }}
       >
         <div className="product-image">
-          {!imageError ? (
-            <img 
-              src={product.image} 
-              alt={product.name}
-              className="product-img"
-              onError={() => setImageError(true)}
-            />
+          {!imageError && displayImage ? (
+            <>
+              <img 
+                src={displayImage} 
+                alt={product.name}
+                className="product-img"
+                onError={() => setImageError(true)}
+              />
+              {hasMultipleImages && (
+                <div className="product-image-badge">
+                  <IconPackage size={14} stroke={2} />
+                  <span>{product.images.length} fotos</span>
+                </div>
+              )}
+            </>
           ) : (
             <div className="image-placeholder">
               <IconPackage size={64} stroke={1.5} className="placeholder-icon" />

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo: Multi-Image Paste Area - M'Martin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background-color: #191210;
+            background-image: radial-gradient(ellipse at 18% 28%, rgba(72, 53, 38, 0.48) 0%, transparent 52%),
+                              radial-gradient(ellipse at 82% 72%, rgba(94, 71, 52, 0.28) 0%, transparent 44%);
+            color: #e8e1d4;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Georgia', serif;
+            color: #d9b154;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #bfb3a2;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .demo-section {
+            background: rgba(30, 21, 16, 0.92);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(217, 177, 84, 0.12);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: #d9b154;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Image Paste Area Styles */
+        .image-paste-area {
+            position: relative;
+            width: 100%;
+            min-height: 180px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(217, 177, 84, 0.25);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .image-paste-area:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(217, 177, 84, 0.4);
+        }
+
+        .paste-area-icon {
+            font-size: 3rem;
+            color: #d9b154;
+            opacity: 0.6;
+        }
+
+        .paste-area-text {
+            text-align: center;
+        }
+
+        .paste-area-title {
+            color: #e8e1d4;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .paste-area-subtitle {
+            color: #bfb3a2;
+            font-size: 0.8rem;
+        }
+
+        /* Thumbnails Grid */
+        .image-thumbnails-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .image-thumbnail-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(217, 177, 84, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .image-thumbnail-item:hover {
+            border-color: rgba(217, 177, 84, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-thumbnail-badge {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(217, 177, 84, 0.9);
+            backdrop-filter: blur(4px);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #191210;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .image-thumbnail-remove {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 24px;
+            height: 24px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            opacity: 0;
+            transition: all 0.2s ease;
+            font-size: 0.8rem;
+        }
+
+        .image-thumbnail-item:hover .image-thumbnail-remove {
+            opacity: 1;
+        }
+
+        .image-thumbnail-remove:hover {
+            background: rgba(244, 67, 54, 0.9);
+        }
+
+        .info-box {
+            background: rgba(217, 177, 84, 0.08);
+            border: 1px solid rgba(217, 177, 84, 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-box h3 {
+            color: #d9b154;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            color: #bfb3a2;
+            font-size: 0.9rem;
+            padding: 0.25rem 0;
+        }
+
+        .info-box li:before {
+            content: "✓ ";
+            color: #d9b154;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Multi-Image Paste Area</h1>
+        <p class="subtitle">Demonstração da área de colagem de múltiplas imagens para produtos M'Martin</p>
+
+        <div class="demo-section">
+            <div class="section-title">
+                📸 Área de Upload de Imagens
+            </div>
+            
+            <div class="image-paste-area" id="pasteArea">
+                <div class="paste-area-icon">📷</div>
+                <div class="paste-area-text">
+                    <div class="paste-area-title">Cole, arraste ou clique para adicionar imagens</div>
+                    <div class="paste-area-subtitle">Ctrl+V para colar • Arraste arquivos • Ou clique para selecionar</div>
+                </div>
+            </div>
+
+            <div class="image-thumbnails-grid" id="thumbnailsGrid">
+                <!-- Sample thumbnails to demonstrate the layout -->
+                <div class="image-thumbnail-item">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23483726' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='%23d9b154' text-anchor='middle' dy='.3em'%3EImagem 1%3C/text%3E%3C/svg%3E" 
+                         alt="Imagem 1" class="image-thumbnail">
+                    <div class="image-thumbnail-badge">Principal</div>
+                    <button class="image-thumbnail-remove">×</button>
+                </div>
+                <div class="image-thumbnail-item">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23483726' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='%23d9b154' text-anchor='middle' dy='.3em'%3EImagem 2%3C/text%3E%3C/svg%3E" 
+                         alt="Imagem 2" class="image-thumbnail">
+                    <button class="image-thumbnail-remove">×</button>
+                </div>
+                <div class="image-thumbnail-item">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23483726' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='%23d9b154' text-anchor='middle' dy='.3em'%3EImagem 3%3C/text%3E%3C/svg%3E" 
+                         alt="Imagem 3" class="image-thumbnail">
+                    <button class="image-thumbnail-remove">×</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <div class="section-title">
+                ✨ Funcionalidades Implementadas
+            </div>
+            
+            <div class="info-box">
+                <h3>🎨 UX/UI Padrão M'Martin</h3>
+                <ul>
+                    <li>Design escuro com acentos dourados (#d9b154)</li>
+                    <li>Efeitos de hover e transições suaves</li>
+                    <li>Backdrop blur para profundidade visual</li>
+                    <li>Tipografia consistente com o resto do site</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>📋 Funcionalidade de Colagem</h3>
+                <ul>
+                    <li>Ctrl+V para colar imagens da área de transferência</li>
+                    <li>Drag & drop de arquivos de imagem</li>
+                    <li>Clique para selecionar múltiplas imagens</li>
+                    <li>Suporte para URLs de imagens</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>🖼️ Miniaturas ao Vivo</h3>
+                <ul>
+                    <li>Grade responsiva de miniaturas</li>
+                    <li>Badge "Principal" na primeira imagem</li>
+                    <li>Botão de remoção com hover</li>
+                    <li>Animações suaves de entrada/saída</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>🔄 Carrossel de Imagens (ProductDialog)</h3>
+                <ul>
+                    <li>Navegação entre múltiplas imagens com setas</li>
+                    <li>Miniaturas clicáveis na parte inferior</li>
+                    <li>Transições animadas com Framer Motion</li>
+                    <li>Suporte para keyboard navigation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -13,6 +13,7 @@ import {
   IconPhoto,
 } from '@tabler/icons-react';
 import { useAdmin } from '../context/AdminContext';
+import ImagePasteArea from '../components/ImagePasteArea';
 import '../Admin.css';
 
 const emptyProduct = {
@@ -21,6 +22,7 @@ const emptyProduct = {
   description: '',
   price: '',
   image: '',
+  images: [],
   features: '',
   stockQuantity: 50,
   minStock: 5,
@@ -56,12 +58,19 @@ const ProductsPage = () => {
 
   const openEdit = (product) => {
     setEditing(product.id);
+    // Support both old single image and new multiple images format
+    const productImages = product.images && product.images.length > 0 
+      ? product.images 
+      : product.image 
+        ? [product.image] 
+        : [];
     setForm({
       name: product.name,
       category: product.category,
       description: product.description,
       price: product.price,
       image: product.image,
+      images: productImages,
       features: Array.isArray(product.features) ? product.features.join(', ') : product.features || '',
       stockQuantity: stock[product.id]?.quantity ?? 0,
       minStock: stock[product.id]?.minStock ?? 5,
@@ -103,7 +112,10 @@ const ProductsPage = () => {
       category: form.category,
       description: form.description,
       price: form.price,
-      image: form.image,
+      // Keep backward compatibility: set image to first image or empty
+      image: form.images && form.images.length > 0 ? form.images[0] : form.image,
+      // Add images array for multi-image support
+      images: form.images && form.images.length > 0 ? form.images : undefined,
       features: featuresArr,
       stockQuantity: parseInt(form.stockQuantity, 10) || 0,
       minStock: parseInt(form.minStock, 10) || 5,
@@ -334,19 +346,13 @@ const ProductsPage = () => {
                     <div className="product-form-section">
                       <div className="product-form-section-header">
                         <IconPhoto size={20} stroke={1.8} />
-                        <h3>Imagem</h3>
+                        <h3>Imagens do Produto</h3>
                       </div>
                       
-                      {form.image && (
-                        <div className="product-image-preview">
-                          <img src={form.image} alt={form.name ? `Preview de ${form.name}` : 'Preview da imagem do produto'} onError={(e) => e.target.style.display = 'none'} />
-                        </div>
-                      )}
-                      
-                      <div className="form-group">
-                        <label htmlFor="prod-image">URL da Imagem</label>
-                        <input id="prod-image" name="image" value={form.image} onChange={handleChange} placeholder="https://..." />
-                      </div>
+                      <ImagePasteArea
+                        images={form.images}
+                        onChange={(newImages) => setForm((prev) => ({ ...prev, images: newImages }))}
+                      />
                     </div>
                   </div>
                 </div>

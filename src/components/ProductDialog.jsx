@@ -11,6 +11,8 @@ import {
   IconBrandWhatsapp,
   IconCheck,
   IconStar,
+  IconChevronLeft,
+  IconChevronRight,
 } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import CushionKitSelector from './CushionKitSelector';
@@ -64,7 +66,15 @@ const DialogInner = ({ product, onClose }) => {
   const [selectedFoam, setSelectedFoam] = useState(product.foamOptions ? product.foamOptions[0] : null);
   const [cushionColors, setCushionColors] = useState([]);
   const [paymentType, setPaymentType] = useState('cash');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addItem } = useCart();
+
+  // Get images array (support both single image and multiple images)
+  const images = product.images && product.images.length > 0 
+    ? product.images 
+    : product.image 
+      ? [product.image] 
+      : [];
 
   // Reset states when product changes
   useEffect(() => {
@@ -74,7 +84,15 @@ const DialogInner = ({ product, onClose }) => {
     setPaymentType('cash');
     setQuantity(1);
     setImageError(false);
+    setCurrentImageIndex(0);
   }, [product]);
+
+  // Reset image index if it exceeds the current images array length
+  useEffect(() => {
+    if (currentImageIndex >= images.length && images.length > 0) {
+      setCurrentImageIndex(0);
+    }
+  }, [images.length, currentImageIndex]);
 
   const handleAddToCart = () => {
     const itemData = {
@@ -132,21 +150,68 @@ const DialogInner = ({ product, onClose }) => {
 
       <div className="dialog-layout">
         <motion.div
-          className="dialog-image"
+          className="dialog-image-container"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
-          {!imageError ? (
-            <img
-              src={product.image}
-              alt={product.name}
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className="dialog-image-placeholder">
-              <IconPackage size={72} stroke={1.5} className="placeholder-icon" />
-            </div>
+          <div className="dialog-image">
+            {images.length > 0 && !imageError ? (
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentImageIndex}
+                  src={images[currentImageIndex]}
+                  alt={`${product.name} - Imagem ${currentImageIndex + 1}`}
+                  onError={() => setImageError(true)}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </AnimatePresence>
+            ) : (
+              <div className="dialog-image-placeholder">
+                <IconPackage size={72} stroke={1.5} className="placeholder-icon" />
+              </div>
+            )}
+          </div>
+
+          {images.length > 1 && !imageError && (
+            <>
+              <motion.button
+                className="dialog-image-nav dialog-image-nav-prev"
+                onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                aria-label="Imagem anterior"
+              >
+                <IconChevronLeft size={24} stroke={2} />
+              </motion.button>
+              <motion.button
+                className="dialog-image-nav dialog-image-nav-next"
+                onClick={() => setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                aria-label="Próxima imagem"
+              >
+                <IconChevronRight size={24} stroke={2} />
+              </motion.button>
+              
+              <div className="dialog-image-thumbnails">
+                {images.map((img, index) => (
+                  <motion.button
+                    key={index}
+                    className={`dialog-image-thumbnail ${index === currentImageIndex ? 'thumbnail-active' : ''}`}
+                    onClick={() => setCurrentImageIndex(index)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    aria-label={`Ver imagem ${index + 1}`}
+                  >
+                    <img src={img} alt={`Miniatura ${index + 1}`} />
+                  </motion.button>
+                ))}
+              </div>
+            </>
           )}
         </motion.div>
 
