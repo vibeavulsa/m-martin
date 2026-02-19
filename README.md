@@ -1,47 +1,19 @@
 # M'Martin - Estofados Finos
 
-Catálogo moderno de produtos para estofados, desenvolvido com React e liquid-glass-react.
-
-## 🔒 Núcleo de Segurança e Integridade (Novo!)
-
-Este projeto agora inclui um sistema completo de segurança e integridade:
-
-- ✅ **Autenticação Firebase** - Login seguro para administradores
-- ✅ **Transações Atômicas** - Controle de estoque sem risco de overselling
-- ✅ **Regras de Segurança** - Proteção de dados sensíveis no Firestore
-
-📖 **[Guia de Configuração Firebase →](FIREBASE_SETUP.md)** ⭐ **COMECE AQUI**
-📖 **[Instruções de Configuração Completas →](SETUP_INSTRUCTIONS.md)**
-📚 **[Documentação Técnica →](SECURITY_IMPLEMENTATION.md)**
-
-### ⚙️ Configuração Rápida
-
-1. **Criar usuário admin no Firebase Console:**
-   - Authentication → Users → Add user
-   - Email: `admin@mmartin.com` (ou outro de sua escolha)
-   - Senha: Escolha uma senha forte
-
-2. **Deploy das regras de segurança:**
-   ```bash
-   firebase deploy --only firestore:rules
-   ```
-
-3. **Acessar painel admin:**
-   - Acesse `/login` e use as credenciais criadas
-   - Ou vá direto para `/admin` (redirecionará para login se necessário)
+E-commerce moderno para estofados finos, com catálogo interativo, painel administrativo completo, checkout integrado e segurança de nível produção. Desenvolvido com React 19, Firebase e Cloud Functions.
 
 ## 📋 Informações do Projeto
 
-- **Nome:** M'Martin
-- **ID do Projeto:** m-martin-estofados
-- **Número do Projeto:** 178643218861
-- **Tecnologias:** React, Vite, liquid-glass-react, Tabler Icons, Firebase
+- **Nome:** M'Martin Estofados Finos
+- **ID do Projeto Firebase:** m-martin-estofados
+- **Tecnologias:** React 19, Vite 7, Firebase (Auth, Firestore, Cloud Functions, Storage), Framer Motion, Mercado Pago
+- **Plataformas de Deploy:** Firebase Hosting, Vercel, Netlify
 
 ## 🚀 Como Executar
 
 ### Pré-requisitos
 - Node.js (versão 18 ou superior)
-- npm ou yarn
+- npm
 - Conta Firebase com projeto configurado
 
 ### Instalação
@@ -50,227 +22,259 @@ Este projeto agora inclui um sistema completo de segurança e integridade:
 # Instalar dependências
 npm install
 
-# ⚠️ IMPORTANTE: Configurar variáveis de ambiente
+# Configurar variáveis de ambiente
 cp .env.example .env
 # Edite o arquivo .env com suas credenciais do Firebase
 # Obtenha as credenciais no Firebase Console: Project Settings > General > Your apps
 ```
 
-> **⚠️ CONFIGURAÇÃO OBRIGATÓRIA**: Antes de executar o projeto, você DEVE configurar o arquivo `.env` com suas credenciais Firebase reais. Sem isso, você verá erros de autenticação como `auth/api-key-not-valid`. Veja [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) para detalhes.
+> **⚠️ CONFIGURAÇÃO OBRIGATÓRIA**: Antes de executar o projeto, configure o arquivo `.env` com suas credenciais Firebase reais. Sem isso, ocorrerão erros como `auth/api-key-not-valid`. Veja [FIREBASE_SETUP.md](FIREBASE_SETUP.md) para detalhes.
 
 ### Desenvolvimento
 
 ```bash
-# Iniciar servidor de desenvolvimento
 npm run dev
-
 # O aplicativo estará disponível em http://localhost:5173
 ```
 
 ### Build para Produção
 
 ```bash
-# Criar build otimizado
 npm run build
-
-# Visualizar build
 npm run preview
 ```
 
 ## 🚀 Deploy
 
-O projeto está configurado para deploy em múltiplas plataformas. Escolha a que melhor se adequa às suas necessidades:
+O projeto está configurado para deploy em múltiplas plataformas:
 
 ### Firebase Hosting
 
 ```bash
-# Instalar Firebase CLI (se ainda não tiver)
 npm install -g firebase-tools
-
-# Fazer login no Firebase
 firebase login
-
-# Inicializar projeto (se necessário)
-firebase init hosting
-
-# Build e deploy
 npm run build
 firebase deploy
 ```
 
-O arquivo `firebase.json` já está configurado com:
-- Reescritas de rota para SPA (Single Page Application)
-- Configuração de cache para assets estáticos
-- Pasta de build: `dist`
+O arquivo `firebase.json` já está configurado com reescritas de rota para SPA e cache de assets.
+
+### Vercel
+
+```bash
+npm install -g vercel
+vercel
+```
+
+Ou conecte o repositório no [Vercel](https://vercel.com) — a configuração é detectada automaticamente via `vercel.json`.
 
 ### Netlify
 
-Opção 1 - Deploy via CLI:
 ```bash
-# Instalar Netlify CLI
 npm install -g netlify-cli
-
-# Deploy
 npm run build
 netlify deploy --prod
 ```
 
-Opção 2 - Deploy via Git:
-1. Conecte seu repositório no [Netlify](https://netlify.com)
-2. Configure:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-
-O arquivo `public/_redirects` já está configurado para lidar com rotas SPA.
-
-### Vercel
-
-Opção 1 - Deploy via CLI:
-```bash
-# Instalar Vercel CLI
-npm install -g vercel
-
-# Deploy
-vercel
-```
-
-Opção 2 - Deploy via Git:
-1. Conecte seu repositório no [Vercel](https://vercel.com)
-2. A configuração será detectada automaticamente
-
-O arquivo `vercel.json` já está configurado com rewrites para SPA.
+Ou conecte o repositório no [Netlify](https://netlify.com) com build command `npm run build` e publish directory `dist`.
 
 ## 📦 Estrutura do Projeto
 
 ```
 src/
-├── components/          # Componentes React
-│   ├── Header.jsx      # Cabeçalho com navegação
-│   ├── Hero.jsx        # Seção hero com animações
+├── components/              # Componentes da loja
+│   ├── Header.jsx           # Navegação com carrinho e perfil
+│   ├── Hero.jsx             # Banner principal com CTAs
 │   ├── CategorySection.jsx  # Seções de categorias
-│   └── ProductCard.jsx # Cards de produtos com efeito glass
-├── admin/              # Painel administrativo
-│   ├── pages/          # Páginas do admin
-│   ├── components/     # Componentes do admin
-│   ├── context/        # Context API do admin
-│   └── AdminRoutes.jsx # Rotas do painel
-├── config/             # Configurações
-│   └── firebase.js     # Configuração do Firebase
-├── data/               # Dados estáticos
-│   └── products.js     # Catálogo de produtos
-├── hooks/              # Custom hooks
-│   └── useCatalogoMMartin.js
-├── App.jsx             # Componente principal
-└── main.jsx           # Entry point
+│   ├── ProductCard.jsx      # Cards com efeito glassmorphism
+│   ├── CushionKitBanner.jsx # Banner do kit de almofadas com vídeo
+│   ├── CushionKitSelector.jsx # Seletor interativo de cores
+│   ├── CheckoutDialog.jsx   # Checkout em 3 etapas
+│   ├── PaymentMethodSelector.jsx # Seletor de método de pagamento
+│   ├── CartDialog.jsx       # Carrinho de compras
+│   ├── LoyaltyProgramBanner.jsx # Programa de fidelidade
+│   ├── TestimonialsSection.jsx  # Depoimentos de clientes
+│   ├── NewsletterSignup.jsx # Cadastro de newsletter
+│   ├── Login.jsx            # Página de login (Firebase Auth)
+│   └── PrivateRoute.jsx     # Proteção de rotas admin
+├── admin/                   # Painel administrativo
+│   ├── AdminRoutes.jsx      # Rotas do admin
+│   ├── pages/
+│   │   ├── DashboardPage.jsx     # Dashboard com KPIs
+│   │   ├── ProductsPage.jsx      # CRUD de produtos
+│   │   ├── StockPage.jsx         # Controle de estoque
+│   │   ├── OrdersPage.jsx        # Gestão de pedidos
+│   │   ├── CushionKitPage.jsx    # Gestão do kit de almofadas
+│   │   └── PaymentSettingsPage.jsx # Config. de pagamentos
+│   └── components/
+│       ├── AdminLayout.jsx       # Layout com menu lateral
+│       └── ImagePasteArea.jsx    # Upload de imagens via paste
+├── context/                 # Gerenciamento de estado
+│   ├── AuthContext.jsx      # Autenticação Firebase
+│   ├── CartContext.jsx      # Carrinho de compras
+│   └── UserContext.jsx      # Perfil e configurações do usuário
+├── services/                # Serviços backend
+│   ├── orderService.ts      # Criação de pedidos via Cloud Functions
+│   └── paymentService.ts    # Processamento de pagamentos
+├── config/
+│   └── firebase.js          # Inicialização do Firebase
+├── data/                    # Dados estáticos de fallback
+├── hooks/                   # Custom hooks
+├── App.jsx                  # Componente principal da loja
+└── main.jsx                 # Entry point com providers e rotas
+
+functions/                   # Firebase Cloud Functions
+└── src/
+    └── index.ts             # createOrder + processPayment
 ```
-
-## 🔐 Painel Administrativo
-
-O projeto inclui um painel administrativo completo acessível em `/admin`.
-
-### Acesso
-
-**URL:** `/admin`
-
-**Credenciais padrão (apenas para desenvolvimento):**
-- Usuário: `admin`
-- Senha: `mmartin2026`
-
-> ⚠️ **SEGURANÇA CRÍTICA:** Estas são credenciais de desenvolvimento. NUNCA use em produção!
-> 
-> **Para produção, OBRIGATORIAMENTE configure as variáveis de ambiente:**
-> - `VITE_ADMIN_USER` - Defina um nome de usuário seguro
-> - `VITE_ADMIN_PASS` - Defina uma senha forte
-> 
-> As credenciais acima só devem ser usadas em ambiente de desenvolvimento local.
-
-### Funcionalidades
-
-- 📊 **Dashboard** - Visão geral com métricas e estatísticas
-- 📦 **Gestão de Produtos** - Adicionar, editar e remover produtos
-- 📋 **Controle de Estoque** - Gerenciar quantidades e alertas de estoque baixo
-- 🧾 **Gestão de Pedidos** - Visualizar e atualizar status de pedidos
-
-Todos os dados são armazenados no LocalStorage do navegador.
 
 ## 🛋️ Categorias de Produtos
 
-1. **Sofás** - Estofados finos para sala de estar
-2. **Almofadas** - Conforto e decoração
-3. **Travesseiros** - Qualidade para um sono tranquilo
-4. **Homecare e Hospitalar** - Linha especializada
+1. **Sofás** — Estofados finos para sala de estar
+2. **Almofadas** — Kit de 5 almofadas com seleção de cores e fibra siliconada 500g
+3. **Travesseiros** — Linha premium de conforto
+4. **Puffs & Chaise** — Complementos decorativos
+5. **Para Acamados** — Linha hospitalar e homecare
 
-## 🎨 Tecnologias Utilizadas
+## 🔐 Painel Administrativo
 
-- **React 19** - Framework JavaScript
-- **Vite** - Build tool e dev server
-- **liquid-glass-react** - Efeito glassmorphism
-- **@tabler/icons-react** - Biblioteca de ícones
-- **Firebase** - Backend e hosting (configuração pronta)
+Acessível em `/admin` com autenticação via Firebase Auth (email/senha).
 
-## 🔥 Firebase
+### Acesso
 
-O projeto está configurado para usar Firebase. Para ativar:
+1. Crie um usuário admin no Firebase Console → Authentication → Users → Add user
+2. Acesse `/login` e faça login com as credenciais criadas
+3. Será redirecionado automaticamente para o dashboard
 
-1. Crie um projeto no [Firebase Console](https://console.firebase.google.com/)
-2. Adicione suas credenciais no arquivo `.env`:
-   - `VITE_FIREBASE_API_KEY`
-   - `VITE_FIREBASE_APP_ID`
+> 📖 Para instruções detalhadas, veja [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
 
-## 📱 Recursos
+### Páginas do Admin
 
-### Loja/Catálogo
-- ✅ Design responsivo
-- ✅ Efeitos glassmorphism modernos
-- ✅ Animações suaves
-- ✅ Navegação intuitiva
-- ✅ 12 produtos de exemplo
-- ✅ Ícones profissionais Tabler Icons
-- ✅ Pronto para integração Firebase
+| Página | Rota | Descrição |
+|--------|------|-----------|
+| Dashboard | `/admin` | KPIs: total de produtos, valor em estoque, pedidos, alertas de estoque baixo |
+| Produtos | `/admin/produtos` | CRUD completo com múltiplas imagens, código de barras, fornecedor, preço de custo |
+| Estoque | `/admin/estoque` | Controle visual com filtros, incremento/decremento, alertas por nível |
+| Pedidos | `/admin/pedidos` | Acompanhamento de status (Pendente → Processando → Enviado → Entregue) |
+| Kit Almofadas | `/admin/almofadas` | Gestão de cores, estoque separado por capa/refil, preços individuais |
+| Pagamentos | `/admin/pagamentos` | Configuração de Mercado Pago, PIX, WhatsApp, cartão de crédito |
+
+## 🔒 Segurança
+
+O projeto implementa múltiplas camadas de segurança:
+
+- **Firebase Authentication** — Login com email/senha para administradores
+- **Rotas protegidas** — `PrivateRoute` redireciona para `/login` se não autenticado
+- **Cloud Functions** — Validação de preços no servidor (previne manipulação client-side)
+- **Transações atômicas** — Controle de estoque com Firestore transactions (previne overselling)
+- **Rate limiting** — Proteção contra abuso nas Cloud Functions (5 req/min por IP)
+- **Firestore Security Rules** — Proteção de dados sensíveis por coleção
+
+> 📖 Documentação completa: [SECURITY_IMPLEMENTATION.md](SECURITY_IMPLEMENTATION.md) · [FIRESTORE_SECURITY.md](FIRESTORE_SECURITY.md) · [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)
+
+## 💳 Pagamentos
+
+Métodos de pagamento integrados:
+
+| Método | Status | Descrição |
+|--------|--------|-----------|
+| WhatsApp | ✅ Implementado | Checkout manual via mensagem formatada |
+| Mercado Pago | ✅ Implementado | Checkout completo via API (sandbox e produção) |
+| PIX | ✅ Implementado | Pagamento instantâneo com QR code |
+| Cartão de Crédito | ✅ Implementado | Via Mercado Pago |
+
+## 📱 Recursos Implementados
+
+### Loja / Catálogo
+- ✅ Design responsivo com glassmorphism
+- ✅ Animações com Framer Motion (cards, KPIs, transições)
+- ✅ Hero section com badges de confiança e CTAs
+- ✅ Seletor interativo de cores para kit de almofadas (5 cores)
+- ✅ Banner de vídeo para kit de almofadas
+- ✅ Checkout em 3 etapas (carrinho → dados → pagamento)
+- ✅ 4 métodos de pagamento (WhatsApp, Mercado Pago, PIX, cartão)
+- ✅ Programa de fidelidade com 4 benefícios
+- ✅ Seção de depoimentos de clientes
+- ✅ Cadastro de newsletter
+- ✅ Navegação mobile otimizada (bottom nav, menu hamburger)
+- ✅ SEO: meta tags, Open Graph, schema markup, sitemap
 
 ### Painel Administrativo
-- ✅ Sistema de autenticação
-- ✅ Dashboard com métricas em tempo real
-- ✅ CRUD completo de produtos
-- ✅ Gestão de estoque com alertas
-- ✅ Controle de pedidos
-- ✅ Interface responsiva e moderna
+- ✅ Autenticação Firebase (email/senha)
+- ✅ Dashboard com KPIs e alertas em tempo real
+- ✅ CRUD completo de produtos com múltiplas imagens e upload via paste
+- ✅ Gestão de estoque com filtros, alertas visuais e controles inline
+- ✅ Controle de pedidos com tracking de status
+- ✅ Gestão de kit de almofadas (cores, estoque por capa/refil, preços separados)
+- ✅ Configuração de gateways de pagamento
+- ✅ Layout responsivo com menu drawer para mobile
 
-## 🖼️ Preview
+### Backend / Segurança
+- ✅ Firebase Cloud Functions (createOrder, processPayment)
+- ✅ Validação de preços server-side
+- ✅ Transações atômicas de estoque
+- ✅ Rate limiting por IP
+- ✅ Firestore Security Rules por coleção
+- ✅ Firebase Auth com PrivateRoute
 
-O catálogo apresenta um design moderno com:
-- Hero section com gradiente animado
-- Cards com efeito liquid glass
-- Grid responsivo de produtos
-- Footer com informações da empresa
+## 🎨 Tecnologias
 
-## 📝 Changelog / Histórico de Mudanças
+| Tecnologia | Versão | Uso |
+|------------|--------|-----|
+| React | 19 | Framework UI |
+| Vite | 7 | Build tool e dev server |
+| Firebase | 12.9 | Auth, Firestore, Cloud Functions, Storage |
+| Framer Motion | 12 | Animações e transições |
+| React Router | 7 | Roteamento SPA |
+| Tabler Icons | 3 | Biblioteca de ícones |
+| Mercado Pago | — | Gateway de pagamentos |
 
-### v1.0.0 (Fevereiro 2026)
+## 📚 Documentação
 
-#### 🎨 Identidade Visual
-- **Logo atualizado** - Substituição do logo SVG por versão PNG em `assets/logo.png` para melhor compatibilidade
-- **Imagens reais de produtos** - Adição de fotos profissionais do Unsplash para sofás, almofadas, travesseiros e produtos hospitalares
-- **Logo no Header e Hero** - Integração do logo M'Martin nas seções de cabeçalho e hero do site
+| Documento | Descrição |
+|-----------|-----------|
+| [FIREBASE_SETUP.md](FIREBASE_SETUP.md) | Guia passo-a-passo de configuração do Firebase |
+| [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) | Instruções de configuração e checklist de implantação |
+| [SECURITY_IMPLEMENTATION.md](SECURITY_IMPLEMENTATION.md) | Documentação técnica de autenticação, transações e segurança |
+| [FIRESTORE_SECURITY.md](FIRESTORE_SECURITY.md) | Regras de segurança do Firestore com testes práticos |
+| [DELIVERABLE_SUMMARY.md](DELIVERABLE_SUMMARY.md) | Resumo das entregas do núcleo de segurança |
+| [PROXIMOS_PASSOS.md](PROXIMOS_PASSOS.md) | Plano de próximos passos e evolução do projeto |
 
-#### ✨ Funcionalidades Implementadas
-- **Catálogo moderno** - Implementação completa do catálogo com design liquid-glass usando `liquid-glass-react`
-- **Ícones profissionais** - Integração da biblioteca Tabler Icons para ícones consistentes e modernos
-- **Efeitos glassmorphism** - Cards de produtos com efeito de vidro líquido animado
-- **Design responsivo** - Layout adaptável para desktop, tablet e mobile
+## 📝 Histórico de Evolução
 
-#### 📚 Documentação
-- **README abrangente** - Documentação completa com instruções de instalação, execução e estrutura do projeto
-- **Configuração Firebase** - Guia de configuração do Firebase para backend e hosting
-- **Estrutura de pastas** - Documentação da arquitetura de componentes e arquivos
+O projeto evoluiu através de **28 pull requests mergeados**, organizados nas seguintes fases:
 
-#### 🏗️ Infraestrutura
-- **Firebase Data Connect** - Configuração do serviço de dados com PostgreSQL
-- **Firestore Rules** - Regras de segurança configuradas para o banco de dados
-- **Vite + React 19** - Setup moderno de desenvolvimento com hot reload
+### Fase 1 — Catálogo e Base (PRs #24–#29)
+- Catálogo com design glassmorphism e imagens reais de produtos
+- Banner de vídeo para kit de almofadas com seletor de cores
+- Conteúdo de marketing premium com branding M'Martin
+- Checkout via WhatsApp com persistência no Firestore
+
+### Fase 2 — Segurança e Backend (PRs #30–#36)
+- Firestore Security Rules com proteção contra manipulação de preços
+- Firebase Auth para painel administrativo
+- Transações atômicas de estoque (Firestore transactions)
+- Cloud Functions com validação server-side e rate limiting
+- Integração Mercado Pago (checkout, PIX, cartão de crédito)
+- SEO: meta tags, Open Graph, schema markup, sitemap
+
+### Fase 3 — Admin e UX (PRs #37–#47)
+- Conteúdo persuasivo inspirado em marcas premium de estofados
+- UX de checkout refinado (grid 2 colunas, correção de cores)
+- Gestão avançada de estoque com integração kit de almofadas
+- Formulário de produto estilo ERP (2 colunas, campos de negócio)
+- Preços separados para capas e refis de almofadas
+- Retenção de clientes (fidelidade, depoimentos, newsletter)
+- Upload de imagens com paste e preview
+- Navegação mobile otimizada (bottom nav, 9:16)
+
+### Fase 4 — Polimento Visual (PRs #48–#52)
+- Padronização da paleta de cores da marca (marrom/dourado)
+- Redesign do programa de fidelidade (layout 2 colunas)
+- Modernização do admin com animações Framer Motion
 
 ---
 
 ## 📄 Licença
 
-© 2026 M'Martin. Todos os direitos reservados.
+© 2026 M'Martin Estofados Finos. Todos os direitos reservados.
