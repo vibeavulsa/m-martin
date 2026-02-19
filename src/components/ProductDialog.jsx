@@ -87,6 +87,13 @@ const DialogInner = ({ product, onClose }) => {
     setCurrentImageIndex(0);
   }, [product]);
 
+  // Reset image index if it exceeds the current images array length
+  useEffect(() => {
+    if (currentImageIndex >= images.length && images.length > 0) {
+      setCurrentImageIndex(0);
+    }
+  }, [images.length, currentImageIndex]);
+
   const handleAddToCart = () => {
     const itemData = {
       ...product,
