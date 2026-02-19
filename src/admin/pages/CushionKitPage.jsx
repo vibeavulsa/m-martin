@@ -10,6 +10,7 @@ import {
   IconAlertTriangle,
   IconCurrencyDollar,
 } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
 
@@ -149,7 +150,7 @@ const CushionKitPage = () => {
   };
 
   return (
-    <>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <div className="admin-page-header">
         <h1>Kit de Almofadas</h1>
         <p>Gerencie as cores disponíveis e informações do kit de almofadas</p>
@@ -162,51 +163,29 @@ const CushionKitPage = () => {
             <IconPalette size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#d9b154' }} />
             Cores Disponíveis
           </h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+          <div className="cushion-color-chips">
             {cushionKit.colors.map((color) => (
               <div
                 key={color}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.4rem 0.75rem',
-                  background: 'rgba(217, 177, 84, 0.08)',
-                  border: '1px solid rgba(217, 177, 84, 0.15)',
-                  borderRadius: '10px',
-                }}
+                className="cushion-color-chip"
               >
                 <span
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '6px',
-                    background: colorGradients[color] || '#999',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    flexShrink: 0,
-                  }}
+                  className="cushion-color-swatch"
+                  style={{ background: colorGradients[color] || '#999' }}
                 />
-                <span style={{ fontSize: '0.85rem', color: '#e8e1d4' }}>{color}</span>
+                <span className="cushion-color-name">{color}</span>
                 <button
                   onClick={() => handleRemoveColor(color)}
                   title="Remover cor"
                   aria-label={`Remover cor ${color}`}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#f44336',
-                    cursor: 'pointer',
-                    padding: '2px',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
+                  className="cushion-remove-btn"
                 >
                   <IconTrash size={14} stroke={1.6} />
                 </button>
               </div>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <div className="cushion-add-row">
             <input
               className="admin-search"
               style={{ maxWidth: '200px', flex: 1 }}
@@ -231,14 +210,9 @@ const CushionKitPage = () => {
           
           {/* Refis Stock Control */}
           <div style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ color: '#d9b154', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>Refis (Enchimento)</h3>
-            <div style={{
-              padding: '1rem',
-              background: 'rgba(72, 55, 38, 0.2)',
-              border: '1px solid rgba(217, 177, 84, 0.08)',
-              borderRadius: '12px',
-            }}>
-              <div className="stock-controls" style={{ justifyContent: 'center' }}>
+            <h3 className="cushion-stock-section-title">Refis (Enchimento)</h3>
+            <div className="cushion-stock-box">
+              <div className="stock-controls cushion-stock-center">
                 <button onClick={() => updateRefilStock(cushionKit.stockRefis - 1)} aria-label="Diminuir estoque de refis">
                   <IconMinus size={14} stroke={2} />
                 </button>
@@ -249,21 +223,12 @@ const CushionKitPage = () => {
                   <IconPlus size={14} stroke={2} />
                 </button>
               </div>
-              <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+              <div className="cushion-direct-input-wrapper">
                 <input
                   type="number"
                   min="0"
-                  style={{
-                    width: '100px',
-                    padding: '0.35rem 0.5rem',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(217,177,84,0.15)',
-                    borderRadius: '8px',
-                    color: '#e8e1d4',
-                    fontSize: '0.85rem',
-                    outline: 'none',
-                    textAlign: 'center',
-                  }}
+                  className="stock-direct-input"
+                  style={{ textAlign: 'center' }}
                   placeholder="Definir qtd"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -281,35 +246,21 @@ const CushionKitPage = () => {
 
           {/* Capas por Cor Stock Control */}
           <div style={{ marginBottom: '1rem' }}>
-            <h3 style={{ color: '#d9b154', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>Capas por Cor</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+            <h3 className="cushion-stock-section-title">Capas por Cor</h3>
+            <div className="cushion-color-grid">
               {cushionKit.colors.map((color) => {
                 const colorStock = cushionKit.stockCapas[color] || 0;
                 
                 return (
                   <div
                     key={color}
-                    style={{
-                      padding: '0.75rem 1rem',
-                      background: 'rgba(72, 55, 38, 0.2)',
-                      border: '1px solid rgba(217, 177, 84, 0.08)',
-                      borderRadius: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                    }}
+                    className="cushion-color-stock-card"
                   >
                     <span
-                      style={{
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '8px',
-                        background: colorGradients[color] || '#999',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        flexShrink: 0,
-                      }}
+                      className="cushion-color-swatch large"
+                      style={{ background: colorGradients[color] || '#999' }}
                     />
-                    <span style={{ fontSize: '0.85rem', color: '#e8e1d4', flex: 1, fontWeight: 500 }}>{color}</span>
+                    <span className="cushion-color-label">{color}</span>
                     <div className="stock-controls" style={{ gap: '0.4rem' }}>
                       <button onClick={() => updateCapaStock(color, colorStock - 1)} aria-label={`Diminuir estoque de capa ${color}`} style={{ width: '26px', height: '26px' }}>
                         <IconMinus size={12} stroke={2} />
@@ -329,19 +280,7 @@ const CushionKitPage = () => {
 
           {/* Stock Alerts */}
           {(cushionKit.stockRefis <= 0 || stockAlerts.outOfStockColors.length > 0) && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.75rem 1rem',
-              background: 'rgba(244, 67, 54, 0.12)',
-              border: '1px solid rgba(244, 67, 54, 0.25)',
-              borderRadius: '10px',
-              color: '#f44336',
-              fontSize: '0.85rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-            }}>
+            <div className="cushion-alert danger">
               <IconAlertTriangle size={16} stroke={2} />
               {cushionKit.stockRefis <= 0 && 'Refis sem estoque! '}
               {stockAlerts.outOfStockColors.length > 0 && 
@@ -349,36 +288,13 @@ const CushionKitPage = () => {
             </div>
           )}
           {cushionKit.stockRefis > 0 && cushionKit.stockRefis <= LOW_STOCK_THRESHOLD_REFILLS && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.75rem 1rem',
-              background: 'rgba(255, 152, 0, 0.12)',
-              border: '1px solid rgba(255, 152, 0, 0.25)',
-              borderRadius: '10px',
-              color: '#ff9800',
-              fontSize: '0.85rem',
-              fontWeight: 500,
-              marginBottom: '0.5rem',
-            }}>
+            <div className="cushion-alert warning">
               <IconAlertTriangle size={16} stroke={2} />
               Estoque baixo de refis! Apenas {cushionKit.stockRefis} restante(s).
             </div>
           )}
           {stockAlerts.lowStockColors.length > 0 && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.75rem 1rem',
-              background: 'rgba(255, 152, 0, 0.12)',
-              border: '1px solid rgba(255, 152, 0, 0.25)',
-              borderRadius: '10px',
-              color: '#ff9800',
-              fontSize: '0.85rem',
-              fontWeight: 500,
-            }}>
+            <div className="cushion-alert warning">
               <IconAlertTriangle size={16} stroke={2} />
               Estoque baixo de capas: {stockAlerts.lowStockColors.join(', ')}
             </div>
@@ -391,61 +307,36 @@ const CushionKitPage = () => {
             <IconCurrencyDollar size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#d9b154' }} />
             Controle de Preços
           </h2>
-          <form onSubmit={handleSavePricing} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <form onSubmit={handleSavePricing}>
             {/* Capas Pricing */}
             <div style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ color: '#d9b154', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>Capas</h3>
-              <div style={{
-                padding: '1rem',
-                background: 'rgba(72, 55, 38, 0.2)',
-                border: '1px solid rgba(217, 177, 84, 0.08)',
-                borderRadius: '12px',
-              }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+              <h3 className="cushion-stock-section-title">Capas</h3>
+              <div className="cushion-pricing-box">
+                <div className="cushion-pricing-grid">
                   <div className="form-group">
-                    <label htmlFor="capa-price-cash" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço à Vista</label>
+                    <label htmlFor="capa-price-cash" className="cushion-form-label">Preço à Vista</label>
                     <input
                       id="capa-price-cash"
                       name="priceCash"
                       value={pricingCapasForm.priceCash}
                       onChange={handlePricingCapasChange}
                       placeholder="R$ 0,00"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem',
-                        background: 'rgba(72, 55, 38, 0.35)',
-                        border: '1px solid rgba(217, 177, 84, 0.12)',
-                        borderRadius: '10px',
-                        color: '#e8e1d4',
-                        fontSize: '0.95rem',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                      }}
+                      className="cushion-form-input"
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="capa-price-installment" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço Parcelado</label>
+                    <label htmlFor="capa-price-installment" className="cushion-form-label">Preço Parcelado</label>
                     <input
                       id="capa-price-installment"
                       name="priceInstallment"
                       value={pricingCapasForm.priceInstallment}
                       onChange={handlePricingCapasChange}
                       placeholder="R$ 0,00"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem',
-                        background: 'rgba(72, 55, 38, 0.35)',
-                        border: '1px solid rgba(217, 177, 84, 0.12)',
-                        borderRadius: '10px',
-                        color: '#e8e1d4',
-                        fontSize: '0.95rem',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                      }}
+                      className="cushion-form-input"
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="capa-installments" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Nº Parcelas</label>
+                    <label htmlFor="capa-installments" className="cushion-form-label">Nº Parcelas</label>
                     <input
                       id="capa-installments"
                       name="installments"
@@ -453,17 +344,7 @@ const CushionKitPage = () => {
                       min="1"
                       value={pricingCapasForm.installments}
                       onChange={handlePricingCapasChange}
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem',
-                        background: 'rgba(72, 55, 38, 0.35)',
-                        border: '1px solid rgba(217, 177, 84, 0.12)',
-                        borderRadius: '10px',
-                        color: '#e8e1d4',
-                        fontSize: '0.95rem',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                      }}
+                      className="cushion-form-input"
                     />
                   </div>
                 </div>
@@ -472,58 +353,33 @@ const CushionKitPage = () => {
 
             {/* Refis Pricing */}
             <div style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ color: '#d9b154', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>Refis (Enchimento)</h3>
-              <div style={{
-                padding: '1rem',
-                background: 'rgba(72, 55, 38, 0.2)',
-                border: '1px solid rgba(217, 177, 84, 0.08)',
-                borderRadius: '12px',
-              }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+              <h3 className="cushion-stock-section-title">Refis (Enchimento)</h3>
+              <div className="cushion-pricing-box">
+                <div className="cushion-pricing-grid">
                   <div className="form-group">
-                    <label htmlFor="refil-price-cash" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço à Vista</label>
+                    <label htmlFor="refil-price-cash" className="cushion-form-label">Preço à Vista</label>
                     <input
                       id="refil-price-cash"
                       name="priceCash"
                       value={pricingRefisForm.priceCash}
                       onChange={handlePricingRefisChange}
                       placeholder="R$ 0,00"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem',
-                        background: 'rgba(72, 55, 38, 0.35)',
-                        border: '1px solid rgba(217, 177, 84, 0.12)',
-                        borderRadius: '10px',
-                        color: '#e8e1d4',
-                        fontSize: '0.95rem',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                      }}
+                      className="cushion-form-input"
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="refil-price-installment" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço Parcelado</label>
+                    <label htmlFor="refil-price-installment" className="cushion-form-label">Preço Parcelado</label>
                     <input
                       id="refil-price-installment"
                       name="priceInstallment"
                       value={pricingRefisForm.priceInstallment}
                       onChange={handlePricingRefisChange}
                       placeholder="R$ 0,00"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem',
-                        background: 'rgba(72, 55, 38, 0.35)',
-                        border: '1px solid rgba(217, 177, 84, 0.12)',
-                        borderRadius: '10px',
-                        color: '#e8e1d4',
-                        fontSize: '0.95rem',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                      }}
+                      className="cushion-form-input"
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="refil-installments" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Nº Parcelas</label>
+                    <label htmlFor="refil-installments" className="cushion-form-label">Nº Parcelas</label>
                     <input
                       id="refil-installments"
                       name="installments"
@@ -531,17 +387,7 @@ const CushionKitPage = () => {
                       min="1"
                       value={pricingRefisForm.installments}
                       onChange={handlePricingRefisChange}
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem',
-                        background: 'rgba(72, 55, 38, 0.35)',
-                        border: '1px solid rgba(217, 177, 84, 0.12)',
-                        borderRadius: '10px',
-                        color: '#e8e1d4',
-                        fontSize: '0.95rem',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                      }}
+                      className="cushion-form-input"
                     />
                   </div>
                 </div>
@@ -550,8 +396,7 @@ const CushionKitPage = () => {
 
             <button
               type="submit"
-              className="btn-primary"
-              style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+              className="btn-primary cushion-save-btn-wrapper"
             >
               {savedPricing ? <IconCheck size={18} stroke={2} /> : <IconDeviceFloppy size={18} stroke={2} />}
               {savedPricing ? 'Salvo!' : 'Salvar Preços'}
@@ -562,9 +407,9 @@ const CushionKitPage = () => {
         {/* Product Info Section */}
         <div className="dashboard-section">
           <h2>Informações do Produto</h2>
-          <form onSubmit={handleSaveProduct} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label htmlFor="kit-name" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Nome do Kit</label>
+          <form onSubmit={handleSaveProduct}>
+            <div className="cushion-form-group">
+              <label htmlFor="kit-name" className="cushion-form-label">Nome do Kit</label>
               <input
                 id="kit-name"
                 name="name"
@@ -572,47 +417,25 @@ const CushionKitPage = () => {
                 onChange={handleProductChange}
                 placeholder="Ex: Kit Refil de Almofada"
                 required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  background: 'rgba(72, 55, 38, 0.35)',
-                  border: '1px solid rgba(217, 177, 84, 0.12)',
-                  borderRadius: '10px',
-                  color: '#e8e1d4',
-                  fontSize: '0.95rem',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
+                className="cushion-form-input"
               />
             </div>
 
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label htmlFor="kit-desc" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Descrição</label>
+            <div className="cushion-form-group">
+              <label htmlFor="kit-desc" className="cushion-form-label">Descrição</label>
               <textarea
                 id="kit-desc"
                 name="description"
                 value={productForm.description}
                 onChange={handleProductChange}
                 rows="3"
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  background: 'rgba(72, 55, 38, 0.35)',
-                  border: '1px solid rgba(217, 177, 84, 0.12)',
-                  borderRadius: '10px',
-                  color: '#e8e1d4',
-                  fontSize: '0.95rem',
-                  outline: 'none',
-                  resize: 'vertical',
-                  fontFamily: 'inherit',
-                  boxSizing: 'border-box',
-                }}
+                className="cushion-form-input"
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="cushion-form-grid-2">
               <div className="form-group">
-                <label htmlFor="kit-price" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço à Vista</label>
+                <label htmlFor="kit-price" className="cushion-form-label">Preço à Vista</label>
                 <input
                   id="kit-price"
                   name="priceCash"
@@ -620,45 +443,25 @@ const CushionKitPage = () => {
                   onChange={handleProductChange}
                   placeholder="R$ 0,00"
                   required
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    background: 'rgba(72, 55, 38, 0.35)',
-                    border: '1px solid rgba(217, 177, 84, 0.12)',
-                    borderRadius: '10px',
-                    color: '#e8e1d4',
-                    fontSize: '0.95rem',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
+                  className="cushion-form-input"
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="kit-installment" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Preço Parcela</label>
+                <label htmlFor="kit-installment" className="cushion-form-label">Preço Parcela</label>
                 <input
                   id="kit-installment"
                   name="priceInstallment"
                   value={productForm.priceInstallment}
                   onChange={handleProductChange}
                   placeholder="R$ 0,00"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    background: 'rgba(72, 55, 38, 0.35)',
-                    border: '1px solid rgba(217, 177, 84, 0.12)',
-                    borderRadius: '10px',
-                    color: '#e8e1d4',
-                    fontSize: '0.95rem',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
+                  className="cushion-form-input"
                 />
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="cushion-form-grid-2">
               <div className="form-group">
-                <label htmlFor="kit-installments" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Nº de Parcelas</label>
+                <label htmlFor="kit-installments" className="cushion-form-label">Nº de Parcelas</label>
                 <input
                   id="kit-installments"
                   name="installments"
@@ -666,89 +469,48 @@ const CushionKitPage = () => {
                   min="1"
                   value={productForm.installments}
                   onChange={handleProductChange}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    background: 'rgba(72, 55, 38, 0.35)',
-                    border: '1px solid rgba(217, 177, 84, 0.12)',
-                    borderRadius: '10px',
-                    color: '#e8e1d4',
-                    fontSize: '0.95rem',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
+                  className="cushion-form-input"
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="kit-sizes" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Tamanhos (vírgula)</label>
+                <label htmlFor="kit-sizes" className="cushion-form-label">Tamanhos (vírgula)</label>
                 <input
                   id="kit-sizes"
                   value={sizesText}
                   onChange={(e) => setSizesText(e.target.value)}
                   placeholder="45x45, 50x50"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    background: 'rgba(72, 55, 38, 0.35)',
-                    border: '1px solid rgba(217, 177, 84, 0.12)',
-                    borderRadius: '10px',
-                    color: '#e8e1d4',
-                    fontSize: '0.95rem',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
+                  className="cushion-form-input"
                 />
               </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label htmlFor="kit-image" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>URL da Imagem</label>
+            <div className="cushion-form-group">
+              <label htmlFor="kit-image" className="cushion-form-label">URL da Imagem</label>
               <input
                 id="kit-image"
                 name="image"
                 value={productForm.image}
                 onChange={handleProductChange}
                 placeholder="https://..."
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  background: 'rgba(72, 55, 38, 0.35)',
-                  border: '1px solid rgba(217, 177, 84, 0.12)',
-                  borderRadius: '10px',
-                  color: '#e8e1d4',
-                  fontSize: '0.95rem',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
+                className="cushion-form-input"
               />
             </div>
 
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label htmlFor="kit-features" style={{ display: 'block', color: '#bfb3a2', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem' }}>Características (vírgula)</label>
+            <div className="cushion-form-group">
+              <label htmlFor="kit-features" className="cushion-form-label">Características (vírgula)</label>
               <input
                 id="kit-features"
                 name="features"
                 value={productForm.features}
                 onChange={handleProductChange}
                 placeholder="Kit com 5 unidades, Tecido Oxford"
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  background: 'rgba(72, 55, 38, 0.35)',
-                  border: '1px solid rgba(217, 177, 84, 0.12)',
-                  borderRadius: '10px',
-                  color: '#e8e1d4',
-                  fontSize: '0.95rem',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
+                className="cushion-form-input"
               />
             </div>
 
             <button
               type="submit"
-              className="btn-primary"
-              style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+              className="btn-primary cushion-save-btn-wrapper"
             >
               {saved ? <IconCheck size={18} stroke={2} /> : <IconDeviceFloppy size={18} stroke={2} />}
               {saved ? 'Salvo!' : 'Salvar Alterações'}
@@ -756,7 +518,7 @@ const CushionKitPage = () => {
           </form>
         </div>
       </div>
-    </>
+    </motion.div>
   );
 };
 

@@ -1887,6 +1887,7 @@
   box-sizing: border-box;
   transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
+  resize: vertical;
 }
 
 .cushion-form-input:focus {
@@ -1922,6 +1923,12 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+}
+
+.dashboard-section > form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 /* Responsive for cushion kit */
