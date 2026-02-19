@@ -66,6 +66,11 @@ function LoyaltyProgramBanner() {
           className="loyalty-cta-button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            // TODO: Implement loyalty program registration
+            // Could open a modal or navigate to registration page
+            alert('Funcionalidade de cadastro será implementada em breve. Entre em contato pelo WhatsApp para se cadastrar no programa de fidelidade!');
+          }}
         >
           Cadastre-se Gratuitamente
         </motion.button>

@@ -11,7 +11,7 @@ function NewsletterSignup() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // In a real implementation, this would send to a backend/email service
-    console.log('Newsletter signup:', { name, email });
+    // TODO: Integrate with email service API (e.g., Mailchimp, SendGrid)
     setSubscribed(true);
     setTimeout(() => {
       setEmail('');
