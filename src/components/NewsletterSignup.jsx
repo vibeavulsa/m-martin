@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { IconMail, IconBell, IconTag, IconCheck } from '@tabler/icons-react';
 import './NewsletterSignup.css';
 
