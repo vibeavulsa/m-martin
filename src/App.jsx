@@ -13,6 +13,9 @@ import CheckoutDialog from './components/CheckoutDialog';
 import OrderConfirmationDialog from './components/OrderConfirmationDialog';
 import UserProfileDialog from './components/UserProfileDialog';
 import SettingsDialog from './components/SettingsDialog';
+import LoyaltyProgramBanner from './components/LoyaltyProgramBanner';
+import TestimonialsSection from './components/TestimonialsSection';
+import NewsletterSignup from './components/NewsletterSignup';
 import { CartProvider, useCart } from './context/CartContext';
 import { UserProvider } from './context/UserContext';
 import { categories as fallbackCategories, products as fallbackProducts } from './data/products';
@@ -230,9 +233,12 @@ class AppCatalog extends Component {
       <>
         <SalesDialogs />
         <Hero />
+        <LoyaltyProgramBanner />
         <main className="catalog-container">
           {this.gerarTodasExposicoes()}
         </main>
+        <TestimonialsSection />
+        <NewsletterSignup />
         {this.renderizarInformacoesCorporativas()}
       </>
     );
