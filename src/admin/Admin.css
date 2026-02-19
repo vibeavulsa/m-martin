@@ -327,6 +327,13 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(217, 177, 84, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 16px rgba(217, 177, 84, 0.06);
 }
 
 .kpi-icon {
@@ -373,6 +380,12 @@
   border: 1px solid rgba(217, 177, 84, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-section:hover {
+  border-color: rgba(217, 177, 84, 0.18);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
 }
 
 .dashboard-section h2 {
@@ -593,6 +606,10 @@
 
 .admin-table tr:last-child td {
   border-bottom: none;
+}
+
+.admin-table tbody tr {
+  transition: background 0.2s ease;
 }
 
 .admin-table tr:hover td {
@@ -975,6 +992,89 @@
 
 .stock-warning {
   color: #ffc107;
+}
+
+/* Stock Progress Bar */
+.stock-progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 120px;
+}
+
+.stock-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stock-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stock-progress-fill.stock-fill-ok {
+  background: linear-gradient(90deg, #4caf50, #66bb6a);
+}
+
+.stock-progress-fill.stock-fill-warning {
+  background: linear-gradient(90deg, #ff9800, #ffc107);
+}
+
+.stock-progress-fill.stock-fill-low {
+  background: linear-gradient(90deg, #f44336, #ff5252);
+}
+
+/* Stock status badges */
+.stock-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.stock-status-badge.badge-ok {
+  background: rgba(76, 175, 80, 0.12);
+  color: #4caf50;
+}
+
+.stock-status-badge.badge-warning {
+  background: rgba(255, 152, 0, 0.12);
+  color: #ff9800;
+}
+
+.stock-status-badge.badge-out {
+  background: rgba(244, 67, 54, 0.12);
+  color: #f44336;
+}
+
+/* Direct quantity input for stock */
+.stock-direct-input {
+  width: 80px;
+  padding: 0.35rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(217, 177, 84, 0.15);
+  border-radius: 8px;
+  color: #e8e1d4;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.stock-direct-input:focus {
+  border-color: rgba(217, 177, 84, 0.4);
+  box-shadow: 0 0 0 3px rgba(217, 177, 84, 0.1);
+}
+
+.stock-direct-input::placeholder {
+  color: rgba(191, 179, 162, 0.4);
 }
 
 /* ============================================
@@ -1613,3 +1713,260 @@
 }
 
 /* Responsive (Payment) is handled above in main responsive sections */
+
+/* ============================================
+   CUSHION KIT PAGE STYLES
+   ============================================ */
+
+.cushion-color-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.cushion-color-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(217, 177, 84, 0.08);
+  border: 1px solid rgba(217, 177, 84, 0.15);
+  border-radius: 10px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.cushion-color-chip:hover {
+  border-color: rgba(217, 177, 84, 0.3);
+  background: rgba(217, 177, 84, 0.12);
+}
+
+.cushion-color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.cushion-color-swatch.large {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+}
+
+.cushion-color-name {
+  font-size: 0.85rem;
+  color: #e8e1d4;
+}
+
+.cushion-remove-btn {
+  background: none;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.cushion-remove-btn:hover {
+  color: #ff6659;
+}
+
+.cushion-add-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.cushion-stock-section-title {
+  color: #d9b154;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.cushion-stock-box {
+  padding: 1rem;
+  background: rgba(72, 55, 38, 0.2);
+  border: 1px solid rgba(217, 177, 84, 0.08);
+  border-radius: 12px;
+  transition: border-color 0.2s ease;
+}
+
+.cushion-stock-box:hover {
+  border-color: rgba(217, 177, 84, 0.15);
+}
+
+.cushion-stock-center {
+  display: flex;
+  justify-content: center;
+}
+
+.cushion-direct-input-wrapper {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.cushion-color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.cushion-color-stock-card {
+  padding: 0.75rem 1rem;
+  background: rgba(72, 55, 38, 0.2);
+  border: 1px solid rgba(217, 177, 84, 0.08);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.cushion-color-stock-card:hover {
+  border-color: rgba(217, 177, 84, 0.18);
+  background: rgba(72, 55, 38, 0.3);
+}
+
+.cushion-color-label {
+  font-size: 0.85rem;
+  color: #e8e1d4;
+  flex: 1;
+  font-weight: 500;
+}
+
+.cushion-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.cushion-alert.danger {
+  background: rgba(244, 67, 54, 0.12);
+  border: 1px solid rgba(244, 67, 54, 0.25);
+  color: #f44336;
+}
+
+.cushion-alert.warning {
+  background: rgba(255, 152, 0, 0.12);
+  border: 1px solid rgba(255, 152, 0, 0.25);
+  color: #ff9800;
+}
+
+.cushion-pricing-box {
+  padding: 1rem;
+  background: rgba(72, 55, 38, 0.2);
+  border: 1px solid rgba(217, 177, 84, 0.08);
+  border-radius: 12px;
+}
+
+.cushion-pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.cushion-form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(72, 55, 38, 0.35);
+  border: 1px solid rgba(217, 177, 84, 0.12);
+  border-radius: 10px;
+  color: #e8e1d4;
+  font-size: 0.95rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.cushion-form-input:focus {
+  border-color: rgba(217, 177, 84, 0.4);
+  box-shadow: 0 0 0 3px rgba(217, 177, 84, 0.1);
+}
+
+.cushion-form-input::placeholder {
+  color: rgba(191, 179, 162, 0.4);
+}
+
+.cushion-form-label {
+  display: block;
+  color: #bfb3a2;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+}
+
+.cushion-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cushion-form-group {
+  margin-bottom: 1rem;
+}
+
+.cushion-save-btn-wrapper {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dashboard-section > form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Responsive for cushion kit */
+@media (max-width: 768px) {
+  .cushion-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cushion-form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   ADMIN ANIMATIONS
+   ============================================ */
+
+.admin-page-enter {
+  animation: pageEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse animation for stock alerts */
+@keyframes alertPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.stock-alert-pulse {
+  animation: alertPulse 2s ease-in-out infinite;
+}

@@ -9,6 +9,7 @@ import {
   IconAlertTriangle,
   IconSettings,
 } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import '../Admin.css';
@@ -85,7 +86,7 @@ const PaymentSettingsPage = () => {
   }
 
   return (
-    <>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <div className="admin-page-header">
         <h1>Pagamentos</h1>
         <p>Configure os métodos de pagamento e integração com Mercado Pago</p>
@@ -102,7 +103,7 @@ const PaymentSettingsPage = () => {
         </div>
       )}
 
-      <div className="payment-settings-grid">
+      <motion.div className="payment-settings-grid" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }}>
         {/* Métodos de Pagamento Ativos */}
         <div className="payment-settings-card">
           <div className="payment-card-header">
@@ -283,9 +284,9 @@ const PaymentSettingsPage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="payment-settings-actions">
+      <motion.div className="payment-settings-actions" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.35 }}>
         <button
           className="btn-primary"
           onClick={handleSave}
@@ -294,8 +295,8 @@ const PaymentSettingsPage = () => {
           <IconDeviceFloppy size={18} stroke={2} />
           {saving ? 'Salvando...' : 'Salvar Configurações'}
         </button>
-      </div>
-    </>
+      </motion.div>
+    </motion.div>
   );
 };
 

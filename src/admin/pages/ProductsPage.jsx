@@ -12,6 +12,7 @@ import {
   IconStack2,
   IconPhoto,
 } from '@tabler/icons-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
 import ImagePasteArea from '../components/ImagePasteArea';
 import '../Admin.css';
@@ -32,6 +33,16 @@ const emptyProduct = {
   costPrice: '',
   wholesalePrice: '',
   maxStock: '',
+};
+
+const rowVariants = {
+  hidden: { opacity: 0, x: -12 },
+  visible: (i) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: 0.1 + i * 0.03, duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+  }),
+  exit: { opacity: 0, x: 12, transition: { duration: 0.2 } },
 };
 
 const ProductsPage = () => {
@@ -141,13 +152,13 @@ const ProductsPage = () => {
   };
 
   return (
-    <>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <div className="admin-page-header">
         <h1>Produtos</h1>
         <p>Gerencie o catálogo de produtos da M&apos;Martin</p>
       </div>
 
-      <div className="admin-toolbar">
+      <motion.div className="admin-toolbar" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.35 }}>
         <div style={{ position: 'relative', flex: 1, maxWidth: 360 }}>
           <IconSearch size={16} stroke={1.8} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#bfb3a2' }} />
           <input
@@ -162,9 +173,9 @@ const ProductsPage = () => {
           <IconPlus size={18} stroke={2} />
           Novo Produto
         </button>
-      </div>
+      </motion.div>
 
-      <div className="admin-table-wrapper">
+      <motion.div className="admin-table-wrapper" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.4 }}>
         <table className="admin-table">
           <thead>
             <tr>
@@ -176,64 +187,67 @@ const ProductsPage = () => {
               <th>Ações</th>
             </tr>
           </thead>
-          <tbody>
-            {filtered.map((p) => {
-              const s = stock[p.id];
-              const qty = s?.quantity ?? 0;
-              const isLow = s && qty <= s.minStock;
-              return (
-                <tr key={p.id}>
-                  <td data-label="Imagem">
-                    {p.image ? (
-                      <img src={p.image} alt={p.name} className="product-thumb" />
-                    ) : (
-                      <div className="product-thumb" style={{ background: 'rgba(217,177,84,0.1)' }} />
-                    )}
-                  </td>
-                  <td data-label="Nome">{p.name}</td>
-                  <td data-label="Categoria"><span className="category-badge">{getCategoryName(p.category)}</span></td>
-                  <td data-label="Preço">{p.price}</td>
-                  <td data-label="Estoque">
-                    <span className={isLow ? 'stock-low' : 'stock-ok'}>
-                      {qty} un.
-                    </span>
-                  </td>
-                  <td data-label="Ações">
-                    <div className="table-actions">
-                      <button title="Editar" aria-label="Editar produto" onClick={() => openEdit(p)}>
-                        <IconPencil size={16} stroke={1.6} />
-                      </button>
-                      <button title="Excluir" aria-label="Excluir produto" className="delete" onClick={() => handleDelete(p)}>
-                        <IconTrash size={16} stroke={1.6} />
-                      </button>
-                    </div>
+          <AnimatePresence mode="popLayout">
+            <tbody>
+              {filtered.map((p, i) => {
+                const s = stock[p.id];
+                const qty = s?.quantity ?? 0;
+                const isLow = s && qty <= s.minStock;
+                return (
+                  <motion.tr key={p.id} custom={i} initial="hidden" animate="visible" exit="exit" variants={rowVariants} layout>
+                    <td data-label="Imagem">
+                      {p.image ? (
+                        <img src={p.image} alt={p.name} className="product-thumb" />
+                      ) : (
+                        <div className="product-thumb" style={{ background: 'rgba(217,177,84,0.1)' }} />
+                      )}
+                    </td>
+                    <td data-label="Nome">{p.name}</td>
+                    <td data-label="Categoria"><span className="category-badge">{getCategoryName(p.category)}</span></td>
+                    <td data-label="Preço">{p.price}</td>
+                    <td data-label="Estoque">
+                      <span className={isLow ? 'stock-low' : 'stock-ok'}>
+                        {qty} un.
+                      </span>
+                    </td>
+                    <td data-label="Ações">
+                      <div className="table-actions">
+                        <button title="Editar" aria-label="Editar produto" onClick={() => openEdit(p)}>
+                          <IconPencil size={16} stroke={1.6} />
+                        </button>
+                        <button title="Excluir" aria-label="Excluir produto" className="delete" onClick={() => handleDelete(p)}>
+                          <IconTrash size={16} stroke={1.6} />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                );
+              })}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center', color: '#bfb3a2', padding: '2rem' }}>
+                    Nenhum produto encontrado.
                   </td>
                 </tr>
-              );
-            })}
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan="6" style={{ textAlign: 'center', color: '#bfb3a2', padding: '2rem' }}>
-                  Nenhum produto encontrado.
-                </td>
-              </tr>
-            )}
-          </tbody>
+              )}
+            </tbody>
+          </AnimatePresence>
         </table>
-      </div>
+      </motion.div>
 
-      {modalOpen && (
-        <div className="admin-modal-overlay" onClick={() => setModalOpen(false)}>
-          <div className="admin-modal admin-modal-wide" onClick={(e) => e.stopPropagation()}>
-            <button className="admin-modal-close" onClick={() => setModalOpen(false)} aria-label="Fechar">
-              <IconX size={18} stroke={2} />
-            </button>
-            <div className="admin-modal-body">
-              <div className="admin-modal-header">
-                <IconPackage size={32} stroke={1.5} className="modal-header-icon" />
-                <h2>{editing !== null ? 'Editar Produto' : 'Novo Produto'}</h2>
-                <p>{editing !== null ? 'Atualize as informações do produto' : 'Preencha os dados para cadastrar um novo produto'}</p>
-              </div>
+      <AnimatePresence>
+        {modalOpen && (
+          <motion.div className="admin-modal-overlay" onClick={() => setModalOpen(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <motion.div className="admin-modal admin-modal-wide" onClick={(e) => e.stopPropagation()} initial={{ opacity: 0, scale: 0.92, y: 24 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.92, y: 24 }} transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}>
+              <button className="admin-modal-close" onClick={() => setModalOpen(false)} aria-label="Fechar">
+                <IconX size={18} stroke={2} />
+              </button>
+              <div className="admin-modal-body">
+                <div className="admin-modal-header">
+                  <IconPackage size={32} stroke={1.5} className="modal-header-icon" />
+                  <h2>{editing !== null ? 'Editar Produto' : 'Novo Produto'}</h2>
+                  <p>{editing !== null ? 'Atualize as informações do produto' : 'Preencha os dados para cadastrar um novo produto'}</p>
+                </div>
               <form onSubmit={handleSubmit}>
                 <div className="product-form-layout">
                   {/* Left Column - Product Information */}
@@ -363,26 +377,29 @@ const ProductsPage = () => {
                 </div>
               </form>
             </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {confirmDelete && (
-        <div className="admin-confirm-overlay" onClick={() => setConfirmDelete(null)}>
-          <div className="admin-confirm-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="admin-confirm-body">
-              <IconAlertTriangle size={48} stroke={1.5} className="confirm-icon" />
-              <h3>Excluir Produto</h3>
-              <p>Tem certeza que deseja excluir <strong>{confirmDelete.name}</strong>? Esta ação não pode ser desfeita.</p>
-              <div className="admin-confirm-actions">
-                <button className="btn-cancel" onClick={() => setConfirmDelete(null)}>Cancelar</button>
-                <button className="btn-delete" onClick={confirmDeleteProduct}>Excluir</button>
+      <AnimatePresence>
+        {confirmDelete && (
+          <motion.div className="admin-confirm-overlay" onClick={() => setConfirmDelete(null)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <motion.div className="admin-confirm-dialog" onClick={(e) => e.stopPropagation()} initial={{ opacity: 0, scale: 0.92, y: 24 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.92, y: 24 }} transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}>
+              <div className="admin-confirm-body">
+                <IconAlertTriangle size={48} stroke={1.5} className="confirm-icon" />
+                <h3>Excluir Produto</h3>
+                <p>Tem certeza que deseja excluir <strong>{confirmDelete.name}</strong>? Esta ação não pode ser desfeita.</p>
+                <div className="admin-confirm-actions">
+                  <button className="btn-cancel" onClick={() => setConfirmDelete(null)}>Cancelar</button>
+                  <button className="btn-delete" onClick={confirmDeleteProduct}>Excluir</button>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
