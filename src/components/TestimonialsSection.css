@@ -1,7 +1,7 @@
 .testimonials-section {
   margin: 4rem auto;
   padding: 3rem 2rem;
-  background: linear-gradient(180deg, rgba(147, 51, 234, 0.03) 0%, rgba(138, 43, 226, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(42, 24, 16, 0.95) 0%, rgba(58, 42, 26, 0.9) 100%);
 }
 
 .testimonials-container {
@@ -17,13 +17,13 @@
 .testimonials-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #f5efe6;
   margin-bottom: 1rem;
 }
 
 .testimonials-subtitle {
   font-size: 1.1rem;
-  color: #666;
+  color: #e8dcc8;
   max-width: 600px;
   margin: 0 auto;
 }
@@ -35,12 +35,12 @@
 }
 
 .testimonial-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(74, 55, 40, 0.4);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 2rem;
-  border: 1px solid rgba(147, 51, 234, 0.1);
+  border: 1px solid rgba(217, 177, 84, 0.2);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   display: flex;
@@ -50,8 +50,8 @@
 
 .testimonial-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(147, 51, 234, 0.15);
-  border-color: rgba(147, 51, 234, 0.2);
+  box-shadow: 0 8px 24px rgba(217, 177, 84, 0.3);
+  border-color: rgba(217, 177, 84, 0.5);
 }
 
 .testimonial-header {
@@ -61,7 +61,7 @@
 }
 
 .quote-icon {
-  color: #9333ea;
+  color: #d9b154;
   opacity: 0.3;
 }
 
@@ -77,7 +77,7 @@
 .testimonial-text {
   font-size: 1rem;
   line-height: 1.6;
-  color: #333;
+  color: #e8dcc8;
   flex: 1;
 }
 
@@ -86,7 +86,7 @@
   flex-direction: column;
   gap: 0.5rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(147, 51, 234, 0.1);
+  border-top: 1px solid rgba(217, 177, 84, 0.1);
 }
 
 .testimonial-author {
@@ -97,17 +97,17 @@
 
 .testimonial-author strong {
   font-size: 1rem;
-  color: #1a1a1a;
+  color: #f5efe6;
 }
 
 .testimonial-location {
   font-size: 0.875rem;
-  color: #666;
+  color: rgba(232, 220, 200, 0.7);
 }
 
 .testimonial-product {
   font-size: 0.875rem;
-  color: #9333ea;
+  color: #d9b154;
   font-weight: 500;
 }
 
