@@ -141,6 +141,7 @@
     bottom: 0;
     border-bottom: none;
     border-top: 1px solid rgba(217, 177, 84, 0.12);
+    z-index: 1002;
   }
 
   .header-container {
@@ -162,7 +163,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1001;
+    z-index: 1003;
   }
   
   .logo .logo-image {
