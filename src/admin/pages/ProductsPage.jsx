@@ -198,7 +198,7 @@ const ProductsPage = () => {
                       {qty} un.
                     </span>
                   </td>
-                  <td data-label="">
+                  <td data-label="Ações">
                     <div className="table-actions">
                       <button title="Editar" aria-label="Editar produto" onClick={() => openEdit(p)}>
                         <IconPencil size={16} stroke={1.6} />
