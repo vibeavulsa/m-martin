@@ -2,99 +2,117 @@
 
 ## Resumo do Projeto
 
-Este projeto implementa um catálogo moderno e interativo para M'Martin Estofados Finos, utilizando as mais recentes tecnologias web.
+E-commerce completo para M'Martin Estofados Finos, com catálogo interativo, painel administrativo, checkout multi-pagamento e segurança de nível produção.
 
 ## Informações do Cliente
 
-- **Nome do Projeto:** m'martin
-- **ID do Projeto:** m-martin-estofados  
+- **Nome do Projeto:** M'Martin Estofados Finos
+- **ID do Projeto:** m-martin-estofados
 - **Número do Projeto:** 178643218861
-- **Plataforma:** Firebase
+- **Plataforma:** Firebase (Auth, Firestore, Cloud Functions, Storage)
 
 ## Stack Tecnológico
 
 ### Frontend
-- **React 19** - Framework JavaScript moderno
-- **Vite 7** - Build tool ultrarrápido
-- **liquid-glass-react** - Efeitos glassmorphism líquido da Apple
-- **@tabler/icons-react** - Biblioteca de ícones profissionais
+- **React 19** — Framework JavaScript moderno
+- **Vite 7** — Build tool ultrarrápido
+- **Framer Motion 12** — Animações e transições fluidas
+- **React Router 7** — Roteamento SPA
+- **@tabler/icons-react** — Biblioteca de ícones profissionais
 
 ### Styling
 - CSS modular por componente
-- Gradientes modernos
-- Animações CSS
+- Glassmorphism (liquid-glass-react)
+- Gradientes e animações CSS
 - Design responsivo mobile-first
+- Paleta da marca: marrom e dourado
 
-### Backend (Configurado)
-- **Firebase** - Pronto para Firestore e Storage
-- Variáveis de ambiente configuradas
+### Backend
+- **Firebase Auth** — Autenticação por email/senha
+- **Firestore** — Banco de dados em tempo real
+- **Cloud Functions** — Lógica server-side (pedidos, pagamentos)
+- **Firebase Storage** — Armazenamento de imagens
+
+### Pagamentos
+- **Mercado Pago** — Checkout, PIX, cartão de crédito
+- **WhatsApp** — Checkout manual via mensagem formatada
 
 ## Estrutura do Catálogo
 
-### 1. Sofás (3 produtos)
-- Sofá Premium 3 Lugares - R$ 3.500,00
-- Sofá Retrátil Confort - R$ 4.200,00
-- Sofá de Canto Modular - R$ 5.800,00
+### 1. Sofás
+- Sofás Premium, Retrátil, Modular e variações
 
-### 2. Almofadas (3 produtos)
-- Almofada Decorativa Veludo - R$ 120,00
-- Almofada Ortopédica - R$ 180,00
-- Kit Almofadas Estampadas - R$ 380,00
+### 2. Almofadas (Kit de 5 unidades)
+- Kit com seleção interativa de 8 cores
+- Tecido Oxford premium, fibra siliconada 500g
+- Preços separados para capas e refis
 
-### 3. Travesseiros (3 produtos)
-- Travesseiro Viscoelástico - R$ 280,00
-- Travesseiro Plumas Premium - R$ 350,00
-- Travesseiro Cervical - R$ 240,00
+### 3. Travesseiros
+- Linha premium (viscoelástico, plumas, cervical)
 
-### 4. Linha Homecare e Hospitalar (3 produtos)
-- Colchão Hospitalar D45 - R$ 1.800,00
-- Travesseiro Anti-Refluxo - R$ 320,00
-- Kit Cama Hospitalar Completo - R$ 2.500,00
+### 4. Puffs & Chaise
+- Complementos decorativos para sala
 
-## Componentes Principais
+### 5. Para Acamados (Hospitalar)
+- Colchões, travesseiros e kits hospitalares
 
-### Header
-- Logo M'Martin com efeito gradiente
-- Navegação para as 4 categorias
-- Efeito glass blur no scroll
-- Responsivo
+## Componentes Implementados
 
-### Hero
-- Seção principal com gradiente animado (roxo → lilás)
-- Título e subtítulo com animações
-- 2 CTAs: "Ver Catálogo" e "Linha Hospitalar"
-- Círculos decorativos com animação float
+### Loja
+- **Header** — Navegação por categorias, carrinho, perfil de usuário, configurações
+- **Hero** — Banner com badges de confiança, CTAs, animações
+- **CushionKitBanner** — Vídeo do kit de almofadas com overlay interativo
+- **CushionKitSelector** — Seletor visual de 5 cores para montar o kit
+- **ProductCard** — Cards com glassmorphism, imagens, preço, botão consultar
+- **CheckoutDialog** — Checkout em 3 etapas (carrinho → dados → pagamento)
+- **PaymentMethodSelector** — Seleção entre WhatsApp, Mercado Pago, PIX, cartão
+- **LoyaltyProgramBanner** — Programa de fidelidade com 4 benefícios
+- **TestimonialsSection** — 4 depoimentos de clientes com avaliação 5 estrelas
+- **NewsletterSignup** — Cadastro com nome e email
 
-### CategorySection
-- Cards com efeito liquid glass
-- Ícones Tabler React coloridos
-- Nome e descrição da categoria
-- ID para navegação âncora
+### Admin
+- **DashboardPage** — KPIs animados, alertas de estoque baixo, pedidos recentes
+- **ProductsPage** — CRUD completo com upload de múltiplas imagens via paste
+- **StockPage** — Controle visual com barras de progresso, filtros, alertas
+- **OrdersPage** — Tracking de status (Pendente → Processando → Enviado → Entregue)
+- **CushionKitPage** — Gestão de cores, estoque por capa/refil, preços individuais
+- **PaymentSettingsPage** — Configuração de Mercado Pago (sandbox/produção), PIX, WhatsApp
 
-### ProductCard
-- Cards com liquid glass effect
-- Imagem placeholder com ícone
-- Nome, descrição e preço
-- Tags de features
-- Botão "Consultar"
-- Hover effects
-
-### Footer
-- Liquid glass card
-- Informações do projeto
-- Copyright
+### Backend
+- **createOrder** (Cloud Function) — Validação de preços server-side, transação atômica de estoque
+- **processPayment** (Cloud Function) — Integração Mercado Pago, PIX, cartão de crédito
+- **Firestore Rules** — Proteção por coleção contra manipulação de preços e dados
 
 ## Funcionalidades Implementadas
 
-✅ Design moderno com glassmorphism  
-✅ Animações suaves e profissionais  
-✅ Totalmente responsivo (mobile, tablet, desktop)  
-✅ 12 produtos de exemplo organizados  
-✅ Navegação por categorias  
-✅ Firebase pronto para uso  
-✅ Ícones profissionais Tabler  
-✅ Build otimizado para produção  
-✅ Performance otimizada  
+### Loja
+✅ Design glassmorphism responsivo (mobile, tablet, desktop)
+✅ Animações com Framer Motion (stagger, transições, hover)
+✅ Kit de almofadas interativo com seletor de cores
+✅ Checkout em 3 etapas com 4 métodos de pagamento
+✅ Persistência de pedidos no Firestore
+✅ Programa de fidelidade e depoimentos
+✅ Newsletter com feedback visual
+✅ SEO: meta tags, Open Graph, schema markup, sitemap
+✅ Navegação mobile otimizada (bottom nav, drawer)
+
+### Admin
+✅ Autenticação Firebase (email/senha)
+✅ Dashboard com 6 KPIs e alertas em tempo real
+✅ CRUD de produtos com múltiplas imagens e campos ERP
+✅ Gestão de estoque com filtros e controles inline
+✅ Tracking de pedidos com atualização de status
+✅ Kit de almofadas: cores, estoque capa/refil, preços separados
+✅ Configuração de gateways de pagamento
+✅ Layout responsivo com menu drawer mobile
+
+### Segurança
+✅ Firebase Auth com PrivateRoute
+✅ Cloud Functions com rate limiting (5 req/min/IP)
+✅ Validação de preços no servidor (anti-fraude)
+✅ Transações atômicas de estoque (anti-overselling)
+✅ Firestore Security Rules por coleção
+✅ Proteção contra manipulação de preços (`affectedKeys`)
 
 ## Deploy
 
@@ -102,42 +120,26 @@ O projeto está pronto para deploy em:
 - Firebase Hosting
 - Vercel
 - Netlify
-- Qualquer serviço de hosting estático
 
-### Build de Produção
 ```bash
 npm run build
 # Gera pasta dist/ com arquivos otimizados
 ```
 
-## Próximos Passos Sugeridos
+## Próximos Passos
 
-1. **Adicionar Imagens Reais**
-   - Substituir placeholders por fotos dos produtos
-   - Otimizar imagens para web
+Veja o plano completo em [PROXIMOS_PASSOS.md](PROXIMOS_PASSOS.md).
 
-2. **Integrar Firebase**
-   - Configurar Firestore para produtos dinâmicos
-   - Adicionar Storage para imagens
-   - Implementar busca e filtros
+## Documentação
 
-3. **Funcionalidades Extras**
-   - Sistema de busca
-   - Filtros por preço/categoria
-   - Carrinho de compras
-   - Formulário de contato
-   - WhatsApp integration
-   - Comparador de produtos
-
-4. **SEO e Analytics**
-   - Meta tags
-   - Sitemap
-   - Google Analytics
-   - Schema markup
-
-## Suporte
-
-Para dúvidas ou melhorias, consulte a documentação no README.md
+| Documento | Descrição |
+|-----------|-----------|
+| [README.md](README.md) | Visão geral, instalação e estrutura |
+| [FIREBASE_SETUP.md](FIREBASE_SETUP.md) | Configuração do Firebase passo-a-passo |
+| [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) | Checklist de implantação |
+| [SECURITY_IMPLEMENTATION.md](SECURITY_IMPLEMENTATION.md) | Documentação técnica de segurança |
+| [FIRESTORE_SECURITY.md](FIRESTORE_SECURITY.md) | Regras do Firestore com testes |
+| [PROXIMOS_PASSOS.md](PROXIMOS_PASSOS.md) | Plano de próximos passos |
 
 ---
 **Desenvolvido com 💜 para M'Martin Estofados Finos**
