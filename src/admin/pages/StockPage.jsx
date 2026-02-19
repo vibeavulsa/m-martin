@@ -174,7 +174,7 @@ const StockPage = () => {
               const isLow = s.quantity <= s.minStock;
               return (
                 <tr key={p.id}>
-                  <td>
+                  <td data-label="Produto">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       {p.image ? (
                         <img src={p.image} alt={p.name} className="product-thumb" />
@@ -184,8 +184,8 @@ const StockPage = () => {
                       <span>{p.name}</span>
                     </div>
                   </td>
-                  <td><span className="category-badge">{getCategoryName(p.category)}</span></td>
-                  <td>
+                  <td data-label="Categoria"><span className="category-badge">{getCategoryName(p.category)}</span></td>
+                  <td data-label="Quantidade">
                     <div className="stock-controls">
                       <button onClick={() => updateStock(p.id, s.quantity - 1)} aria-label="Diminuir quantidade em estoque">
                         <IconMinus size={14} stroke={2} />
@@ -196,7 +196,7 @@ const StockPage = () => {
                       </button>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Mínimo">
                     <div className="stock-controls">
                       <button onClick={() => updateMinStock(p.id, s.minStock - 1)} aria-label="Diminuir estoque mínimo">
                         <IconMinus size={14} stroke={2} />
@@ -207,7 +207,7 @@ const StockPage = () => {
                       </button>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Status">
                     {s.quantity <= 0 ? (
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#f44336', fontSize: '0.8rem', fontWeight: 600 }}>
                         <IconPackageOff size={14} stroke={2} />
@@ -224,7 +224,7 @@ const StockPage = () => {
                       </span>
                     )}
                   </td>
-                  <td>
+                  <td data-label="Definir Qtd.">
                     <input
                       type="number"
                       min="0"

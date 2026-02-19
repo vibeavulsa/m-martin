@@ -78,14 +78,14 @@ const OrdersPage = () => {
           <tbody>
             {filtered.map((o) => (
               <tr key={o.id}>
-                <td style={{ fontWeight: 600 }}>#{o.id}</td>
-                <td>{new Date(o.date).toLocaleDateString('pt-BR')}</td>
-                <td>{o.customer?.name || '—'}</td>
-                <td>{o.items?.length || 0} itens</td>
-                <td>
+                <td data-label="ID" style={{ fontWeight: 600 }}>#{o.id}</td>
+                <td data-label="Data">{new Date(o.date).toLocaleDateString('pt-BR')}</td>
+                <td data-label="Cliente">{o.customer?.name || '—'}</td>
+                <td data-label="Itens">{o.items?.length || 0} itens</td>
+                <td data-label="Status">
                   <span className={`order-status ${o.status}`}>{o.status}</span>
                 </td>
-                <td>
+                <td data-label="Alterar Status">
                   <select
                     className="admin-search"
                     style={{ maxWidth: 160, padding: '0.35rem 0.5rem', fontSize: '0.8rem' }}
