@@ -33,6 +33,7 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick }) => {
           <a href="#sofas" className="nav-link" onClick={(e) => handleNavClick(e, 'sofas')}>Sofás</a>
           <a href="#almofadas" className="nav-link" onClick={(e) => handleNavClick(e, 'almofadas')}>Almofadas</a>
           <a href="#travesseiros" className="nav-link" onClick={(e) => handleNavClick(e, 'travesseiros')}>Travesseiros</a>
+          <a href="#puffs-chaise" className="nav-link" onClick={(e) => handleNavClick(e, 'puffs-chaise')}>Puffs & Chaise</a>
           <a href="#homecare-hospitalar" className="nav-link" onClick={(e) => handleNavClick(e, 'homecare-hospitalar')}>Para Acamados</a>
           <div className="nav-actions">
             <motion.button

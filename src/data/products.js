@@ -29,6 +29,12 @@ export const categories = [
     name: 'Pet',
     description: 'Seu pet merece o mesmo conforto — camas resistentes e fáceis de limpar',
     iconName: 'IconPaw'
+  },
+  {
+    id: 'puffs-chaise',
+    name: 'Puffs e Chaise',
+    description: 'Estilo e versatilidade que completam qualquer ambiente — conforto extra para relaxar',
+    iconName: 'IconArmchair2'
   }
 ];
 
@@ -197,5 +203,67 @@ export const products = [
     priceCash: 'R$ 130,00',
     image: 'https://images.unsplash.com/photo-1615751072497-5f5169febe17?w=600',
     features: ['70cm x 90cm', 'Material sintético', 'Fácil limpeza', '500g isopor moído', 'Zíper removível']
+  },
+
+  // Puffs e Chaise
+  {
+    id: 16,
+    category: 'puffs-chaise',
+    name: 'Puff Redondo Luxo',
+    description: 'Elegância em formato compacto. Estofado premium com estrutura reforçada, perfeito como assento extra ou apoio para os pés.',
+    price: 'R$ 450,00',
+    priceInstallment: 'R$ 95,00',
+    installments: 5,
+    priceCash: 'R$ 450,00',
+    image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=600',
+    features: ['Diâmetro 50cm', 'Espuma D33', 'Tecido premium', 'Base antiderrapante', 'Várias cores']
+  },
+  {
+    id: 17,
+    category: 'puffs-chaise',
+    name: 'Puff Quadrado Decorativo',
+    description: 'Versátil e moderno. Design clean que se adapta a qualquer ambiente, com acabamento impecável e conforto garantido.',
+    price: 'R$ 520,00',
+    priceInstallment: 'R$ 109,90',
+    installments: 5,
+    priceCash: 'R$ 520,00',
+    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600',
+    features: ['45x45x45cm', 'Espuma alta densidade', 'Design contemporâneo', 'Fácil limpeza', 'Resistente']
+  },
+  {
+    id: 18,
+    category: 'puffs-chaise',
+    name: 'Chaise Longue Premium',
+    description: 'O luxo de relaxar com estilo. Design ergonômico que convida ao descanso, com estofamento de alta qualidade e acabamento sofisticado.',
+    price: 'R$ 2.800,00',
+    priceInstallment: 'R$ 599,90',
+    installments: 5,
+    priceCash: 'R$ 2.800,00',
+    image: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=600',
+    features: ['1,60m de comprimento', 'Encosto reclinável', 'Espuma D45', 'Tecido premium', 'Pés em madeira nobre']
+  },
+  {
+    id: 19,
+    category: 'puffs-chaise',
+    name: 'Chaise Modular',
+    description: 'Flexibilidade total para seu espaço. Módulos que se adaptam às suas necessidades, criando o canto perfeito para relaxar.',
+    price: 'R$ 3.200,00',
+    priceInstallment: 'R$ 679,90',
+    installments: 5,
+    priceCash: 'R$ 3.200,00',
+    image: 'https://images.unsplash.com/photo-1565183928294-7d22f4d38190?w=600',
+    features: ['Sistema modular', 'Espuma D40', 'Múltiplas configurações', 'Design exclusivo', 'Alta durabilidade']
+  },
+  {
+    id: 20,
+    category: 'puffs-chaise',
+    name: 'Puff Baú Organizador',
+    description: 'Conforto e funcionalidade em um só móvel. Puff com compartimento interno amplo, ideal para guardar mantas, revistas e mais.',
+    price: 'R$ 680,00',
+    priceInstallment: 'R$ 145,00',
+    installments: 5,
+    priceCash: 'R$ 680,00',
+    image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600',
+    features: ['Baú interno 60L', 'Tampa removível', 'Espuma D28', 'Suporta até 150kg', 'Prático e elegante']
   }
 ];
