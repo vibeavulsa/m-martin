@@ -86,6 +86,11 @@ body {
 }
 
 @media (max-width: 768px) {
+  .app-wrapper {
+    padding-top: 60px;
+    padding-bottom: 65px;
+  }
+
   .catalog-container {
     padding: 1.5rem 1rem;
   }
