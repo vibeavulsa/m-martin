@@ -23,6 +23,11 @@
   position: relative;
 }
 
+.dialog-content-sofa {
+  max-width: 1200px;
+  overflow: hidden;
+}
+
 .dialog-close {
   position: absolute;
   top: 1rem;
@@ -49,15 +54,17 @@
 .dialog-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: stretch;
 }
 
 .dialog-layout-sofa {
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: 1.8fr 1fr;
 }
 
 .dialog-image-container {
   position: relative;
   width: 100%;
+  height: 100%;
   min-height: 400px;
 }
 
@@ -73,6 +80,7 @@
   border-radius: 22px 0 0 22px;
   background: linear-gradient(148deg, #483726 0%, #281c12 100%);
   position: relative;
+  cursor: zoom-in;
 }
 
 .dialog-image img {
