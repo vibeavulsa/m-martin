@@ -38,40 +38,111 @@ export const categories = [
   }
 ];
 
+// Available sofa fabrics
+export const sofaFabrics = [
+  { id: 'suede', name: 'Suede', description: 'Aveludado e sofisticado' },
+  { id: 'veludo', name: 'Veludo', description: 'Luxuoso e elegante' },
+  { id: 'linho', name: 'Linho', description: 'Natural e refinado' },
+  { id: 'courino', name: 'Courino', description: 'Resistente e fácil de limpar' },
+  { id: 'chenille', name: 'Chenille', description: 'Macio e durável' },
+  { id: 'boucle', name: 'Bouclê', description: 'Moderno e texturizado' },
+  { id: 'couro-natural', name: 'Couro Natural', description: 'Premium e atemporal' },
+  { id: 'couro-sintetico', name: 'Couro Sintético', description: 'Prático e elegante' },
+  { id: 'veludo-cotelê', name: 'Veludo Cotelê', description: 'Clássico e charmoso' },
+  { id: 'jacquard', name: 'Jacquard', description: 'Sofisticado e resistente' },
+];
+
 // Sample products data
 export const products = [
-  // Sofás
+  // Sofás — sob encomenda, entrega apenas Ribeirão Preto e região
   {
     id: 1,
     category: 'sofas',
-    name: 'Sofá Premium 3 Lugares',
-    description: 'Elegância que se sente ao sentar. Acabamento artesanal, estrutura reforçada e design que valoriza qualquer sala de estar.',
-    price: 'R$ 3.500,00',
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600',
-    features: ['Tecido premium', 'Estrutura reforçada', 'Design moderno']
+    name: 'Sofá Zeus',
+    description: 'Imponência e conforto em perfeita harmonia. O Zeus combina estrutura robusta com design arrojado, ideal para salas amplas que pedem personalidade e sofisticação.',
+    price: 'Sob consulta',
+    image: '',
+    images: [],
+    features: ['Sob encomenda', 'Estrutura reforçada', 'Design arrojado', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
+    isSofa: true,
+    isCustomOrder: true,
+    sofaModel: 'Zeus',
+    fabrics: sofaFabrics,
   },
   {
     id: 2,
     category: 'sofas',
-    name: 'Sofá Retrátil Confort',
-    description: 'O máximo conforto na hora de relaxar. Mecanismo retrátil e reclinável com espuma D33 de alta resiliência.',
-    price: 'R$ 4.200,00',
-    image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600',
-    features: ['Retrátil e reclinável', 'Espuma D33', 'Acabamento impecável']
+    name: 'Sofá Chronos',
+    description: 'O tempo parou quando o Chronos chegou. Linhas clean e elegantes que criam um ambiente de modernidade atemporal — perfeito para quem valoriza o detalhe.',
+    price: 'Sob consulta',
+    image: '',
+    images: [],
+    features: ['Sob encomenda', 'Design atemporal', 'Linhas clean', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
+    isSofa: true,
+    isCustomOrder: true,
+    sofaModel: 'Chronos',
+    fabrics: sofaFabrics,
   },
   {
     id: 3,
     category: 'sofas',
-    name: 'Sofá de Canto Modular',
-    description: 'Versatilidade para montar do seu jeito. Módulos independentes que se adaptam ao espaço e ao seu estilo de vida.',
-    price: 'R$ 5.800,00',
-    image: 'https://images.unsplash.com/photo-1550254478-ead40cc54513?w=600',
-    features: ['Modular', 'Alta durabilidade', 'Design contemporâneo']
+    name: 'Sofá Roma',
+    description: 'A nobreza do design italiano em cada detalhe. O Roma traz capitonê elegante, pés torneados e um acabamento que transforma qualquer sala num ambiente de luxo.',
+    price: 'Sob consulta',
+    image: '',
+    images: [],
+    features: ['Sob encomenda', 'Estilo clássico', 'Capitonê disponível', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
+    isSofa: true,
+    isCustomOrder: true,
+    sofaModel: 'Roma',
+    fabrics: sofaFabrics,
   },
-  
-  // Almofadas
   {
     id: 4,
+    category: 'sofas',
+    name: 'Sofá RC',
+    description: 'Versatilidade e praticidade sem abrir mão do estilo. O RC é retrátil e reclinável, ideal para quem busca o máximo conforto para relaxar com a família.',
+    price: 'Sob consulta',
+    image: '',
+    images: [],
+    features: ['Sob encomenda', 'Retrátil e reclinável', 'Alta durabilidade', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
+    isSofa: true,
+    isCustomOrder: true,
+    sofaModel: 'RC',
+    fabrics: sofaFabrics,
+  },
+  {
+    id: 5,
+    category: 'sofas',
+    name: 'Sofá Orgânico',
+    description: 'Curvas que abraçam. O Orgânico tem formas fluidas e envolventes que evocam natureza e acolhimento — para quem quer um sofá com alma e personalidade únicas.',
+    price: 'Sob consulta',
+    image: '',
+    images: [],
+    features: ['Sob encomenda', 'Design orgânico', 'Formas fluidas', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
+    isSofa: true,
+    isCustomOrder: true,
+    sofaModel: 'Orgânico',
+    fabrics: sofaFabrics,
+  },
+  {
+    id: 6,
+    category: 'sofas',
+    name: 'Sofá Sem Caixa',
+    description: 'Sofisticação sem comprometer a sala. O Sem Caixa tem estrutura elevada e leveza visual, ideal para ambientes menores ou quem prefere um visual mais moderno e arejado.',
+    price: 'Sob consulta',
+    image: '',
+    images: [],
+    features: ['Sob encomenda', 'Visual leve e arejado', 'Estrutura elevada', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
+    isSofa: true,
+    isCustomOrder: true,
+    sofaModel: 'Sem Caixa',
+    fabrics: sofaFabrics,
+  },
+
+  // Almofadas
+  {
+    id: 21,
     category: 'almofadas',
     name: 'Almofada Decorativa Veludo',
     description: 'Toque de sofisticação para seu sofá. Veludo premium disponível em cores que combinam com qualquer decoração.',
@@ -80,7 +151,7 @@ export const products = [
     features: ['Veludo premium', 'Diversas cores', 'Acabamento luxuoso']
   },
   {
-    id: 5,
+    id: 22,
     category: 'almofadas',
     name: 'Almofada Ortopédica',
     description: 'Conforto que cuida da sua postura. Tecido respirável e lavável, ideal para uso diário no trabalho ou em casa.',
@@ -89,7 +160,7 @@ export const products = [
     features: ['Suporte ortopédico', 'Tecido respirável', 'Lavável']
   },
   {
-    id: 6,
+    id: 23,
     category: 'almofadas',
     name: 'Kit Almofadas Estampadas',
     description: 'Renove a decoração da sua sala em minutos. Kit com 4 almofadas de estampas exclusivas M\'Martin.',

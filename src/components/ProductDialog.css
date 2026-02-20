@@ -483,7 +483,8 @@
 /* Trust badges */
 .dialog-trust-badges {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
   padding-top: 0.5rem;
   border-top: 1px solid rgba(217, 177, 84, 0.08);
 }
@@ -496,9 +497,38 @@
   color: #9a8e80;
 }
 
+.trust-badge.trust-badge-custom {
+  color: #d9b154;
+}
+
 .trust-badge svg {
   color: #d9b154;
   opacity: 0.7;
+}
+
+.trust-badge.trust-badge-custom svg {
+  opacity: 1;
+}
+
+/* Custom order price */
+.dialog-price-custom-order {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dialog-price-consult {
+  font-size: 1.85rem;
+  font-weight: 700;
+  background: linear-gradient(138deg, #d9b154 0%, #f7ecc4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dialog-price-consult-note {
+  font-size: 0.8rem;
+  color: #9a8e80;
 }
 
 /* Responsive - Mobile */
