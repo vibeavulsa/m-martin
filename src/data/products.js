@@ -1,3 +1,10 @@
+import zeusImg from '../assets/sofas/zeus.svg';
+import chronosImg from '../assets/sofas/chronos.svg';
+import romaImg from '../assets/sofas/roma.svg';
+import rcImg from '../assets/sofas/rc.svg';
+import organicoImg from '../assets/sofas/organico.svg';
+import semCaixaImg from '../assets/sofas/sem-caixa.svg';
+
 // Product categories for M'Martin catalog
 export const categories = [
   {
@@ -61,7 +68,7 @@ export const products = [
     name: 'Sofá Zeus',
     description: 'Imponência e conforto em perfeita harmonia. O Zeus combina estrutura robusta com design arrojado, ideal para salas amplas que pedem personalidade e sofisticação.',
     price: 'Sob consulta',
-    image: '',
+    image: zeusImg,
     images: [],
     features: ['Sob encomenda', 'Estrutura reforçada', 'Design arrojado', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
     isSofa: true,
@@ -75,7 +82,7 @@ export const products = [
     name: 'Sofá Chronos',
     description: 'O tempo parou quando o Chronos chegou. Linhas clean e elegantes que criam um ambiente de modernidade atemporal — perfeito para quem valoriza o detalhe.',
     price: 'Sob consulta',
-    image: '',
+    image: chronosImg,
     images: [],
     features: ['Sob encomenda', 'Design atemporal', 'Linhas clean', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
     isSofa: true,
@@ -89,7 +96,7 @@ export const products = [
     name: 'Sofá Roma',
     description: 'A nobreza do design italiano em cada detalhe. O Roma traz capitonê elegante, pés torneados e um acabamento que transforma qualquer sala num ambiente de luxo.',
     price: 'Sob consulta',
-    image: '',
+    image: romaImg,
     images: [],
     features: ['Sob encomenda', 'Estilo clássico', 'Capitonê disponível', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
     isSofa: true,
@@ -103,7 +110,7 @@ export const products = [
     name: 'Sofá RC',
     description: 'Versatilidade e praticidade sem abrir mão do estilo. O RC é retrátil e reclinável, ideal para quem busca o máximo conforto para relaxar com a família.',
     price: 'Sob consulta',
-    image: '',
+    image: rcImg,
     images: [],
     features: ['Sob encomenda', 'Retrátil e reclinável', 'Alta durabilidade', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
     isSofa: true,
@@ -117,7 +124,7 @@ export const products = [
     name: 'Sofá Orgânico',
     description: 'Curvas que abraçam. O Orgânico tem formas fluidas e envolventes que evocam natureza e acolhimento — para quem quer um sofá com alma e personalidade únicas.',
     price: 'Sob consulta',
-    image: '',
+    image: organicoImg,
     images: [],
     features: ['Sob encomenda', 'Design orgânico', 'Formas fluidas', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
     isSofa: true,
@@ -131,7 +138,7 @@ export const products = [
     name: 'Sofá Sem Caixa',
     description: 'Sofisticação sem comprometer a sala. O Sem Caixa tem estrutura elevada e leveza visual, ideal para ambientes menores ou quem prefere um visual mais moderno e arejado.',
     price: 'Sob consulta',
-    image: '',
+    image: semCaixaImg,
     images: [],
     features: ['Sob encomenda', 'Visual leve e arejado', 'Estrutura elevada', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
     isSofa: true,

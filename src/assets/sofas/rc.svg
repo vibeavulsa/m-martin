@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e2a1e"/>
+      <stop offset="100%" style="stop-color:#2e4a2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#bg)"/>
+  <!-- Sofa silhouette - retrátil/reclinável style -->
+  <rect x="80" y="225" width="440" height="95" rx="10" fill="#3a5a3a"/>
+  <!-- Footrest extended -->
+  <rect x="400" y="245" width="120" height="60" rx="8" fill="#426042"/>
+  <!-- Back reclined -->
+  <rect x="55" y="165" width="370" height="75" rx="10" style="transform-origin: 425px 240px; transform: rotate(-15deg);" fill="#4a6a4a"/>
+  <rect x="55" y="155" width="72" height="170" rx="10" fill="#3a5a3a"/>
+  <!-- Label -->
+  <text x="300" y="95" font-family="Georgia, serif" font-size="56" font-weight="bold" fill="#d9b154" text-anchor="middle">RC</text>
+  <text x="300" y="135" font-family="Georgia, serif" font-size="18" fill="#a0c0a0" text-anchor="middle">Sofá Retrátil e Reclinável</text>
+  <!-- Feet -->
+  <rect x="100" y="315" width="25" height="20" rx="4" fill="#1e2a1e"/>
+  <rect x="465" y="315" width="25" height="20" rx="4" fill="#1e2a1e"/>
+</svg>

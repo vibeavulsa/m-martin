@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a1f3d"/>
+      <stop offset="100%" style="stop-color:#3d2b5c"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#bg)"/>
+  <!-- Sofa silhouette - organic curves -->
+  <ellipse cx="300" cy="280" rx="220" ry="65" fill="#6a4a8a"/>
+  <ellipse cx="300" cy="235" rx="240" ry="55" fill="#7a5a9a"/>
+  <!-- Curved backrest -->
+  <path d="M100,240 Q150,160 300,155 Q450,160 500,240" fill="none" stroke="#8a6aaa" stroke-width="45" stroke-linecap="round"/>
+  <!-- Armrests organic -->
+  <ellipse cx="120" cy="245" rx="35" ry="55" fill="#6a4a8a"/>
+  <ellipse cx="480" cy="245" rx="35" ry="55" fill="#6a4a8a"/>
+  <!-- Label -->
+  <text x="300" y="95" font-family="Georgia, serif" font-size="42" font-weight="bold" fill="#d9b154" text-anchor="middle">ORGÂNICO</text>
+  <text x="300" y="135" font-family="Georgia, serif" font-size="18" fill="#c0a0e0" text-anchor="middle">Sofá</text>
+</svg>
