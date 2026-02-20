@@ -13,6 +13,7 @@ import {
   IconStar,
   IconChevronLeft,
   IconChevronRight,
+  IconZoomIn,
 } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import CushionKitSelector from './CushionKitSelector';
@@ -69,6 +70,7 @@ const DialogInner = ({ product, onClose }) => {
   const [sofaConfig, setSofaConfig] = useState({ fabric: null, dimensions: {} });
   const [paymentType, setPaymentType] = useState('cash');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [zoomedImage, setZoomedImage] = useState(false);
   const { addItem } = useCart();
 
   // Get images array (support both single image and multiple images)
@@ -88,7 +90,21 @@ const DialogInner = ({ product, onClose }) => {
     setQuantity(1);
     setImageError(false);
     setCurrentImageIndex(0);
+    setZoomedImage(false);
   }, [product]);
+
+  // Close zoom overlay on Escape key
+  useEffect(() => {
+    if (!zoomedImage) return;
+    const handleKey = (e) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setZoomedImage(false);
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [zoomedImage]);
 
   // Reset image index if it exceeds the current images array length
   useEffect(() => {
@@ -157,7 +173,7 @@ const DialogInner = ({ product, onClose }) => {
 
       <div className="dialog-layout">
         <motion.div
-          className="dialog-image-container"
+          className={`dialog-image-container${product.isSofa ? ' dialog-image-sofa' : ''}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
@@ -182,6 +198,18 @@ const DialogInner = ({ product, onClose }) => {
               </div>
             )}
           </div>
+
+          {images.length > 0 && !imageError && (
+            <motion.button
+              className="dialog-zoom-btn"
+              onClick={() => setZoomedImage(true)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              aria-label="Ampliar imagem"
+            >
+              <IconZoomIn size={20} stroke={2} />
+            </motion.button>
+          )}
 
           {images.length > 1 && !imageError && (
             <>
@@ -430,6 +458,40 @@ const DialogInner = ({ product, onClose }) => {
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Fullscreen zoom overlay */}
+      <AnimatePresence>
+        {zoomedImage && images.length > 0 && (
+          <motion.div
+            className="dialog-zoom-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => setZoomedImage(false)}
+          >
+            <motion.button
+              className="dialog-zoom-close"
+              onClick={() => setZoomedImage(false)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              aria-label="Fechar zoom"
+            >
+              <IconX size={22} stroke={2} />
+            </motion.button>
+            <motion.img
+              className="dialog-zoom-image"
+              src={images[currentImageIndex]}
+              alt={`${product.name} - Zoom`}
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
