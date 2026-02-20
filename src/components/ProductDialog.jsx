@@ -93,6 +93,19 @@ const DialogInner = ({ product, onClose }) => {
     setZoomedImage(false);
   }, [product]);
 
+  // Close zoom overlay on Escape key
+  useEffect(() => {
+    if (!zoomedImage) return;
+    const handleKey = (e) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setZoomedImage(false);
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [zoomedImage]);
+
   // Reset image index if it exceeds the current images array length
   useEffect(() => {
     if (currentImageIndex >= images.length && images.length > 0) {
