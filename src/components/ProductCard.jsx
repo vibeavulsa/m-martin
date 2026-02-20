@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconPackage, IconShoppingCartPlus, IconEye } from '@tabler/icons-react';
+import { IconPackage, IconShoppingCartPlus, IconEye, IconTruck, IconTool } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import ProductDialog from './ProductDialog';
 import './ProductCard.css';
@@ -73,18 +73,34 @@ const ProductCard = ({ product }) => {
               </span>
             ))}
           </div>
+          <div className="product-delivery-badge">
+            <IconTruck size={13} stroke={1.8} />
+            {product.isSofa
+              ? 'Entrega: Ribeirão Preto e região'
+              : 'Entrega para todo o Brasil'}
+          </div>
           <div className="product-footer">
-            <span className="product-price">{product.price}</span>
+            <div className="product-price-block">
+              <span className="product-price">{product.price}</span>
+              {product.isSofa && (
+                <span className="product-custom-order-badge">
+                  <IconTool size={11} stroke={2} />
+                  Sob encomenda
+                </span>
+              )}
+            </div>
             <div className="product-actions">
-              <motion.button
-                className={`btn-add-cart ${added ? 'btn-added' : ''}`}
-                onClick={handleAddToCart}
-                title="Adicionar ao carrinho"
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <IconShoppingCartPlus size={18} stroke={2} />
-              </motion.button>
+              {!product.isSofa && (
+                <motion.button
+                  className={`btn-add-cart ${added ? 'btn-added' : ''}`}
+                  onClick={handleAddToCart}
+                  title="Adicionar ao carrinho"
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <IconShoppingCartPlus size={18} stroke={2} />
+                </motion.button>
+              )}
               <motion.button
                 className="btn-contact"
                 onClick={() => setDialogOpen(true)}
@@ -92,7 +108,7 @@ const ProductCard = ({ product }) => {
                 whileTap={{ scale: 0.98 }}
               >
                 <IconEye size={16} stroke={2} />
-                Ver Detalhes
+                {product.isSofa ? 'Configurar' : 'Ver Detalhes'}
               </motion.button>
             </div>
           </div>
