@@ -10,6 +10,18 @@ const defaultSettings = {
   currency: 'BRL',
 };
 
+const defaultHomeDisplaySettings = {
+  showLoyaltyProgram: true,
+  showTestimonials: true,
+  showNewsletter: true,
+  showCategorySofas: true,
+  showCategoryAlmofadas: true,
+  showCategoryTravesseiros: true,
+  showCategoryHomecareHospitalar: true,
+  showCategoryPet: true,
+  showCategoryPuffsChaise: true,
+};
+
 const defaultProfile = {
   name: '',
   email: '',
@@ -21,6 +33,7 @@ const defaultProfile = {
 
 const STORAGE_KEY_PROFILE = 'mmartin_user_profile';
 const STORAGE_KEY_SETTINGS = 'mmartin_user_settings';
+const STORAGE_KEY_HOME_DISPLAY = 'mmartin_home_display';
 
 function loadFromStorage(key, fallback) {
   try {
@@ -41,6 +54,9 @@ export function UserProvider({ children }) {
   const [settings, setSettingsState] = useState(() =>
     loadFromStorage(STORAGE_KEY_SETTINGS, defaultSettings)
   );
+  const [homeDisplaySettings, setHomeDisplaySettings] = useState(() =>
+    loadFromStorage(STORAGE_KEY_HOME_DISPLAY, defaultHomeDisplaySettings)
+  );
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     const saved = loadFromStorage(STORAGE_KEY_PROFILE, defaultProfile);
     return Boolean(saved.name && saved.email);
@@ -53,6 +69,10 @@ export function UserProvider({ children }) {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
   }, [settings]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_HOME_DISPLAY, JSON.stringify(homeDisplaySettings));
+  }, [homeDisplaySettings]);
 
   const updateProfile = useCallback((data) => {
     setProfileState((prev) => {
@@ -68,6 +88,10 @@ export function UserProvider({ children }) {
     setSettingsState((prev) => ({ ...prev, ...data }));
   }, []);
 
+  const updateHomeDisplaySettings = useCallback((data) => {
+    setHomeDisplaySettings((prev) => ({ ...prev, ...data }));
+  }, []);
+
   const logout = useCallback(() => {
     setProfileState(defaultProfile);
     setIsLoggedIn(false);
@@ -78,12 +102,19 @@ export function UserProvider({ children }) {
     setSettingsState(defaultSettings);
   }, []);
 
+  const resetHomeDisplaySettings = useCallback(() => {
+    setHomeDisplaySettings(defaultHomeDisplaySettings);
+  }, []);
+
   const value = {
     profile,
     settings,
+    homeDisplaySettings,
     isLoggedIn,
     updateProfile,
     updateSettings,
+    updateHomeDisplaySettings,
+    resetHomeDisplaySettings,
     logout,
     resetSettings,
   };

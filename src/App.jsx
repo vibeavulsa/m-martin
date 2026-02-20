@@ -17,8 +17,9 @@ import LoyaltyProgramBanner from './components/LoyaltyProgramBanner';
 import TestimonialsSection from './components/TestimonialsSection';
 import NewsletterSignup from './components/NewsletterSignup';
 import { CartProvider, useCart } from './context/CartContext';
-import { UserProvider } from './context/UserContext';
+import { UserProvider, useUser } from './context/UserContext';
 import { categories as fallbackCategories, products as fallbackProducts } from './data/products';
+import { categorySettingKey } from './utils/homeDisplayUtils';
 import './App.css';
 
 const STORAGE_KEY_PRODUCTS = 'mmartin_admin_products';
@@ -229,20 +230,40 @@ class AppCatalog extends Component {
   }
 
   render() {
+    const { homeDisplaySettings } = this.props;
     return (
       <>
         <SalesDialogs />
         <Hero />
-        <LoyaltyProgramBanner />
+        {homeDisplaySettings.showLoyaltyProgram !== false && <LoyaltyProgramBanner />}
         <main className="catalog-container">
           {this.gerarTodasExposicoes()}
         </main>
-        <TestimonialsSection />
-        <NewsletterSignup />
+        {homeDisplaySettings.showTestimonials !== false && <TestimonialsSection />}
+        {homeDisplaySettings.showNewsletter !== false && <NewsletterSignup />}
         {this.renderizarInformacoesCorporativas()}
       </>
     );
   }
+}
+
+function AppContent({ categories, products, cushionKit }) {
+  const { homeDisplaySettings } = useUser();
+
+  const visibleCategories = categories.filter(
+    (c) => homeDisplaySettings[categorySettingKey(c.id)] !== false
+  );
+
+  return (
+    <div className="app-wrapper">
+      <AppCatalog
+        categories={visibleCategories}
+        products={products}
+        cushionKit={cushionKit}
+        homeDisplaySettings={homeDisplaySettings}
+      />
+    </div>
+  );
 }
 
 function App() {
@@ -288,13 +309,11 @@ function App() {
   return (
     <UserProvider>
       <CartProvider>
-        <div className="app-wrapper">
-          <AppCatalog
-            categories={categories}
-            products={displayProducts}
-            cushionKit={cushionKit}
-          />
-        </div>
+        <AppContent
+          categories={categories}
+          products={displayProducts}
+          cushionKit={cushionKit}
+        />
       </CartProvider>
     </UserProvider>
   );
