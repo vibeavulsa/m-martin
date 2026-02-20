@@ -149,6 +149,19 @@ const DialogInner = ({ product, onClose }) => {
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
 
+  const handleSofaQuote = () => {
+    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '5500000000000';
+    const fabricInfo = sofaConfig.fabric ? `Tecido: ${sofaConfig.fabric.name}` : '';
+    const dimInfo = sofaConfig.dimensions && Object.values(sofaConfig.dimensions).some(Boolean)
+      ? `Dimensões: L${sofaConfig.dimensions.largura || '?'}cm × A${sofaConfig.dimensions.altura || '?'}cm × P${sofaConfig.dimensions.profundidade || '?'}cm`
+      : '';
+    const details = [fabricInfo, dimInfo].filter(Boolean).join(' | ');
+    const message = encodeURIComponent(
+      `Olá! Gostaria de fazer um orçamento para o *${product.name}*.\n${details ? details + '\n' : ''}Quantidade: ${quantity}`
+    );
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+  };
+
   const decrementQty = () => setQuantity((q) => Math.max(1, q - 1));
   const incrementQty = () => setQuantity((q) => Math.min(99, q + 1));
 
@@ -171,7 +184,7 @@ const DialogInner = ({ product, onClose }) => {
         <IconX size={18} stroke={2} />
       </motion.button>
 
-      <div className="dialog-layout">
+      <div className={`dialog-layout${product.isSofa ? ' dialog-layout-sofa' : ''}`}>
         <motion.div
           className={`dialog-image-container${product.isSofa ? ' dialog-image-sofa' : ''}`}
           initial={{ opacity: 0 }}
@@ -406,23 +419,36 @@ const DialogInner = ({ product, onClose }) => {
           </motion.div>
 
           <motion.div className="dialog-actions" variants={itemVariants}>
-            <motion.button
-              className={`dialog-btn-cart ${added ? 'dialog-btn-cart-added' : ''}`}
-              onClick={handleAddToCart}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <IconShoppingCartPlus size={18} stroke={2} />
-              {added ? 'Adicionado!' : 'Adicionar ao Carrinho'}
-            </motion.button>
-            <motion.button
-              className="dialog-btn-buy"
-              onClick={handleBuyNow}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Comprar Agora
-            </motion.button>
+            {!product.isSofa && (
+              <motion.button
+                className={`dialog-btn-cart ${added ? 'dialog-btn-cart-added' : ''}`}
+                onClick={handleAddToCart}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <IconShoppingCartPlus size={18} stroke={2} />
+                {added ? 'Adicionado!' : 'Adicionar ao Carrinho'}
+              </motion.button>
+            )}
+            {product.isSofa ? (
+              <motion.button
+                className="dialog-btn-buy"
+                onClick={handleSofaQuote}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Fazer Orçamento Agora
+              </motion.button>
+            ) : (
+              <motion.button
+                className="dialog-btn-buy"
+                onClick={handleBuyNow}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Comprar Agora
+              </motion.button>
+            )}
           </motion.div>
 
           <motion.button
@@ -445,10 +471,27 @@ const DialogInner = ({ product, onClose }) => {
                   : 'Entrega para todo o Brasil'}
               </span>
             </div>
-            <div className="trust-badge">
-              <IconShieldCheck size={18} stroke={1.5} />
-              <span>Garantia de fábrica</span>
-            </div>
+            {product.isSofa ? (
+              <>
+                <div className="trust-badge trust-badge-warranty">
+                  <IconShieldCheck size={18} stroke={1.5} />
+                  <span>Estrutura: <strong>10 anos</strong> de garantia</span>
+                </div>
+                <div className="trust-badge trust-badge-warranty">
+                  <IconShieldCheck size={18} stroke={1.5} />
+                  <span>Espuma: <strong>2 anos</strong> contra deformação</span>
+                </div>
+                <div className="trust-badge trust-badge-warranty">
+                  <IconShieldCheck size={18} stroke={1.5} />
+                  <span>Garantia geral: <strong>1 ano</strong></span>
+                </div>
+              </>
+            ) : (
+              <div className="trust-badge">
+                <IconShieldCheck size={18} stroke={1.5} />
+                <span>Garantia de fábrica</span>
+              </div>
+            )}
             {product.isSofa && (
               <div className="trust-badge trust-badge-custom">
                 <IconPackage size={18} stroke={1.5} />

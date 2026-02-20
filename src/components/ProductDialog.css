@@ -51,10 +51,18 @@
   grid-template-columns: 1fr 1fr;
 }
 
+.dialog-layout-sofa {
+  grid-template-columns: 1.4fr 1fr;
+}
+
 .dialog-image-container {
   position: relative;
   width: 100%;
   min-height: 400px;
+}
+
+.dialog-image-container.dialog-image-sofa {
+  min-height: 500px;
 }
 
 .dialog-image {
@@ -499,6 +507,14 @@
 
 .trust-badge.trust-badge-custom {
   color: #d9b154;
+}
+
+.trust-badge.trust-badge-warranty {
+  color: #bfb3a2;
+  border: 1px solid rgba(217, 177, 84, 0.15);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  background: rgba(217, 177, 84, 0.05);
 }
 
 .trust-badge svg {
