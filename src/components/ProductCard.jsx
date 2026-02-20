@@ -41,7 +41,7 @@ const ProductCard = ({ product }) => {
         whileHover={{ y: -7, boxShadow: '0 18px 38px rgba(0,0,0,0.38), 0 0 18px rgba(217,177,84,0.12)' }}
         transition={{ duration: 0.28 }}
       >
-        <div className="product-image">
+        <div className="product-image" onClick={() => setDialogOpen(true)} style={{ cursor: 'pointer' }}>
           {!imageError && displayImage ? (
             <>
               <img 
