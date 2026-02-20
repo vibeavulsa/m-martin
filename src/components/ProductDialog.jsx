@@ -167,7 +167,7 @@ const DialogInner = ({ product, onClose }) => {
 
   return (
     <motion.div
-      className="dialog-content"
+      className={`dialog-content${product.isSofa ? ' dialog-content-sofa' : ''}`}
       variants={dialogVariants}
       initial="hidden"
       animate="visible"
@@ -191,7 +191,10 @@ const DialogInner = ({ product, onClose }) => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="dialog-image">
+          <div
+            className="dialog-image"
+            onClick={() => images.length > 0 && !imageError && setZoomedImage(true)}
+          >
             {images.length > 0 && !imageError ? (
               <AnimatePresence mode="wait">
                 <motion.img
