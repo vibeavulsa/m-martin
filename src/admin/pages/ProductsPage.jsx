@@ -17,6 +17,8 @@ import { useAdmin } from '../context/AdminContext';
 import ImagePasteArea from '../components/ImagePasteArea';
 import '../Admin.css';
 
+const SOFA_MODELS = ['Zeus', 'Chronos', 'Roma', 'RC', 'Orgânico', 'Sem Caixa'];
+
 const emptyProduct = {
   name: '',
   category: 'sofas',
@@ -33,6 +35,8 @@ const emptyProduct = {
   costPrice: '',
   wholesalePrice: '',
   maxStock: '',
+  sofaModel: '',
+  isCustomOrder: false,
 };
 
 const rowVariants = {
@@ -91,6 +95,8 @@ const ProductsPage = () => {
       costPrice: product.costPrice || '',
       wholesalePrice: product.wholesalePrice || '',
       maxStock: product.maxStock || '',
+      sofaModel: product.sofaModel || '',
+      isCustomOrder: product.isCustomOrder || false,
     });
     setModalOpen(true);
   };
@@ -136,6 +142,11 @@ const ProductsPage = () => {
       costPrice: form.costPrice,
       wholesalePrice: form.wholesalePrice,
       maxStock: form.maxStock ? parseInt(form.maxStock, 10) : '',
+      ...(form.category === 'sofas' && {
+        sofaModel: form.sofaModel,
+        isSofa: true,
+        isCustomOrder: true,
+      }),
     };
 
     if (editing !== null) {
@@ -277,6 +288,18 @@ const ProductsPage = () => {
                           </select>
                         </div>
                       </div>
+
+                      {form.category === 'sofas' && (
+                        <div className="form-group">
+                          <label htmlFor="prod-sofa-model">Modelo do Sofá</label>
+                          <select id="prod-sofa-model" name="sofaModel" value={form.sofaModel} onChange={handleChange}>
+                            <option value="">Selecione o modelo</option>
+                            {SOFA_MODELS.map((m) => (
+                              <option key={m} value={m}>{m}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
 
                       <div className="form-row">
                         <div className="form-group">

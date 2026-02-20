@@ -16,6 +16,7 @@ import {
 } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import CushionKitSelector from './CushionKitSelector';
+import SofaConfigurator from './SofaConfigurator';
 import './ProductDialog.css';
 
 const overlayVariants = {
@@ -65,6 +66,7 @@ const DialogInner = ({ product, onClose }) => {
   const [selectedSize, setSelectedSize] = useState(product.sizes ? product.sizes[0] : null);
   const [selectedFoam, setSelectedFoam] = useState(product.foamOptions ? product.foamOptions[0] : null);
   const [cushionColors, setCushionColors] = useState([]);
+  const [sofaConfig, setSofaConfig] = useState({ fabric: null, dimensions: {} });
   const [paymentType, setPaymentType] = useState('cash');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addItem } = useCart();
@@ -81,6 +83,7 @@ const DialogInner = ({ product, onClose }) => {
     setSelectedSize(product.sizes ? product.sizes[0] : null);
     setSelectedFoam(product.foamOptions ? product.foamOptions[0] : null);
     setCushionColors([]);
+    setSofaConfig({ fabric: null, dimensions: {} });
     setPaymentType('cash');
     setQuantity(1);
     setImageError(false);
@@ -100,6 +103,8 @@ const DialogInner = ({ product, onClose }) => {
       selectedSize,
       selectedFoam,
       cushionColors: cushionColors.length > 0 ? cushionColors : undefined,
+      sofaFabric: product.isSofa ? sofaConfig.fabric : undefined,
+      sofaDimensions: product.isSofa ? sofaConfig.dimensions : undefined,
       paymentType
     };
     addItem(itemData, quantity);
@@ -113,6 +118,8 @@ const DialogInner = ({ product, onClose }) => {
       selectedSize,
       selectedFoam,
       cushionColors: cushionColors.length > 0 ? cushionColors : undefined,
+      sofaFabric: product.isSofa ? sofaConfig.fabric : undefined,
+      sofaDimensions: product.isSofa ? sofaConfig.dimensions : undefined,
       paymentType
     };
     addItem(itemData, quantity);
@@ -302,8 +309,24 @@ const DialogInner = ({ product, onClose }) => {
             </motion.div>
           )}
 
+          {/* Sofa configurator — guided model + fabric + dimensions */}
+          {product.isSofa && product.fabrics && (
+            <motion.div variants={itemVariants}>
+              <SofaConfigurator
+                sofaModel={product.sofaModel || product.name}
+                fabrics={product.fabrics}
+                onChange={setSofaConfig}
+              />
+            </motion.div>
+          )}
+
           <motion.div className="dialog-price-section" variants={itemVariants}>
-            {product.priceInstallment ? (
+            {product.isCustomOrder ? (
+              <div className="dialog-price-custom-order">
+                <span className="dialog-price-consult">{product.price}</span>
+                <span className="dialog-price-consult-note">O valor será calculado conforme sua personalização</span>
+              </div>
+            ) : product.priceInstallment ? (
               <div className="dialog-price-options">
                 <div 
                   className={`dialog-price-option ${paymentType === 'cash' ? 'price-option-active' : ''}`}
@@ -388,12 +411,22 @@ const DialogInner = ({ product, onClose }) => {
           <motion.div className="dialog-trust-badges" variants={itemVariants}>
             <div className="trust-badge">
               <IconTruck size={18} stroke={1.5} />
-              <span>Entrega para todo Brasil</span>
+              <span>
+                {product.isSofa
+                  ? 'Entrega: Ribeirão Preto e região'
+                  : 'Entrega para todo o Brasil'}
+              </span>
             </div>
             <div className="trust-badge">
               <IconShieldCheck size={18} stroke={1.5} />
               <span>Garantia de fábrica</span>
             </div>
+            {product.isSofa && (
+              <div className="trust-badge trust-badge-custom">
+                <IconPackage size={18} stroke={1.5} />
+                <span>Sob encomenda — feito para você</span>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       </div>
