@@ -352,9 +352,8 @@ export default async function handler(req, res) {
       results.sofaFabrics = true;
     }
 
-    // Always upsert sofa products (ids 1–6) so they're restored even if the DB already has data
-    const sofaProducts = seedProducts.filter((p) => p.isSofa);
-    for (const p of sofaProducts) {
+    // Upsert ALL products so they're always restored to the real products table
+    for (const p of seedProducts) {
       await sql`
         INSERT INTO products (
           id, name, category, description, price, image, images, features,
@@ -399,40 +398,6 @@ export default async function handler(req, res) {
           updated_at        = NOW()
       `;
       results.products += 1;
-    }
-
-    // Seed remaining products only if table was empty (excluding sofas already upserted)
-    const existing = await sql`SELECT COUNT(*) AS cnt FROM products WHERE category != 'sofas'`;
-    if (parseInt(existing.rows[0].cnt, 10) === 0) {
-      const nonSofaProducts = seedProducts.filter((p) => !p.isSofa);
-      for (const p of nonSofaProducts) {
-        await sql`
-          INSERT INTO products (
-            id, name, category, description, price, image, images, features,
-            is_sofa, is_custom_order, sofa_model, is_kit, kit_quantity,
-            price_cash, price_installment, installments, fabrics
-          ) VALUES (
-            ${p.id},
-            ${p.name},
-            ${p.category},
-            ${p.description ?? null},
-            ${p.price ?? null},
-            ${p.image ?? null},
-            ${JSON.stringify(p.images ?? [])},
-            ${JSON.stringify(p.features ?? [])},
-            ${p.isSofa ?? false},
-            ${p.isCustomOrder ?? false},
-            ${p.sofaModel ?? null},
-            ${p.isKit ?? false},
-            ${p.kitQuantity ?? null},
-            ${p.priceCash ?? null},
-            ${p.priceInstallment ?? null},
-            ${p.installments ?? null},
-            ${JSON.stringify(p.fabrics ?? [])}
-          )
-        `;
-        results.products += 1;
-      }
     }
 
     return res.status(200).json({ ok: true, seeded: results });

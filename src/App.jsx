@@ -11,6 +11,7 @@ import CustomerDialog from './components/CustomerDialog';
 import CheckoutDialog from './components/CheckoutDialog';
 import OrderConfirmationDialog from './components/OrderConfirmationDialog';
 import UserProfileDialog from './components/UserProfileDialog';
+import AuthDialog from './components/AuthDialog';
 import SettingsDialog from './components/SettingsDialog';
 import LoyaltyProgramBanner from './components/LoyaltyProgramBanner';
 import TestimonialsSection from './components/TestimonialsSection';
@@ -18,6 +19,7 @@ import NewsletterSignup from './components/NewsletterSignup';
 import { CartProvider, useCart } from './context/CartContext';
 import { UserProvider, useUser } from './context/UserContext';
 import { categorySettingKey } from './utils/homeDisplayUtils';
+import { products as staticProducts, categories as staticCategories } from './data/products';
 import './App.css';
 
 const STORAGE_KEY_PRODUCTS = 'mmartin_admin_products';
@@ -51,6 +53,7 @@ function SalesDialogs() {
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const [orderNumber, setOrderNumber] = useState(null);
   const { setCustomer, clearCart } = useCart();
 
@@ -60,6 +63,8 @@ function SalesDialogs() {
   const handleCloseProfile = useCallback(() => setProfileOpen(false), []);
   const handleOpenSettings = useCallback(() => setSettingsOpen(true), []);
   const handleCloseSettings = useCallback(() => setSettingsOpen(false), []);
+  const handleOpenAuth = useCallback(() => setAuthOpen(true), []);
+  const handleCloseAuth = useCallback(() => setAuthOpen(false), []);
 
   const handleCheckout = useCallback(() => {
     setCartOpen(false);
@@ -99,6 +104,11 @@ function SalesDialogs() {
         onCartClick={handleOpenCart}
         onProfileClick={handleOpenProfile}
         onSettingsClick={handleOpenSettings}
+        onAuthClick={handleOpenAuth}
+      />
+      <AuthDialog
+        isOpen={authOpen}
+        onClose={handleCloseAuth}
       />
       <CartDialog
         isOpen={cartOpen}
@@ -267,10 +277,10 @@ function AppContent({ categories, products, cushionKit }) {
 
 function App() {
   const [categories, setCategories] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_CATEGORIES, []);
+    return loadFromStorage(STORAGE_KEY_CATEGORIES, staticCategories);
   });
   const [products, setProducts] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_PRODUCTS, []);
+    return loadFromStorage(STORAGE_KEY_PRODUCTS, staticProducts);
   });
   const [cushionKit, setCushionKit] = useState(() => {
     return loadFromStorage(STORAGE_KEY_CUSHION_KIT, null);
