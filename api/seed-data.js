@@ -71,6 +71,7 @@ const seedProducts = [
     isSofa: true,
     isCustomOrder: true,
     sofaModel: 'Zeus',
+    fabrics: seedSofaFabrics,
   },
   {
     id: '2',
@@ -84,6 +85,7 @@ const seedProducts = [
     isSofa: true,
     isCustomOrder: true,
     sofaModel: 'Chronos',
+    fabrics: seedSofaFabrics,
   },
   {
     id: '3',
@@ -97,6 +99,7 @@ const seedProducts = [
     isSofa: true,
     isCustomOrder: true,
     sofaModel: 'Roma',
+    fabrics: seedSofaFabrics,
   },
   {
     id: '4',
@@ -110,6 +113,7 @@ const seedProducts = [
     isSofa: true,
     isCustomOrder: true,
     sofaModel: 'RC',
+    fabrics: seedSofaFabrics,
   },
   {
     id: '5',
@@ -123,6 +127,7 @@ const seedProducts = [
     isSofa: true,
     isCustomOrder: true,
     sofaModel: 'Orgânico',
+    fabrics: seedSofaFabrics,
   },
   {
     id: '6',
@@ -136,6 +141,7 @@ const seedProducts = [
     isSofa: true,
     isCustomOrder: true,
     sofaModel: 'Sem Caixa',
+    fabrics: seedSofaFabrics,
   },
   {
     id: '21',
@@ -346,10 +352,60 @@ export default async function handler(req, res) {
       results.sofaFabrics = true;
     }
 
-    // Seed products (only if table is empty)
-    const existing = await sql`SELECT COUNT(*) AS cnt FROM products`;
+    // Always upsert sofa products (ids 1–6) so they're restored even if the DB already has data
+    const sofaProducts = seedProducts.filter((p) => p.isSofa);
+    for (const p of sofaProducts) {
+      await sql`
+        INSERT INTO products (
+          id, name, category, description, price, image, images, features,
+          is_sofa, is_custom_order, sofa_model, is_kit, kit_quantity,
+          price_cash, price_installment, installments, fabrics
+        ) VALUES (
+          ${p.id},
+          ${p.name},
+          ${p.category},
+          ${p.description ?? null},
+          ${p.price ?? null},
+          ${p.image ?? null},
+          ${JSON.stringify(p.images ?? [])},
+          ${JSON.stringify(p.features ?? [])},
+          ${p.isSofa ?? false},
+          ${p.isCustomOrder ?? false},
+          ${p.sofaModel ?? null},
+          ${p.isKit ?? false},
+          ${p.kitQuantity ?? null},
+          ${p.priceCash ?? null},
+          ${p.priceInstallment ?? null},
+          ${p.installments ?? null},
+          ${JSON.stringify(p.fabrics ?? [])}
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          name              = EXCLUDED.name,
+          category          = EXCLUDED.category,
+          description       = EXCLUDED.description,
+          price             = EXCLUDED.price,
+          image             = EXCLUDED.image,
+          images            = EXCLUDED.images,
+          features          = EXCLUDED.features,
+          is_sofa           = EXCLUDED.is_sofa,
+          is_custom_order   = EXCLUDED.is_custom_order,
+          sofa_model        = EXCLUDED.sofa_model,
+          is_kit            = EXCLUDED.is_kit,
+          kit_quantity      = EXCLUDED.kit_quantity,
+          price_cash        = EXCLUDED.price_cash,
+          price_installment = EXCLUDED.price_installment,
+          installments      = EXCLUDED.installments,
+          fabrics           = EXCLUDED.fabrics,
+          updated_at        = NOW()
+      `;
+      results.products += 1;
+    }
+
+    // Seed remaining products only if table was empty (excluding sofas already upserted)
+    const existing = await sql`SELECT COUNT(*) AS cnt FROM products WHERE category != 'sofas'`;
     if (parseInt(existing.rows[0].cnt, 10) === 0) {
-      for (const p of seedProducts) {
+      const nonSofaProducts = seedProducts.filter((p) => !p.isSofa);
+      for (const p of nonSofaProducts) {
         await sql`
           INSERT INTO products (
             id, name, category, description, price, image, images, features,
