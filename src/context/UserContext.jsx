@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import * as db from '../services/dbService';
 
 const UserContext = createContext(null);
 
@@ -34,6 +35,7 @@ const defaultProfile = {
 const STORAGE_KEY_PROFILE = 'mmartin_user_profile';
 const STORAGE_KEY_SETTINGS = 'mmartin_user_settings';
 const STORAGE_KEY_HOME_DISPLAY = 'mmartin_home_display';
+const STORAGE_KEY_CATEGORIES = 'mmartin_admin_categories';
 
 function loadFromStorage(key, fallback) {
   try {
@@ -57,10 +59,50 @@ export function UserProvider({ children }) {
   const [homeDisplaySettings, setHomeDisplaySettings] = useState(() =>
     loadFromStorage(STORAGE_KEY_HOME_DISPLAY, defaultHomeDisplaySettings)
   );
+  const [categories, setCategories] = useState(() =>
+    loadFromStorage(STORAGE_KEY_CATEGORIES, [])
+  );
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     const saved = loadFromStorage(STORAGE_KEY_PROFILE, defaultProfile);
     return Boolean(saved.name && saved.email);
   });
+
+  const dbLoaded = useRef(false);
+
+  // ── Load settings and categories from PostgreSQL on mount ──────────────────
+  useEffect(() => {
+    if (dbLoaded.current) return;
+    dbLoaded.current = true;
+
+    async function loadFromDb() {
+      try {
+        const [dbUserSettings, dbHomeDisplay, dbCategories] = await Promise.all([
+          db.fetchSetting('user_settings').catch(() => null),
+          db.fetchSetting('home_display').catch(() => null),
+          db.fetchCategories().catch(() => null),
+        ]);
+
+        if (dbUserSettings && typeof dbUserSettings === 'object') {
+          setSettingsState(prev => ({ ...defaultSettings, ...prev, ...dbUserSettings }));
+          localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify({ ...defaultSettings, ...dbUserSettings }));
+        }
+
+        if (dbHomeDisplay && typeof dbHomeDisplay === 'object') {
+          setHomeDisplaySettings(prev => ({ ...defaultHomeDisplaySettings, ...prev, ...dbHomeDisplay }));
+          localStorage.setItem(STORAGE_KEY_HOME_DISPLAY, JSON.stringify({ ...defaultHomeDisplaySettings, ...dbHomeDisplay }));
+        }
+
+        if (Array.isArray(dbCategories) && dbCategories.length > 0) {
+          setCategories(dbCategories);
+          localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(dbCategories));
+        }
+      } catch {
+        // DB not available — keep localStorage data
+      }
+    }
+
+    loadFromDb();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(profile));
@@ -85,11 +127,19 @@ export function UserProvider({ children }) {
   }, []);
 
   const updateSettings = useCallback((data) => {
-    setSettingsState((prev) => ({ ...prev, ...data }));
+    setSettingsState((prev) => {
+      const updated = { ...prev, ...data };
+      db.saveSetting('user_settings', updated).catch(() => {});
+      return updated;
+    });
   }, []);
 
   const updateHomeDisplaySettings = useCallback((data) => {
-    setHomeDisplaySettings((prev) => ({ ...prev, ...data }));
+    setHomeDisplaySettings((prev) => {
+      const updated = { ...prev, ...data };
+      db.saveSetting('home_display', updated).catch(() => {});
+      return updated;
+    });
   }, []);
 
   const logout = useCallback(() => {
@@ -100,16 +150,19 @@ export function UserProvider({ children }) {
 
   const resetSettings = useCallback(() => {
     setSettingsState(defaultSettings);
+    db.saveSetting('user_settings', defaultSettings).catch(() => {});
   }, []);
 
   const resetHomeDisplaySettings = useCallback(() => {
     setHomeDisplaySettings(defaultHomeDisplaySettings);
+    db.saveSetting('home_display', defaultHomeDisplaySettings).catch(() => {});
   }, []);
 
   const value = {
     profile,
     settings,
     homeDisplaySettings,
+    categories,
     isLoggedIn,
     updateProfile,
     updateSettings,

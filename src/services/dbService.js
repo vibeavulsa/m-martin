@@ -100,9 +100,43 @@ export async function fetchSetting(key) {
   return request(`/settings?key=${encodeURIComponent(key)}`);
 }
 
+export async function fetchAllSettings() {
+  return request('/settings');
+}
+
 export async function saveSetting(key, value) {
   return request('/settings', {
     method: 'POST',
     body: JSON.stringify({ key, value }),
   });
+}
+
+// ─── Categories & Fabrics (stored in settings table) ─────────────────────────
+
+export async function fetchCategories() {
+  return request('/settings?key=categories');
+}
+
+export async function saveCategories(categories) {
+  return request('/settings', {
+    method: 'POST',
+    body: JSON.stringify({ key: 'categories', value: categories }),
+  });
+}
+
+export async function fetchSofaFabrics() {
+  return request('/settings?key=sofaFabrics');
+}
+
+export async function saveSofaFabrics(fabrics) {
+  return request('/settings', {
+    method: 'POST',
+    body: JSON.stringify({ key: 'sofaFabrics', value: fabrics }),
+  });
+}
+
+// ─── Seed / Migration ────────────────────────────────────────────────────────
+
+export async function seedData() {
+  return request('/seed-data', { method: 'POST' });
 }

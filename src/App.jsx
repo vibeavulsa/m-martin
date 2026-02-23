@@ -1,7 +1,6 @@
 import { Component, useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from './config/firebase';
+import * as dbApi from './services/dbService';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CategorySection from './components/CategorySection';
@@ -18,12 +17,12 @@ import TestimonialsSection from './components/TestimonialsSection';
 import NewsletterSignup from './components/NewsletterSignup';
 import { CartProvider, useCart } from './context/CartContext';
 import { UserProvider, useUser } from './context/UserContext';
-import { categories as fallbackCategories, products as fallbackProducts } from './data/products';
 import { categorySettingKey } from './utils/homeDisplayUtils';
 import './App.css';
 
 const STORAGE_KEY_PRODUCTS = 'mmartin_admin_products';
 const STORAGE_KEY_CUSHION_KIT = 'mmartin_cushion_kit';
+const STORAGE_KEY_CATEGORIES = 'mmartin_admin_categories';
 
 function loadFromStorage(key, fallback) {
   try {
@@ -267,9 +266,11 @@ function AppContent({ categories, products, cushionKit }) {
 }
 
 function App() {
-  const [categories, setCategories] = useState(fallbackCategories);
+  const [categories, setCategories] = useState(() => {
+    return loadFromStorage(STORAGE_KEY_CATEGORIES, []);
+  });
   const [products, setProducts] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_PRODUCTS, fallbackProducts);
+    return loadFromStorage(STORAGE_KEY_PRODUCTS, []);
   });
   const [cushionKit, setCushionKit] = useState(() => {
     return loadFromStorage(STORAGE_KEY_CUSHION_KIT, null);
@@ -278,25 +279,31 @@ function App() {
   useEffect(() => {
     async function loadFromDB() {
       try {
-        const prodSnap = await getDocs(collection(db, 'products'));
-        if (!prodSnap.empty) {
-          const dbProducts = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Ensure seed data exists
+        await dbApi.seedData().catch(() => {});
+
+        const [dbProducts, dbCategories, dbKit] = await Promise.all([
+          dbApi.fetchProducts(),
+          dbApi.fetchCategories(),
+          dbApi.fetchCushionKit(),
+        ]);
+
+        if (Array.isArray(dbProducts) && dbProducts.length > 0) {
           setProducts(dbProducts);
+          localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(dbProducts));
         }
 
-        const catSnap = await getDocs(collection(db, 'categories'));
-        if (!catSnap.empty) {
-          const dbCategories = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (Array.isArray(dbCategories) && dbCategories.length > 0) {
           setCategories(dbCategories);
+          localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(dbCategories));
         }
 
-        const kitSnap = await getDocs(collection(db, 'cushionKit'));
-        if (!kitSnap.empty) {
-          const kitDoc = kitSnap.docs[0];
-          setCushionKit({ id: kitDoc.id, ...kitDoc.data() });
+        if (dbKit) {
+          setCushionKit(dbKit);
+          localStorage.setItem(STORAGE_KEY_CUSHION_KIT, JSON.stringify(dbKit));
         }
       } catch {
-        // DB unavailable (offline, no credentials, etc.), use localStorage/fallback data
+        // DB unavailable — use localStorage cache
       }
     }
     loadFromDB();
