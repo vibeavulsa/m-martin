@@ -132,15 +132,15 @@ const seedProducts = [
   {
     id: '6',
     category: 'sofas',
-    name: 'Sofá Sem Caixa',
-    description: 'Sofisticação sem comprometer a sala. O Sem Caixa tem estrutura elevada e leveza visual, ideal para ambientes menores ou quem prefere um visual mais moderno e arejado.',
+    name: 'Chaise',
+    description: "Elegância e conforto em uma peça só. A Chaise M'Martin combina encosto reclinável com assento amplo, perfeita para relaxar com estilo em qualquer ambiente.",
     price: 'Sob consulta',
     image: '/assets/sofas/Chaise.png',
     images: ['/assets/sofas/Chaise.png'],
     features: ['Sob encomenda', 'Visual leve e arejado', 'Estrutura elevada', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
     isSofa: true,
     isCustomOrder: true,
-    sofaModel: 'Sem Caixa',
+    sofaModel: 'Chaise',
     fabrics: seedSofaFabrics,
   },
   {
