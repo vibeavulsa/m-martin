@@ -10,8 +10,7 @@ import {
   IconSettings,
 } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../../config/firebase';
+import { fetchSetting, saveSetting } from '../../services/dbService';
 import '../Admin.css';
 
 const DEFAULT_SETTINGS = {
@@ -25,7 +24,7 @@ const DEFAULT_SETTINGS = {
   publicKey: '',
 };
 
-const PAYMENT_SETTINGS_DOC = 'mercadoPago';
+const PAYMENT_SETTINGS_KEY = 'paymentSettings';
 
 const PaymentSettingsPage = () => {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
@@ -36,10 +35,9 @@ const PaymentSettingsPage = () => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const docRef = doc(db, 'paymentSettings', PAYMENT_SETTINGS_DOC);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setSettings((prev) => ({ ...prev, ...docSnap.data() }));
+        const data = await fetchSetting(PAYMENT_SETTINGS_KEY);
+        if (data) {
+          setSettings((prev) => ({ ...prev, ...data }));
         }
       } catch (error) {
         console.error('[PaymentSettings] Erro ao carregar configurações:', error);
@@ -60,8 +58,7 @@ const PaymentSettingsPage = () => {
     setSaveMessage(null);
 
     try {
-      const docRef = doc(db, 'paymentSettings', PAYMENT_SETTINGS_DOC);
-      await setDoc(docRef, {
+      await saveSetting(PAYMENT_SETTINGS_KEY, {
         ...settings,
         updatedAt: new Date().toISOString(),
       });

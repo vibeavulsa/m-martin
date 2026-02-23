@@ -1,11 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { categories as defaultCategories, products as defaultProducts } from '../../data/products';
+import * as db from '../../services/dbService';
 
 const AdminContext = createContext(null);
 
-const STORAGE_KEY_ADMIN = 'mmartin_admin_auth';
+// localStorage keys kept as a fast-loading cache while the DB request is in flight
 const STORAGE_KEY_PRODUCTS = 'mmartin_admin_products';
 const STORAGE_KEY_ORDERS = 'mmartin_admin_orders';
 const STORAGE_KEY_STOCK = 'mmartin_admin_stock';
@@ -51,11 +52,6 @@ const defaultCushionKit = {
   },
 };
 
-const ADMIN_CREDENTIALS = {
-  user: import.meta.env.VITE_ADMIN_USER || 'admin',
-  pass: import.meta.env.VITE_ADMIN_PASS || 'mmartin2026',
-};
-
 function loadFromStorage(key, fallback) {
   try {
     const stored = localStorage.getItem(key);
@@ -73,47 +69,106 @@ function initStock(products) {
   return stock;
 }
 
+/** Convert the flat stock rows from the DB into the map shape used in state. */
+function stockRowsToMap(rows) {
+  const map = {};
+  for (const row of rows) {
+    map[row.productId] = { quantity: row.quantity, minStock: row.minStock };
+  }
+  return map;
+}
+
+/** Ensure backward-compat fields are present on the cushionKit object. */
+function migrateCushionKit(loaded) {
+  const migrated = { ...loaded };
+  if (!migrated.stockCapas) {
+    migrated.stockCapas = {};
+    for (const color of migrated.colors) {
+      migrated.stockCapas[color] = 0;
+    }
+  }
+  if (migrated.stockRefis === undefined) migrated.stockRefis = 0;
+  if (!migrated.pricingCapas) migrated.pricingCapas = { priceCash: '', priceInstallment: '', installments: 5 };
+  if (!migrated.pricingRefis) migrated.pricingRefis = { priceCash: '', priceInstallment: '', installments: 5 };
+  return migrated;
+}
+
 export function AdminProvider({ children }) {
   const { isAuthenticated } = useAuth();
 
-  const [products, setProducts] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_PRODUCTS, defaultProducts);
-  });
-
-  const [orders, setOrders] = useState(() => {
-    return loadFromStorage(STORAGE_KEY_ORDERS, []);
-  });
-
+  // ── Initial state from localStorage (instant) ──────────────────────────────
+  const [products, setProducts] = useState(() =>
+    loadFromStorage(STORAGE_KEY_PRODUCTS, defaultProducts)
+  );
+  const [orders, setOrders] = useState(() =>
+    loadFromStorage(STORAGE_KEY_ORDERS, [])
+  );
   const [stock, setStock] = useState(() => {
     const saved = loadFromStorage(STORAGE_KEY_STOCK, null);
-    if (saved) return saved;
-    return initStock(defaultProducts);
+    return saved ?? initStock(defaultProducts);
   });
-
   const [categories] = useState(defaultCategories);
+  const [cushionKit, setCushionKit] = useState(() =>
+    migrateCushionKit(loadFromStorage(STORAGE_KEY_CUSHION_KIT, defaultCushionKit))
+  );
 
-  const [cushionKit, setCushionKit] = useState(() => {
-    const loaded = loadFromStorage(STORAGE_KEY_CUSHION_KIT, defaultCushionKit);
-    // Ensure backward compatibility: add stockCapas and stockRefis if missing
-    const migrated = { ...loaded };
-    if (!migrated.stockCapas) {
-      migrated.stockCapas = {};
-      for (const color of migrated.colors) {
-        migrated.stockCapas[color] = 0;
+  // Track whether we have already seeded the DB with default data this session
+  const dbSeeded = useRef(false);
+
+  // ── Load authoritative data from Vercel Postgres on mount ──────────────────
+  useEffect(() => {
+    if (dbSeeded.current) return;
+    dbSeeded.current = true;
+
+    async function loadFromDb() {
+      try {
+        const [dbProducts, stockRows, dbOrders, dbKit] = await Promise.all([
+          db.fetchProducts(),
+          db.fetchStock(),
+          db.fetchOrders(),
+          db.fetchCushionKit(),
+        ]);
+
+        // Products
+        if (Array.isArray(dbProducts) && dbProducts.length > 0) {
+          setProducts(dbProducts);
+          localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(dbProducts));
+        } else if (Array.isArray(dbProducts) && dbProducts.length === 0) {
+          // DB is empty — seed with static defaults
+          for (const p of defaultProducts) {
+            await db.createProduct(p).catch(() => {});
+          }
+        }
+
+        // Stock
+        if (Array.isArray(stockRows) && stockRows.length > 0) {
+          const stockMap = stockRowsToMap(stockRows);
+          setStock(stockMap);
+          localStorage.setItem(STORAGE_KEY_STOCK, JSON.stringify(stockMap));
+        }
+
+        // Orders
+        if (Array.isArray(dbOrders)) {
+          setOrders(dbOrders);
+          localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(dbOrders));
+        }
+
+        // Cushion Kit
+        if (dbKit) {
+          const migrated = migrateCushionKit(dbKit);
+          setCushionKit(migrated);
+          localStorage.setItem(STORAGE_KEY_CUSHION_KIT, JSON.stringify(migrated));
+        }
+      } catch (err) {
+        // DB not available (e.g. POSTGRES_URL not set) — keep localStorage data
+        console.warn('[AdminContext] Vercel Postgres unavailable, using localStorage:', err.message);
       }
     }
-    if (migrated.stockRefis === undefined) {
-      migrated.stockRefis = 0;
-    }
-    if (!migrated.pricingCapas) {
-      migrated.pricingCapas = { priceCash: '', priceInstallment: '', installments: 5 };
-    }
-    if (!migrated.pricingRefis) {
-      migrated.pricingRefis = { priceCash: '', priceInstallment: '', installments: 5 };
-    }
-    return migrated;
-  });
 
+    loadFromDb();
+  }, []);
+
+  // ── Mirror state changes to localStorage (cache) ───────────────────────────
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
   }, [products]);
@@ -130,38 +185,54 @@ export function AdminProvider({ children }) {
     localStorage.setItem(STORAGE_KEY_CUSHION_KIT, JSON.stringify(cushionKit));
   }, [cushionKit]);
 
+  // ── Deprecated auth helpers (kept for backwards-compat) ────────────────────
   const login = useCallback(() => {
-    // This function is now deprecated as we use Firebase Auth
-    // Kept for backward compatibility but does nothing
     console.warn('[AdminContext] login() is deprecated. Use AuthContext instead.');
     return false;
   }, []);
 
   const logout = useCallback(() => {
-    // This function is now deprecated as we use Firebase Auth
-    // Kept for backward compatibility but does nothing
     console.warn('[AdminContext] logout() is deprecated. Use AuthContext instead.');
   }, []);
 
+  // ── Products ───────────────────────────────────────────────────────────────
   const addProduct = useCallback((product) => {
     const newId = crypto.randomUUID();
     const newProduct = { ...product, id: newId };
     setProducts(prev => [...prev, newProduct]);
-    setStock(prev => ({ ...prev, [newId]: { quantity: product.stockQuantity || 0, minStock: product.minStock || 5 } }));
+    setStock(prev => ({
+      ...prev,
+      [newId]: { quantity: product.stockQuantity || 0, minStock: product.minStock || 5 },
+    }));
+    db.createProduct(newProduct).catch(err =>
+      console.error('[AdminContext] createProduct failed:', err)
+    );
+    db.upsertStock(newId, product.stockQuantity || 0, product.minStock || 5).catch(() => {});
     return newProduct;
   }, []);
 
   const updateProduct = useCallback((id, data) => {
     setProducts(prev => prev.map(p => p.id === id ? { ...p, ...data } : p));
     if (data.stockQuantity !== undefined || data.minStock !== undefined) {
-      setStock(prev => ({
-        ...prev,
-        [id]: {
-          quantity: data.stockQuantity !== undefined ? Math.max(0, parseInt(data.stockQuantity, 10) || 0) : (prev[id]?.quantity ?? 0),
-          minStock: data.minStock !== undefined ? Math.max(0, parseInt(data.minStock, 10) || 5) : (prev[id]?.minStock ?? 5),
-        }
-      }));
+      setStock(prev => {
+        const next = {
+          ...prev,
+          [id]: {
+            quantity: data.stockQuantity !== undefined
+              ? Math.max(0, parseInt(data.stockQuantity, 10) || 0)
+              : (prev[id]?.quantity ?? 0),
+            minStock: data.minStock !== undefined
+              ? Math.max(0, parseInt(data.minStock, 10) || 5)
+              : (prev[id]?.minStock ?? 5),
+          },
+        };
+        db.upsertStock(id, next[id].quantity, next[id].minStock).catch(() => {});
+        return next;
+      });
     }
+    db.updateProduct({ id, ...data }).catch(err =>
+      console.error('[AdminContext] updateProduct failed:', err)
+    );
   }, []);
 
   const deleteProduct = useCallback((id) => {
@@ -171,22 +242,31 @@ export function AdminProvider({ children }) {
       delete next[id];
       return next;
     });
+    db.deleteProduct(id).catch(err =>
+      console.error('[AdminContext] deleteProduct failed:', err)
+    );
   }, []);
 
+  // ── Stock ──────────────────────────────────────────────────────────────────
   const updateStock = useCallback((productId, quantity) => {
-    setStock(prev => ({
-      ...prev,
-      [productId]: { ...prev[productId], quantity: Math.max(0, quantity) }
-    }));
+    setStock(prev => {
+      const qty = Math.max(0, quantity);
+      const minStock = prev[productId]?.minStock ?? 5;
+      db.upsertStock(productId, qty, minStock).catch(() => {});
+      return { ...prev, [productId]: { ...prev[productId], quantity: qty } };
+    });
   }, []);
 
   const updateMinStock = useCallback((productId, minStock) => {
-    setStock(prev => ({
-      ...prev,
-      [productId]: { ...prev[productId], minStock: Math.max(0, minStock) }
-    }));
+    setStock(prev => {
+      const ms = Math.max(0, minStock);
+      const quantity = prev[productId]?.quantity ?? 0;
+      db.upsertStock(productId, quantity, ms).catch(() => {});
+      return { ...prev, [productId]: { ...prev[productId], minStock: ms } };
+    });
   }, []);
 
+  // ── Orders ─────────────────────────────────────────────────────────────────
   const addOrder = useCallback((order) => {
     const newOrder = {
       ...order,
@@ -202,65 +282,68 @@ export function AdminProvider({ children }) {
           const pid = item.productId || item.id;
           if (pid && next[pid]) {
             const qty = item.quantity || 1;
-            next[pid] = { ...next[pid], quantity: Math.max(0, next[pid].quantity - qty) };
+            const newQty = Math.max(0, next[pid].quantity - qty);
+            next[pid] = { ...next[pid], quantity: newQty };
+            db.upsertStock(pid, newQty, next[pid].minStock).catch(() => {});
           }
         }
         return next;
       });
     }
+    db.createOrder(newOrder).catch(err =>
+      console.error('[AdminContext] createOrder failed:', err)
+    );
     return newOrder;
   }, []);
 
   const updateOrderStatus = useCallback((orderId, status) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+    db.updateOrderStatus(orderId, status).catch(err =>
+      console.error('[AdminContext] updateOrderStatus failed:', err)
+    );
   }, []);
 
+  // ── Cushion Kit ────────────────────────────────────────────────────────────
   const updateCushionKit = useCallback((newConfig) => {
     setCushionKit(prev => {
       const updated = { ...prev, ...newConfig };
-      
-      // If colors changed, update stockCapas accordingly
       if (newConfig.colors) {
         const newStockCapas = { ...prev.stockCapas };
-        
-        // Add new colors with stock 0
         for (const color of newConfig.colors) {
-          if (!newStockCapas[color]) {
-            newStockCapas[color] = 0;
-          }
+          if (!newStockCapas[color]) newStockCapas[color] = 0;
         }
-        
-        // Remove colors that are no longer in the list
         for (const color of Object.keys(newStockCapas)) {
-          if (!newConfig.colors.includes(color)) {
-            delete newStockCapas[color];
-          }
+          if (!newConfig.colors.includes(color)) delete newStockCapas[color];
         }
-        
         updated.stockCapas = newStockCapas;
       }
-      
+      db.saveCushionKit(updated).catch(err =>
+        console.error('[AdminContext] saveCushionKit failed:', err)
+      );
       return updated;
     });
   }, []);
 
   const updateCapaStock = useCallback((color, quantity) => {
-    setCushionKit(prev => ({
-      ...prev,
-      stockCapas: {
-        ...prev.stockCapas,
-        [color]: Math.max(0, quantity)
-      }
-    }));
+    setCushionKit(prev => {
+      const updated = {
+        ...prev,
+        stockCapas: { ...prev.stockCapas, [color]: Math.max(0, quantity) },
+      };
+      db.saveCushionKit(updated).catch(() => {});
+      return updated;
+    });
   }, []);
 
   const updateRefilStock = useCallback((quantity) => {
-    setCushionKit(prev => ({
-      ...prev,
-      stockRefis: Math.max(0, quantity)
-    }));
+    setCushionKit(prev => {
+      const updated = { ...prev, stockRefis: Math.max(0, quantity) };
+      db.saveCushionKit(updated).catch(() => {});
+      return updated;
+    });
   }, []);
 
+  // ── Computed helpers ───────────────────────────────────────────────────────
   const getLowStockProducts = useCallback(() => {
     return products.filter(p => {
       const s = stock[p.id];
@@ -285,7 +368,9 @@ export function AdminProvider({ children }) {
     for (const p of products) {
       const s = stock[p.id];
       if (s) {
-        const price = parseFloat(p.price.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+        const price = parseFloat(
+          p.price.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()
+        ) || 0;
         total += price * s.quantity;
       }
     }
