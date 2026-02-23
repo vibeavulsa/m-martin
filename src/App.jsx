@@ -287,7 +287,7 @@ function App() {
 
         // Seed DB if empty, then re-fetch
         const needsSeed = (!Array.isArray(dbProducts) || dbProducts.length === 0)
-          && (!Array.isArray(dbCategories) || dbCategories.length === 0);
+          || (!Array.isArray(dbCategories) || dbCategories.length === 0);
 
         if (needsSeed) {
           await dbApi.seedData().catch(() => {});

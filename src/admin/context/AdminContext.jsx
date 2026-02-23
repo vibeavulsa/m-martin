@@ -124,7 +124,7 @@ export function AdminProvider({ children }) {
 
         // If DB is empty, seed initial data and re-fetch
         const needsSeed = (!Array.isArray(dbProducts) || dbProducts.length === 0)
-          && (!Array.isArray(dbCategories) || dbCategories.length === 0);
+          || (!Array.isArray(dbCategories) || dbCategories.length === 0);
 
         if (needsSeed) {
           await db.seedData().catch(() => {});
