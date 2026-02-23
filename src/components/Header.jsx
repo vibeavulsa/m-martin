@@ -1,14 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconShoppingCart, IconUser, IconSettings } from '@tabler/icons-react';
+import { IconShoppingCart, IconUser, IconSettings, IconLogin, IconShieldCheck } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import { useUser } from '../context/UserContext';
+import { useAuth } from '../context/AuthContext';
 import './Header.css';
 import logo from '../assets/logo.png';
 
-const Header = ({ onCartClick, onProfileClick, onSettingsClick }) => {
+const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick }) => {
   const { totalItems } = useCart();
   const { isLoggedIn, profile } = useUser();
+  const { isAuthenticated } = useAuth();
 
   const handleNavClick = (e, targetId) => {
     e.preventDefault();
@@ -36,6 +38,24 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick }) => {
           <a href="#puffs-chaise" className="nav-link" onClick={(e) => handleNavClick(e, 'puffs-chaise')}>Puffs & Chaise</a>
           <a href="#homecare-hospitalar" className="nav-link" onClick={(e) => handleNavClick(e, 'homecare-hospitalar')}>Para Acamados</a>
           <div className="nav-actions">
+            <motion.button
+              className={`nav-icon-btn ${isAuthenticated ? 'nav-icon-btn-auth' : ''}`}
+              onClick={onAuthClick}
+              aria-label={isAuthenticated ? 'Conta autenticada' : 'Entrar'}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title={isAuthenticated ? 'Conta / Admin' : 'Entrar'}
+            >
+              {isAuthenticated ? <IconShieldCheck size={20} stroke={1.8} /> : <IconLogin size={20} stroke={1.8} />}
+              {isAuthenticated && (
+                <motion.span
+                  className="auth-indicator"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500 }}
+                />
+              )}
+            </motion.button>
             <motion.button
               className={`nav-icon-btn ${isLoggedIn ? 'nav-icon-btn-active' : ''}`}
               onClick={onProfileClick}
