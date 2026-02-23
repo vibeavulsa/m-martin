@@ -108,6 +108,20 @@ const seedProducts = [
   {
     id: '6',
     category: 'sofas',
+    name: 'Sofá Sem Caixa',
+    description: 'Sofisticação sem comprometer a sala. O Sem Caixa tem estrutura elevada e leveza visual, ideal para ambientes menores ou quem prefere um visual mais moderno e arejado.',
+    price: 'Sob consulta',
+    image: '/assets/sofas/SemCaixa.png',
+    images: ['/assets/sofas/SemCaixa.png'],
+    features: ['Sob encomenda', 'Visual leve e arejado', 'Estrutura elevada', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
+    isSofa: true,
+    isCustomOrder: true,
+    sofaModel: 'Sem Caixa',
+    fabrics: seedSofaFabrics,
+  },
+  {
+    id: '7',
+    category: 'sofas',
     name: 'Chaise',
     description: "Elegância e conforto em uma peça só. A Chaise M'Martin combina encosto reclinável com assento amplo, perfeita para relaxar com estilo em qualquer ambiente.",
     price: 'Sob consulta',
@@ -177,8 +191,8 @@ export default async function handler(req, res) {
           ${p.description ?? null},
           ${p.price ?? null},
           ${p.image ?? null},
-          ${JSON.stringify(p.images ?? [])},
-          ${JSON.stringify(p.features ?? [])},
+          ${JSON.stringify(p.images ?? [])}::jsonb,
+          ${JSON.stringify(p.features ?? [])}::jsonb,
           ${p.isSofa ?? false},
           ${p.isCustomOrder ?? false},
           ${p.sofaModel ?? null},
@@ -187,7 +201,7 @@ export default async function handler(req, res) {
           ${p.priceCash ?? null},
           ${p.priceInstallment ?? null},
           ${p.installments ?? null},
-          ${JSON.stringify(p.fabrics ?? [])}
+          ${JSON.stringify(p.fabrics ?? [])}::jsonb
         )
         ON CONFLICT (id) DO UPDATE SET
           name              = EXCLUDED.name,
