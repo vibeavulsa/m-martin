@@ -114,9 +114,6 @@ export function AdminProvider({ children }) {
 
     async function loadFromDb() {
       try {
-        // First, ensure seed data exists in the DB
-        await db.seedData().catch(() => {});
-
         const [dbProducts, stockRows, dbOrders, dbKit, dbCategories] = await Promise.all([
           db.fetchProducts(),
           db.fetchStock(),
@@ -125,10 +122,37 @@ export function AdminProvider({ children }) {
           db.fetchCategories(),
         ]);
 
-        // Products
-        if (Array.isArray(dbProducts) && dbProducts.length > 0) {
-          setProducts(dbProducts);
-          localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(dbProducts));
+        // If DB is empty, seed initial data and re-fetch
+        const needsSeed = (!Array.isArray(dbProducts) || dbProducts.length === 0)
+          && (!Array.isArray(dbCategories) || dbCategories.length === 0);
+
+        if (needsSeed) {
+          await db.seedData().catch(() => {});
+          // Re-fetch after seeding
+          const [seededProducts, seededCategories] = await Promise.all([
+            db.fetchProducts(),
+            db.fetchCategories(),
+          ]);
+          if (Array.isArray(seededProducts) && seededProducts.length > 0) {
+            setProducts(seededProducts);
+            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(seededProducts));
+          }
+          if (Array.isArray(seededCategories) && seededCategories.length > 0) {
+            setCategories(seededCategories);
+            localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(seededCategories));
+          }
+        } else {
+          // Products
+          if (Array.isArray(dbProducts) && dbProducts.length > 0) {
+            setProducts(dbProducts);
+            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(dbProducts));
+          }
+
+          // Categories
+          if (Array.isArray(dbCategories) && dbCategories.length > 0) {
+            setCategories(dbCategories);
+            localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(dbCategories));
+          }
         }
 
         // Stock
@@ -149,12 +173,6 @@ export function AdminProvider({ children }) {
           const migrated = migrateCushionKit(dbKit);
           setCushionKit(migrated);
           localStorage.setItem(STORAGE_KEY_CUSHION_KIT, JSON.stringify(migrated));
-        }
-
-        // Categories
-        if (Array.isArray(dbCategories) && dbCategories.length > 0) {
-          setCategories(dbCategories);
-          localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(dbCategories));
         }
       } catch (err) {
         // DB not available (e.g. POSTGRES_URL not set) — keep localStorage data

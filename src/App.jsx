@@ -279,23 +279,40 @@ function App() {
   useEffect(() => {
     async function loadFromDB() {
       try {
-        // Ensure seed data exists
-        await dbApi.seedData().catch(() => {});
-
         const [dbProducts, dbCategories, dbKit] = await Promise.all([
           dbApi.fetchProducts(),
           dbApi.fetchCategories(),
           dbApi.fetchCushionKit(),
         ]);
 
-        if (Array.isArray(dbProducts) && dbProducts.length > 0) {
-          setProducts(dbProducts);
-          localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(dbProducts));
-        }
+        // Seed DB if empty, then re-fetch
+        const needsSeed = (!Array.isArray(dbProducts) || dbProducts.length === 0)
+          && (!Array.isArray(dbCategories) || dbCategories.length === 0);
 
-        if (Array.isArray(dbCategories) && dbCategories.length > 0) {
-          setCategories(dbCategories);
-          localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(dbCategories));
+        if (needsSeed) {
+          await dbApi.seedData().catch(() => {});
+          const [seededProducts, seededCategories] = await Promise.all([
+            dbApi.fetchProducts(),
+            dbApi.fetchCategories(),
+          ]);
+          if (Array.isArray(seededProducts) && seededProducts.length > 0) {
+            setProducts(seededProducts);
+            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(seededProducts));
+          }
+          if (Array.isArray(seededCategories) && seededCategories.length > 0) {
+            setCategories(seededCategories);
+            localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(seededCategories));
+          }
+        } else {
+          if (Array.isArray(dbProducts) && dbProducts.length > 0) {
+            setProducts(dbProducts);
+            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(dbProducts));
+          }
+
+          if (Array.isArray(dbCategories) && dbCategories.length > 0) {
+            setCategories(dbCategories);
+            localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(dbCategories));
+          }
         }
 
         if (dbKit) {

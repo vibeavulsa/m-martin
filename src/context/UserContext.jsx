@@ -83,12 +83,12 @@ export function UserProvider({ children }) {
         ]);
 
         if (dbUserSettings && typeof dbUserSettings === 'object') {
-          setSettingsState(prev => ({ ...defaultSettings, ...prev, ...dbUserSettings }));
+          setSettingsState({ ...defaultSettings, ...dbUserSettings });
           localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify({ ...defaultSettings, ...dbUserSettings }));
         }
 
         if (dbHomeDisplay && typeof dbHomeDisplay === 'object') {
-          setHomeDisplaySettings(prev => ({ ...defaultHomeDisplaySettings, ...prev, ...dbHomeDisplay }));
+          setHomeDisplaySettings({ ...defaultHomeDisplaySettings, ...dbHomeDisplay });
           localStorage.setItem(STORAGE_KEY_HOME_DISPLAY, JSON.stringify({ ...defaultHomeDisplaySettings, ...dbHomeDisplay }));
         }
 
