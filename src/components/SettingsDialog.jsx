@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { IconX, IconSettings, IconRefresh } from '@tabler/icons-react';
 import { useUser } from '../context/UserContext';
-import { categories } from '../data/products';
 import { categorySettingKey } from '../utils/homeDisplayUtils';
 import './SettingsDialog.css';
 
@@ -40,7 +39,7 @@ const itemVariants = {
 };
 
 const SettingsDialog = ({ isOpen, onClose }) => {
-  const { settings, updateSettings, resetSettings, homeDisplaySettings, updateHomeDisplaySettings, resetHomeDisplaySettings } = useUser();
+  const { settings, updateSettings, resetSettings, homeDisplaySettings, updateHomeDisplaySettings, resetHomeDisplaySettings, categories } = useUser();
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -185,7 +184,7 @@ const SettingsDialog = ({ isOpen, onClose }) => {
               <motion.div className="settings-section" variants={itemVariants}>
                   <h3 className="settings-section-title">Exibição na Home</h3>
 
-                  {categories.map((cat) => {
+                  {(categories || []).map((cat) => {
                     const key = categorySettingKey(cat.id);
                     return (
                       <div key={cat.id} className="settings-item">

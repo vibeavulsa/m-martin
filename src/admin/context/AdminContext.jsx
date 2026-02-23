@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { categories as defaultCategories, products as defaultProducts } from '../../data/products';
 import * as db from '../../services/dbService';
 
 const AdminContext = createContext(null);
@@ -11,6 +10,7 @@ const STORAGE_KEY_PRODUCTS = 'mmartin_admin_products';
 const STORAGE_KEY_ORDERS = 'mmartin_admin_orders';
 const STORAGE_KEY_STOCK = 'mmartin_admin_stock';
 const STORAGE_KEY_CUSHION_KIT = 'mmartin_cushion_kit';
+const STORAGE_KEY_CATEGORIES = 'mmartin_admin_categories';
 
 const defaultCushionKit = {
   colors: ['Preto', 'Branco', 'Azul Marinho', 'Cinza Rato', 'Rosê', 'Terracota', 'Bege', 'Bordô'],
@@ -60,15 +60,6 @@ function loadFromStorage(key, fallback) {
   return fallback;
 }
 
-function initStock(products) {
-  const stock = {};
-  for (const p of products) {
-    stock[p.id] = { quantity: 50, minStock: 5 };
-  }
-  stock['cushion-kit'] = { quantity: 50, minStock: 5 };
-  return stock;
-}
-
 /** Convert the flat stock rows from the DB into the map shape used in state. */
 function stockRowsToMap(rows) {
   const map = {};
@@ -98,16 +89,17 @@ export function AdminProvider({ children }) {
 
   // ── Initial state from localStorage (instant) ──────────────────────────────
   const [products, setProducts] = useState(() =>
-    loadFromStorage(STORAGE_KEY_PRODUCTS, defaultProducts)
+    loadFromStorage(STORAGE_KEY_PRODUCTS, [])
   );
   const [orders, setOrders] = useState(() =>
     loadFromStorage(STORAGE_KEY_ORDERS, [])
   );
   const [stock, setStock] = useState(() => {
-    const saved = loadFromStorage(STORAGE_KEY_STOCK, null);
-    return saved ?? initStock(defaultProducts);
+    return loadFromStorage(STORAGE_KEY_STOCK, {});
   });
-  const [categories] = useState(defaultCategories);
+  const [categories, setCategories] = useState(() =>
+    loadFromStorage(STORAGE_KEY_CATEGORIES, [])
+  );
   const [cushionKit, setCushionKit] = useState(() =>
     migrateCushionKit(loadFromStorage(STORAGE_KEY_CUSHION_KIT, defaultCushionKit))
   );
@@ -122,21 +114,44 @@ export function AdminProvider({ children }) {
 
     async function loadFromDb() {
       try {
-        const [dbProducts, stockRows, dbOrders, dbKit] = await Promise.all([
+        const [dbProducts, stockRows, dbOrders, dbKit, dbCategories] = await Promise.all([
           db.fetchProducts(),
           db.fetchStock(),
           db.fetchOrders(),
           db.fetchCushionKit(),
+          db.fetchCategories(),
         ]);
 
-        // Products
-        if (Array.isArray(dbProducts) && dbProducts.length > 0) {
-          setProducts(dbProducts);
-          localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(dbProducts));
-        } else if (Array.isArray(dbProducts) && dbProducts.length === 0) {
-          // DB is empty — seed with static defaults
-          for (const p of defaultProducts) {
-            await db.createProduct(p).catch(() => {});
+        // If DB is empty, seed initial data and re-fetch
+        const needsSeed = (!Array.isArray(dbProducts) || dbProducts.length === 0)
+          && (!Array.isArray(dbCategories) || dbCategories.length === 0);
+
+        if (needsSeed) {
+          await db.seedData().catch(() => {});
+          // Re-fetch after seeding
+          const [seededProducts, seededCategories] = await Promise.all([
+            db.fetchProducts(),
+            db.fetchCategories(),
+          ]);
+          if (Array.isArray(seededProducts) && seededProducts.length > 0) {
+            setProducts(seededProducts);
+            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(seededProducts));
+          }
+          if (Array.isArray(seededCategories) && seededCategories.length > 0) {
+            setCategories(seededCategories);
+            localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(seededCategories));
+          }
+        } else {
+          // Products
+          if (Array.isArray(dbProducts) && dbProducts.length > 0) {
+            setProducts(dbProducts);
+            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(dbProducts));
+          }
+
+          // Categories
+          if (Array.isArray(dbCategories) && dbCategories.length > 0) {
+            setCategories(dbCategories);
+            localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(dbCategories));
           }
         }
 
@@ -184,6 +199,12 @@ export function AdminProvider({ children }) {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_CUSHION_KIT, JSON.stringify(cushionKit));
   }, [cushionKit]);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
+    }
+  }, [categories]);
 
   // ── Deprecated auth helpers (kept for backwards-compat) ────────────────────
   const login = useCallback(() => {
