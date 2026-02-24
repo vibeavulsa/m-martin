@@ -104,6 +104,8 @@ export function AdminProvider({ children }) {
     migrateCushionKit(loadFromStorage(STORAGE_KEY_CUSHION_KIT, defaultCushionKit))
   );
 
+  const [dbError, setDbError] = useState(null);
+
   // Track whether we have already seeded the DB with default data this session
   const dbSeeded = useRef(false);
 
@@ -127,7 +129,7 @@ export function AdminProvider({ children }) {
           || (!Array.isArray(dbCategories) || dbCategories.length === 0);
 
         if (needsSeed) {
-          await db.seedData().catch(() => {});
+          await db.seedData().catch(() => { });
           // Re-fetch after seeding
           const [seededProducts, seededCategories] = await Promise.all([
             db.fetchProducts(),
@@ -174,9 +176,13 @@ export function AdminProvider({ children }) {
           setCushionKit(migrated);
           localStorage.setItem(STORAGE_KEY_CUSHION_KIT, JSON.stringify(migrated));
         }
+
+        // Clear any previous errors
+        setDbError(null);
       } catch (err) {
         // DB not available (e.g. POSTGRES_URL not set) — keep localStorage data
         console.warn('[AdminContext] Vercel Postgres unavailable, using localStorage:', err.message);
+        setDbError(err.message || 'Falha ao conectar ao banco de dados');
       }
     }
 
@@ -228,7 +234,7 @@ export function AdminProvider({ children }) {
     db.createProduct(newProduct).catch(err =>
       console.error('[AdminContext] createProduct failed:', err)
     );
-    db.upsertStock(newId, product.stockQuantity || 0, product.minStock || 5).catch(() => {});
+    db.upsertStock(newId, product.stockQuantity || 0, product.minStock || 5).catch(() => { });
     return newProduct;
   }, []);
 
@@ -247,7 +253,7 @@ export function AdminProvider({ children }) {
               : (prev[id]?.minStock ?? 5),
           },
         };
-        db.upsertStock(id, next[id].quantity, next[id].minStock).catch(() => {});
+        db.upsertStock(id, next[id].quantity, next[id].minStock).catch(() => { });
         return next;
       });
     }
@@ -273,7 +279,7 @@ export function AdminProvider({ children }) {
     setStock(prev => {
       const qty = Math.max(0, quantity);
       const minStock = prev[productId]?.minStock ?? 5;
-      db.upsertStock(productId, qty, minStock).catch(() => {});
+      db.upsertStock(productId, qty, minStock).catch(() => { });
       return { ...prev, [productId]: { ...prev[productId], quantity: qty } };
     });
   }, []);
@@ -282,7 +288,7 @@ export function AdminProvider({ children }) {
     setStock(prev => {
       const ms = Math.max(0, minStock);
       const quantity = prev[productId]?.quantity ?? 0;
-      db.upsertStock(productId, quantity, ms).catch(() => {});
+      db.upsertStock(productId, quantity, ms).catch(() => { });
       return { ...prev, [productId]: { ...prev[productId], minStock: ms } };
     });
   }, []);
@@ -305,7 +311,7 @@ export function AdminProvider({ children }) {
             const qty = item.quantity || 1;
             const newQty = Math.max(0, next[pid].quantity - qty);
             next[pid] = { ...next[pid], quantity: newQty };
-            db.upsertStock(pid, newQty, next[pid].minStock).catch(() => {});
+            db.upsertStock(pid, newQty, next[pid].minStock).catch(() => { });
           }
         }
         return next;
@@ -351,7 +357,7 @@ export function AdminProvider({ children }) {
         ...prev,
         stockCapas: { ...prev.stockCapas, [color]: Math.max(0, quantity) },
       };
-      db.saveCushionKit(updated).catch(() => {});
+      db.saveCushionKit(updated).catch(() => { });
       return updated;
     });
   }, []);
@@ -359,7 +365,7 @@ export function AdminProvider({ children }) {
   const updateRefilStock = useCallback((quantity) => {
     setCushionKit(prev => {
       const updated = { ...prev, stockRefis: Math.max(0, quantity) };
-      db.saveCushionKit(updated).catch(() => {});
+      db.saveCushionKit(updated).catch(() => { });
       return updated;
     });
   }, []);
@@ -420,6 +426,7 @@ export function AdminProvider({ children }) {
     updateCushionKit,
     updateCapaStock,
     updateRefilStock,
+    dbError,
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

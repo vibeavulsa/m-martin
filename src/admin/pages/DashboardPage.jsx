@@ -8,11 +8,11 @@ import {
   IconTrendingUp,
   IconClock,
 } from '@tabler/icons-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
 import '../Admin.css';
 
-const cardVariants = {
+const kpiVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i) => ({
     opacity: 1,
@@ -26,14 +26,25 @@ const sectionVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.4, 0, 0.2, 1] } },
 };
 
+const rowVariants = {
+  hidden: { opacity: 0, x: -12 },
+  visible: (i) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: 0.15 + i * 0.03, duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+  }),
+  exit: { opacity: 0, x: 12, transition: { duration: 0.2 } },
+};
+
 const DashboardPage = () => {
-  const { products, stock, orders, getLowStockProducts, getOutOfStockProducts, getTotalStockValue } = useAdmin();
+  const { products, stock, orders, getLowStockProducts, getOutOfStockProducts, getTotalStockValue, dbError } = useAdmin();
 
   const totalProducts = products.length;
   const totalStock = Object.values(stock).reduce((sum, s) => sum + s.quantity, 0);
   const lowStockProducts = getLowStockProducts();
   const outOfStockProducts = getOutOfStockProducts();
   const totalStockValue = getTotalStockValue();
+  const outOfStockTotal = outOfStockProducts.length; // Assuming this is what 'outOfStockTotal' refers to
 
   const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
   const pendingOrders = orders.filter((o) => o.status === 'pendente').length;
@@ -48,19 +59,51 @@ const DashboardPage = () => {
     { icon: <IconClock size={24} stroke={1.6} />, style: { background: 'rgba(255, 152, 0, 0.15)', color: '#ff9800' }, label: 'Pedidos Pendentes', value: pendingOrders },
     { icon: <IconCurrencyReal size={24} stroke={1.6} />, className: 'gold', label: 'Ticket Médio', value: formatCurrency(avgTicket) },
     { icon: <IconBoxSeam size={24} stroke={1.6} />, style: { background: 'rgba(156, 39, 176, 0.15)', color: '#9c27b0' }, label: 'Itens em Estoque', value: totalStock },
-    { icon: <IconAlertTriangle size={24} stroke={1.6} />, style: { background: 'rgba(244, 67, 54, 0.15)', color: '#f44336' }, label: 'Alertas de Estoque', value: lowStockProducts.length + outOfStockProducts.length },
+    { icon: <IconAlertTriangle size={24} stroke={1.6} />, className: 'red', label: 'Sem Estoque', value: outOfStockTotal },
   ];
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <div className="admin-page-header">
-        <h1>Dashboard</h1>
-        <p>Visão geral de faturamento e administração de pedidos</p>
+        <h1>Dashboard Corporativo</h1>
+        <p>Visão geral da evolução de vendas, M'Martin Estofados</p>
       </div>
+
+      <AnimatePresence>
+        {dbError && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -20, height: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              color: '#ef4444',
+              padding: '1rem',
+              borderRadius: '8px',
+              marginBottom: '1.5rem',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem'
+            }}
+          >
+            <IconAlertTriangle size={24} stroke={2} />
+            <div>
+              <h4 style={{ margin: '0 0 0.25rem 0', fontWeight: 600 }}>Erro de Conexão com o Servidor Neon Postgres</h4>
+              <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>
+                O sistema não conectou ao banco de dados e está usando o armazenamento local do navegador para evitar perda de dados.
+                As alterações realizadas <strong>não estão indo para o banco de dados online</strong>.<br />
+                <em>Sinal de erro: {dbError}</em>. Verifique a chave DATABASE_URL / POSTGRES_URL.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="dashboard-kpis">
         {kpis.map((kpi, i) => (
-          <motion.div key={kpi.label} className="kpi-card" custom={i} initial="hidden" animate="visible" variants={cardVariants}>
+          <motion.div key={kpi.label} className="kpi-card" custom={i} initial="hidden" animate="visible" variants={kpiVariants}>
             <div className={`kpi-icon${kpi.className ? ` ${kpi.className}` : ''}`} style={kpi.style}>
               {kpi.icon}
             </div>
