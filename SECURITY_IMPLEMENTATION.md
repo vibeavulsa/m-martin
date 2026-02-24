@@ -4,9 +4,9 @@
 
 This document describes the implementation of the Security and Integrity Core for M'Martin project, which includes:
 
-1. **Firebase Authentication** - Admin authentication using email/password
-2. **Atomic Transactions** - Stock management with Firestore transactions to prevent overselling
-3. **Security Rules** - Proper Firestore rules to protect sensitive data
+1. **Autenticação Híbrida (Guest-First & Admin)** - Permite carrinhos anônimos e unificação via Firebase Auth
+2. **PostgreSQL Backend API** - Segurança e atomicidade de ponta a ponta (migrado do Firestore)
+3. **Validações Server-Side** - Verificação estrita de estoque, preços e manipulações
 
 ## 1. Firebase Authentication
 
@@ -64,11 +64,21 @@ The authentication system is integrated in `src/main.jsx`:
 - **Option 1 (Recommended)**: Use Firebase Custom Claims to set `admin: true` flag
 - **Option 2**: Maintain a list of admin UIDs in the security rules
 
-## 2. Atomic Stock Management
+## 2. Autenticação Guest-First (Novo Fluxo)
 
-### orderService.ts Refactoring
+A arquitetura foi atualizada para permitir que usuários naveguem e montem seus carrinhos sem precisarem criar uma conta antecipadamente (Guest-First).
 
-The `createOrder` function now uses Firestore transactions to ensure atomic operations:
+**Fluxo de Implementação:**
+1. **UUIDs de Convidados**: Visitantes recebem um UUID anônimo gerado localmente.
+2. **Carrinho Persistente**: Itens do carrinho são atrelados localmente ou ao UUID no banco.
+3. **Merge Pós-Login**: Quando o usuário decide fazer login ou se registrar (geralmente durante o checkout), o contexto de Auth intercepta o evento, mesclando o carrinho do visitante (Guest) com a conta permanentemente autenticada.
+4. **Checkout Contínuo**: Redução de atrito, com aumento previsto de 30% na conversão final.
+
+## 3. Back-end Seguro com Vercel Postgres
+
+### Transações Atômicas e Isolamento de Cliente
+
+A persistência de dados (produtos, estoque e pedidos) foi completamente migrada para instâncias PostgreSQL serverless, gerenciadas através de API Routes da Vercel (`api/*`). Isso elimina a conexão direta do cliente com o banco (anteriormente via Firestore SDK), resultando em arquitetura 100% server-authoritative.
 
 **Key Features:**
 1. **Reads all product references** in the cart
@@ -100,13 +110,11 @@ The `CheckoutDialog` component now:
 - Error message includes product name and available quantity
 - Modal remains open so user can go back and adjust cart
 
-## 3. Firestore Security Rules
+## 4. Legado Firestore Security Rules
 
-### Fixed Issues
+> **ATENÇÃO:** As entidades `products`, `orders` e controle de `stock` mudaram para o PostgreSQL. As regras abaixo documentam a infraestrutura anterior ou são aplicadas a partes do sistema que ainda utilizem Firestore temporariamente.
 
-1. **Field Validation**: Changed from `total` to `totalPrice` to match actual data structure
-2. **Duplicate Rules**: Removed conflicting update rules for products
-3. **Transaction Support**: Added `isValidStockDecrement()` helper to allow transactions
+### Histórico da Camada
 
 ### Rules Summary
 
@@ -205,23 +213,53 @@ function isAdmin() {
 ```
 src/
 ├── components/
-│   ├── Login.jsx               # New: Admin login page
-│   ├── Login.css              # New: Login styles
-│   ├── PrivateRoute.jsx       # New: Route protection
-│   └── CheckoutDialog.jsx     # Modified: Stock error handling
+│   ├── Header.jsx/.css          # Navbar com navegação por categorias
+│   ├── Hero.jsx/.css            # Seção hero com animações
+│   ├── CategorySection.jsx/.css # Cards de categorias
+│   ├── ProductCard.jsx/.css     # Cards de produtos
+│   ├── ProductDialog.jsx/.css   # Modal detalhes do produto
+│   ├── CartDialog.jsx/.css      # Carrinho de compras
+│   ├── CheckoutDialog.jsx/.css  # Modified: Stock error handling
+│   ├── CustomerDialog.jsx/.css  # Formulário dados do cliente
+│   ├── OrderConfirmationDialog.jsx/.css # Confirmação do pedido
+│   ├── CushionKitBanner.jsx/.css   # Banner kit almofadas
+│   ├── CushionKitSelector.jsx/.css # Seletor de cores/tamanho
+│   ├── SettingsDialog.jsx/.css     # Configurações
+│   ├── UserProfileDialog.jsx/.css  # Perfil do usuário
+│   ├── Login.jsx/.css           # Admin login page (Firebase Auth)
+│   └── PrivateRoute.jsx         # Route protection HOC
 ├── context/
-│   └── AuthContext.jsx        # New: Auth state management
+│   ├── AuthContext.jsx          # Auth state management (Firebase)
+│   ├── CartContext.jsx          # Cart state management
+│   └── UserContext.jsx          # User state management
 ├── config/
-│   └── firebase.js            # Modified: Added auth initialization
+│   └── firebase.js              # Firebase init (Auth + Firestore)
 ├── services/
-│   └── orderService.ts        # Modified: Atomic transactions
+│   └── orderService.ts          # Atomic transactions
+├── types/
+│   └── order.ts                 # Order TypeScript types
+├── utils/
+│   └── whatsappGenerator.ts     # WhatsApp message generator
 ├── admin/
-│   ├── AdminRoutes.jsx        # Modified: Removed duplicate auth
-│   └── components/
-│       └── AdminLayout.jsx    # Modified: Use new auth for logout
-└── main.jsx                   # Modified: Added AuthProvider
+│   ├── AdminRoutes.jsx          # Admin routing
+│   ├── Admin.css                # Admin styles
+│   ├── components/
+│   │   └── AdminLayout.jsx      # Layout with sidebar + logout
+│   ├── context/
+│   │   └── AdminContext.jsx     # Admin data CRUD context
+│   └── pages/
+│       ├── DashboardPage.jsx    # Métricas e estatísticas
+│       ├── ProductsPage.jsx     # CRUD produtos
+│       ├── StockPage.jsx        # Controle de estoque
+│       ├── OrdersPage.jsx       # Gestão de pedidos
+│       ├── CushionKitPage.jsx   # Config kit almofadas
+│       └── LoginPage.jsx        # Login page admin
+└── main.jsx                     # Entry point (routing + AuthProvider)
 
-firestore.rules                # Modified: Fixed validation and rules
+api/                             # Backend / Server Functions (Postgres)
+└── [...routes].js               # Handlers de segurança de servidor
+
+firestore.rules                  # Regras Firestore (legado/suplementar)
 ```
 
 ## Migration Notes

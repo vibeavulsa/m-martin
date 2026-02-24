@@ -6,7 +6,7 @@ E-commerce moderno para estofados finos, com catálogo interativo, painel admini
 
 - **Nome:** M'Martin Estofados Finos
 - **ID do Projeto Firebase:** m-martin-estofados
-- **Tecnologias:** React 19, Vite 7, Firebase (Auth, Firestore, Cloud Functions, Storage), Framer Motion, Mercado Pago
+- **Tecnologias:** React 19, Vite 7, Vercel Postgres, Firebase (Auth, Cloud Functions, Storage), Framer Motion, Mercado Pago
 - **Plataformas de Deploy:** Firebase Hosting, Vercel, Netlify
 
 ## 🚀 Como Executar
@@ -165,10 +165,10 @@ O projeto implementa múltiplas camadas de segurança:
 
 - **Firebase Authentication** — Login com email/senha para administradores
 - **Rotas protegidas** — `PrivateRoute` redireciona para `/login` se não autenticado
-- **Cloud Functions** — Validação de preços no servidor (previne manipulação client-side)
-- **Transações atômicas** — Controle de estoque com Firestore transactions (previne overselling)
-- **Rate limiting** — Proteção contra abuso nas Cloud Functions (5 req/min por IP)
-- **Firestore Security Rules** — Proteção de dados sensíveis por coleção
+- **Validação no Servidor** — Preços e regras de negócio validados em rotas de API server-side
+- **Transações Atômicas** — Controle de estoque através do Vercel Postgres
+- **Rate limiting** — Proteção contra abuso nas APIs
+- **Autenticação Guest-First** — Permite adição ao carrinho sem login, unificando os dados automaticamente após a autenticação
 
 > 📖 Documentação completa: [SECURITY_IMPLEMENTATION.md](SECURITY_IMPLEMENTATION.md) · [FIRESTORE_SECURITY.md](FIRESTORE_SECURITY.md) · [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)
 
@@ -210,12 +210,11 @@ Métodos de pagamento integrados:
 - ✅ Layout responsivo com menu drawer para mobile
 
 ### Backend / Segurança
-- ✅ Firebase Cloud Functions (createOrder, processPayment)
-- ✅ Validação de preços server-side
-- ✅ Transações atômicas de estoque
-- ✅ Rate limiting por IP
-- ✅ Firestore Security Rules por coleção
-- ✅ Firebase Auth com PrivateRoute
+- ✅ Vercel Postgres API Routes (CRUD completo isolado do cliente)
+- ✅ Validação de preços server-side e processamento de checkout
+- ✅ Transações atômicas de estoque via Postgres
+- ✅ Rate limiting por IP nas APIs
+- ✅ Firebase Auth com rotas protegidas e suporte a Guest-First
 
 ## 🎨 Tecnologias
 
@@ -223,7 +222,8 @@ Métodos de pagamento integrados:
 |------------|--------|-----|
 | React | 19 | Framework UI |
 | Vite | 7 | Build tool e dev server |
-| Firebase | 12.9 | Auth, Firestore, Cloud Functions, Storage |
+| Vercel Postgres | — | Banco de Dados Relacional Primário |
+| Firebase | 12.9 | Auth, Cloud Functions, Storage |
 | Framer Motion | 12 | Animações e transições |
 | React Router | 7 | Roteamento SPA |
 | Tabler Icons | 3 | Biblioteca de ícones |
@@ -272,6 +272,11 @@ O projeto evoluiu através de **28 pull requests mergeados**, organizados nas se
 - Padronização da paleta de cores da marca (marrom/dourado)
 - Redesign do programa de fidelidade (layout 2 colunas)
 - Modernização do admin com animações Framer Motion
+
+### Fase 5 — Arquitetura e Performance (PRs Recentes)
+- Migração completa para **Vercel Postgres** (substituindo Firestore)
+- Fluxo de checkout **Guest-First** com unificação automática de carrinho
+- Otimização de assets estáticos e melhorias de build no Vite
 
 ---
 

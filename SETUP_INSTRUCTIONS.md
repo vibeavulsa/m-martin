@@ -57,7 +57,7 @@
 
 > **💡 Nota**: Nunca commite o arquivo `.env` no Git. Ele já está no `.gitignore`.
 
-### Passo 2: Criar Usuário Admin no Firebase Console
+### Passo 1: Criar Usuário Admin no Firebase Console
 
 **OBRIGATÓRIO**: Você precisa criar manualmente o usuário admin:
 
@@ -73,7 +73,7 @@
 
 ✅ Pronto! Agora você pode fazer login em `/login` com essas credenciais.
 
-### Passo 3: Deploy das Regras de Segurança
+### Passo 2: Deploy das Regras de Segurança
 
 Para aplicar as novas regras de segurança do Firestore:
 
@@ -86,7 +86,7 @@ Ou, se preferir deploy completo:
 firebase deploy
 ```
 
-### Passo 4: Inicializar Produtos no Firestore
+### Passo 3: Inicializar Produtos no Firestore
 
 Certifique-se de que seus produtos no Firestore têm o campo `quantity`:
 

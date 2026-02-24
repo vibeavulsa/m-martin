@@ -1,15 +1,12 @@
 /**
- * Camada de serviço para persistência de pedidos via Cloud Functions.
- * A Cloud Function valida preços no servidor, decrementa estoque e cria o pedido.
+ * Camada de serviço para persistência de pedidos via API Backend.
+ * A API Vercel no /api/orders valida preços, decrementa estoque via transação
+ * e cria o pedido na base Postgres.
  */
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import app from '../config/firebase';
 import type { Order } from '../types/order';
 
-const functions = getFunctions(app);
-
-/** Dados enviados para a Cloud Function (sem preços — o servidor calcula) */
 interface CreateOrderInput {
+  id: string;
   items: Array<{
     productId: string;
     name: string;
@@ -24,33 +21,31 @@ interface CreateOrderInput {
     city?: string;
     notes?: string;
   };
+  paymentMethod: string;
 }
 
 /**
- * Cria um pedido via Cloud Function.
+ * Cria um pedido chamando a API Backend construída em Next.js / Vercel.
  * Os preços são validados e calculados no servidor para evitar manipulação.
- * O estoque é decrementado atomicamente pela Cloud Function.
+ * O estoque é decrementado atomicamente pela API.
  * 
  * @param orderData - Dados do pedido (preços do cliente são ignorados pelo servidor).
- * @returns O ID do documento gerado pelo Firestore.
- * @throws Error se algum produto estiver fora de estoque ou se houver falha.
+ * @returns O ID único do pedido gerado.
+ * @throws Error se algum produto estiver fora de estoque ou se houver falha na API.
  */
 export async function createOrder(
   orderData: Omit<Order, 'createdAt'>
 ): Promise<string> {
   try {
-    const createOrderFn = httpsCallable<CreateOrderInput, { orderId: string }>(
-      functions,
-      'createOrder'
-    );
+    const orderId = `ord_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
-    // Enviar apenas os dados necessários (preços são calculados no servidor)
     const input: CreateOrderInput = {
+      id: orderId,
       items: orderData.items.map(item => ({
-        productId: item.productId,
+        productId: item.productId || (item as any).id,
         name: item.name,
         quantity: item.quantity,
-        imageUrl: item.imageUrl,
+        imageUrl: item.imageUrl || (item as any).image,
       })),
       customer: {
         name: orderData.customer.name,
@@ -60,29 +55,34 @@ export async function createOrder(
         city: orderData.customer.city,
         notes: orderData.customer.notes,
       },
+      paymentMethod: orderData.paymentMethod || 'whatsapp_checkout',
     };
 
-    const result = await createOrderFn(input);
-    return result.data.orderId;
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to create order on server.');
+    }
+
+    const result = await response.json();
+    return result.id;
   } catch (error: unknown) {
     console.error('[orderService] Falha ao salvar pedido:', error);
-    
-    // Extrair mensagem de erro da Cloud Function
-    const firebaseError = error as { code?: string; message?: string };
-    const message = firebaseError.message || '';
-    
-    // Propagar erros específicos de estoque
-    if (message.includes('Estoque insuficiente')) {
+
+    const message = error instanceof Error ? error.message : '';
+
+    // Propagar erros específicos do Backend
+    if (message.includes('Estoque insuficiente') || message.includes('Produto não encontrado')) {
       throw new Error(message);
     }
 
-    // Propagar erros de rate limiting
-    if (firebaseError.code === 'functions/resource-exhausted') {
-      throw new Error(message || 'Muitas requisições. Aguarde um momento.');
-    }
-    
     throw new Error(
-      'Não foi possível registrar o pedido. Tente novamente.'
+      'Não foi possível registrar o pedido. ' + (message ? message : 'Tente novamente.')
     );
   }
 }

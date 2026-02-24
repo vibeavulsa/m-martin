@@ -1,15 +1,9 @@
 /**
  * Serviço de pagamento — abstrai a comunicação com o gateway.
  *
- * O gateway real (Stripe, Mercado Pago, etc.) é invocado via Cloud Function
- * para manter as chaves secretas no servidor. Este módulo envia os dados
- * necessários e recebe o resultado (URL de redirect, código PIX, etc.).
+ * Agora consumindo a rota /api/payment nativa em Node.js (Vercel).
  */
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import app from '../config/firebase';
 import type { PaymentMethod, PaymentResult } from '../types/order';
-
-const functions = getFunctions(app);
 
 interface PaymentInput {
   orderId: string;
@@ -24,36 +18,42 @@ interface PaymentInput {
 }
 
 /**
- * Solicita a criação de um pagamento via Cloud Function.
- * A Cloud Function deve integrar com o gateway configurado (ex.: Stripe)
- * e retornar o resultado adequado ao método de pagamento escolhido.
+ * Solicita a criação de um pagamento via API Vercel Serverless.
+ * A API integra com o gateway configurado (ex.: Mercado Pago)
+ * e retorna URL de redirect, código PIX, etc.
  *
  * @returns PaymentResult com dados de transação, redirect ou código PIX.
  */
 export async function processPayment(input: PaymentInput): Promise<PaymentResult> {
   try {
-    const processPaymentFn = httpsCallable<PaymentInput, PaymentResult>(
-      functions,
-      'processPayment'
-    );
+    const response = await fetch('/api/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
 
-    const result = await processPaymentFn(input);
-    return result.data;
+    if (!response.ok) {
+      if (response.status === 429) {
+        return {
+          success: false,
+          error: 'Muitas requisições. Aguarde um momento e tente novamente.',
+        };
+      }
+
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Falha ao processar o pagamento na API.');
+    }
+
+    const data = await response.json();
+    return data;
   } catch (error: unknown) {
     console.error('[paymentService] Falha ao processar pagamento:', error);
 
-    const firebaseError = error as { code?: string; message?: string };
-
-    if (firebaseError.code === 'functions/resource-exhausted') {
-      return {
-        success: false,
-        error: 'Muitas requisições. Aguarde um momento e tente novamente.',
-      };
-    }
+    const message = error instanceof Error ? error.message : '';
 
     return {
       success: false,
-      error: firebaseError.message || 'Erro ao processar o pagamento. Tente novamente.',
+      error: message || 'Erro ao processar o pagamento. Tente novamente.',
     };
   }
 }

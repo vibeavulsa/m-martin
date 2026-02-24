@@ -2,7 +2,12 @@
 
 ## 📋 Visão Geral
 
-Este documento descreve as regras de segurança do Firestore implementadas para o e-commerce M'Martin, com foco em proteção contra vazamento de dados e manipulação de preços.
+> ⚠️ **AVISO IMPORTANTE DE ARQUITETURA (Fev 2026):**
+> O projeto **M'Martin migrou seu banco de dados principal (produtos, estoque, pedidos, categorias) para PostgreSQL (Vercel Postgres)**, operado por meio de API Routes backend. 
+> 
+> As regras do Firestore descritas neste documento representam a implementação histórica de segurança client-side e agora aplicam-se apenas a serviços pontuais que possam continuar consumindo Firestore. Toda a validação atômica real foi transferida para o ambiente Node.js isolado nas rotas `/api`.
+
+Este documento descreve as regras de segurança do Firestore originalmente implementadas para o e-commerce M'Martin, com foco em proteção contra vazamento de dados e manipulação de preços.
 
 ## 🎯 Objetivos de Segurança
 
@@ -45,7 +50,7 @@ function isAdmin() {
 #### `hasRequiredOrderFields(data)`
 ```javascript
 function hasRequiredOrderFields(data) {
-  return data.keys().hasAll(['total', 'items', 'customer']);
+  return data.keys().hasAll(['totalPrice', 'items', 'customer']);
 }
 ```
 **Propósito**: Valida que o pedido contém todos os campos obrigatórios.
@@ -53,14 +58,14 @@ function hasRequiredOrderFields(data) {
 #### `isValidTotal(data)`
 ```javascript
 function isValidTotal(data) {
-  return data.total is number 
-    && data.total > 0
+  return data.totalPrice is number 
+    && data.totalPrice > 0
     && data.items is list
     && data.items.size() > 0;
 }
 ```
 **Propósito**: 
-- Garante que o total do pedido é um número positivo
+- Garante que o totalPrice do pedido é um número positivo
 - Verifica que items é uma lista/array
 - Verifica que items contém pelo menos 1 item (não está vazio)
 
@@ -128,7 +133,7 @@ allow create: if hasRequiredOrderFields(request.resource.data)
 ```
 
 **Campos obrigatórios:**
-- `total` - Valor total do pedido (number > 0)
+- `totalPrice` - Valor total do pedido (number > 0)
 - `items` - Array de itens do pedido (não pode ser vazio)
 - `customer` - Dados do cliente
 
@@ -139,9 +144,9 @@ allow create: if hasRequiredOrderFields(request.resource.data)
 - Items deve conter pelo menos 1 item
 
 **⚠️ IMPORTANTE - Limitação de Validação de Preços:**
-As Firestore Rules não verificam se o `total` corresponde à soma dos preços dos items. Esta validação deve ser feita:
+As Firestore Rules não verificam se o `totalPrice` corresponde à soma dos preços dos items. Esta validação deve ser feita:
 - No backend usando Cloud Functions antes de processar pagamentos
-- NUNCA confie no valor de `total` enviado pelo cliente sem recalcular no servidor
+- NUNCA confie no valor de `totalPrice` enviado pelo cliente sem recalcular no servidor
 
 ---
 
@@ -299,11 +304,11 @@ await addDoc(collection(db, 'orders'), {
 **Resultado Esperado**: ✅ Sucesso - pedido criado
 
 **⚠️ IMPORTANTE**: As Firestore Rules validam que:
-- Campos obrigatórios existem (total, items, customer)
-- Total é um número positivo
+- Campos obrigatórios existem (totalPrice, items, customer)
+- totalPrice é um número positivo
 - Items não está vazio
 
-**MAS NÃO VALIDAM** se o total corresponde à soma dos preços. Esta validação DEVE ser feita no backend com Cloud Functions antes de processar pagamentos!
+**MAS NÃO VALIDAM** se o `totalPrice` corresponde à soma dos preços. Esta validação DEVE ser feita no backend com Cloud Functions antes de processar pagamentos!
 
 ---
 

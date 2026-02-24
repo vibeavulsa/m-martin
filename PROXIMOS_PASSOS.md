@@ -8,37 +8,29 @@ Este documento apresenta o plano de evolução do projeto, organizado por priori
 
 Itens obrigatórios antes de ir para produção.
 
-### 1. Implementar verificação real de Admin
-**Status atual:** A função `isAdmin()` nas Firestore Rules aceita qualquer usuário autenticado como admin.
-
+### 1. Implementar verificação avançada de Admin (Autenticação)
+**Status atual:** A Autenticação via Firebase Auth é limitada apenas aos e-mails permitidos manualmente ou a implementação das rotas `/admin/*` não valida o backend de forma robusta por session cookie.
 **Ação:**
-- Implementar Custom Claims no Firebase Auth (`admin: true`)
-- Criar Cloud Function para definir claims de admin
-- Atualizar `firestore.rules` para verificar `request.auth.token.admin == true`
+- Garantir que todas as chamadas `PUT`, `POST` e `DELETE` no frontend (via `api/orders`, `api/products`, etc.) validem o token JWT de Firebase do usuário.
+- Atualmente, as APIs confiam em dados brutos. Precisamos validar o header `Authorization: Bearer <token>` nas Serverless Functions do Vercel e garantir que pertença a um usuário que seja admin.
 
-### 2. Mover gestão de estoque para Cloud Functions
-**Status atual:** As Firestore Rules permitem que usuários não autenticados decrementem estoque diretamente.
-
+### 2. Monitoramento e Otimização do Vercel Postgres
+**Status atual:** Toda a lógica de gestão de estoque e pedidos foi migrada para Vercel Postgres (`api/orders`, `api/stock`), o que garante consistência usando transações SQL.
 **Ação:**
-- Remover permissão de update de `quantity` por não-admins nas Rules
-- Toda decrementação de estoque via Cloud Function `createOrder` (já implementada)
-- Testar cenários de race condition
+- Testar sob estresse as conexões do banco de dados (pool limit).
+- Garantir que índices corretos existam (`CREATE INDEX`) para acelerar as consultas principais de catálogo.
 
-### 3. Validação completa de pedidos no servidor
-**Status atual:** Cloud Function `createOrder` valida preços, mas falta validação de campos do cliente.
-
+### 3. Validação completa de pedidos no servidor (API)
+**Status atual:** A rota API `/api/orders` valida preços e realiza transação atômica de estoque de forma correta, mas as verificações sobre formatação do e-mail, telefone e endereço do cliente poderiam ser mais rigorosas.
 **Ação:**
-- Validar formato de email, telefone e endereço na Cloud Function
-- Implementar sanitização de inputs no servidor
-- Adicionar logging de pedidos suspeitos
+- Implementar sanitização dos inputs no backend.
+- Adicionar logging robusto aos pedidos recusados (tentativas de preço alterado, estoque faltante, parâmetros inválidos).
 
 ### 4. Configurar ambientes separados (dev/staging/produção)
-**Status atual:** Um único projeto Firebase para todos os ambientes.
-
+**Status atual:** Vercel permite configurar variáveis `.env` independentes.
 **Ação:**
-- Criar projeto Firebase de produção separado
-- Configurar variáveis de ambiente por ambiente
-- Separar chaves do Mercado Pago (sandbox vs produção)
+- Cadastrar corretamente `MERCADO_PAGO_ACCESS_TOKEN` na Vercel (Produção e Preview) para processamento real via `/api/payment`.
+- Separar chaves do Mercado Pago (sandbox vs produção).
 
 ---
 
