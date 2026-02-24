@@ -39,24 +39,24 @@ const Hero = () => {
           Conforto e Elegância em Cada Detalhe
         </motion.h1>
         <motion.p className="hero-description" variants={itemVariants}>
-          Descubra a sofisticação dos estofados M&apos;Martin. Sofás com acabamento artesanal, 
-          almofadas com fibra siliconada 500g e uma linha completa para acamados e hospitalar.
-          Transforme seus ambientes com qualidade que você sente ao toque.
+          Descubra a sofisticação dos estofados M&apos;Martin. Fabricamos sofás de alto padrão com acabamento artesanal,
+          aliando qualidade premium, garantia estendida e preço justo. Transforme seu ambiente com a durabilidade
+          e o conforto que você merece. Faça agora mesmo o seu orçamento!
         </motion.p>
         <motion.div className="hero-trust-badges" variants={itemVariants}>
           <div className="trust-badge">
+            <span className="trust-number">10 Anos</span>
+            <span className="trust-label">Garantia na Estrutura</span>
+          </div>
+          <div className="trust-divider" />
+          <div className="trust-badge">
+            <span className="trust-number">2 Anos</span>
+            <span className="trust-label">Espuma contra Deformação</span>
+          </div>
+          <div className="trust-divider" />
+          <div className="trust-badge">
             <span className="trust-number">100%</span>
             <span className="trust-label">Qualidade Premium</span>
-          </div>
-          <div className="trust-divider" />
-          <div className="trust-badge">
-            <span className="trust-number">5x</span>
-            <span className="trust-label">Sem Juros</span>
-          </div>
-          <div className="trust-divider" />
-          <div className="trust-badge">
-            <span className="trust-number">500g</span>
-            <span className="trust-label">Fibra Siliconada</span>
           </div>
         </motion.div>
         <motion.div className="hero-buttons" variants={itemVariants}>
@@ -66,15 +66,15 @@ const Hero = () => {
             whileHover={{ y: -3, boxShadow: '0 11px 28px rgba(0,0,0,0.38), 0 0 18px rgba(217,177,84,0.42)' }}
             whileTap={{ scale: 0.97 }}
           >
-            Explorar Catálogo
+            Fazer Orçamento
           </motion.a>
           <motion.a
-            href="#homecare-hospitalar"
+            href="#categories"
             className="btn-secondary"
             whileHover={{ y: -3, backgroundColor: 'rgba(217,177,84,0.24)' }}
             whileTap={{ scale: 0.97 }}
           >
-            Linha Hospitalar
+            Explorar Categorias
           </motion.a>
         </motion.div>
       </motion.div>
