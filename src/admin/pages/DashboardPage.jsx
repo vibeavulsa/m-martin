@@ -5,6 +5,8 @@ import {
   IconAlertTriangle,
   IconCurrencyReal,
   IconPackageOff,
+  IconTrendingUp,
+  IconClock,
 } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
@@ -33,23 +35,27 @@ const DashboardPage = () => {
   const outOfStockProducts = getOutOfStockProducts();
   const totalStockValue = getTotalStockValue();
 
+  const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+  const pendingOrders = orders.filter((o) => o.status === 'pendente').length;
+  const avgTicket = orders.length > 0 ? totalRevenue / orders.length : 0;
+
   const formatCurrency = (value) =>
     value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const kpis = [
-    { icon: <IconPackage size={24} stroke={1.6} />, className: 'gold', label: 'Produtos', value: totalProducts },
-    { icon: <IconBoxSeam size={24} stroke={1.6} />, className: 'green', label: 'Itens em Estoque', value: totalStock },
-    { icon: <IconReceipt size={24} stroke={1.6} />, className: 'blue', label: 'Pedidos', value: orders.length },
-    { icon: <IconCurrencyReal size={24} stroke={1.6} />, className: 'red', label: 'Valor em Estoque', value: formatCurrency(totalStockValue) },
-    { icon: <IconAlertTriangle size={24} stroke={1.6} />, style: { background: 'rgba(255, 152, 0, 0.15)', color: '#ff9800' }, label: 'Estoque Baixo', value: lowStockProducts.length },
-    { icon: <IconPackageOff size={24} stroke={1.6} />, style: { background: 'rgba(244, 67, 54, 0.15)', color: '#f44336' }, label: 'Sem Estoque', value: outOfStockProducts.length },
+    { icon: <IconTrendingUp size={24} stroke={1.6} />, className: 'green', label: 'Faturamento Total', value: formatCurrency(totalRevenue) },
+    { icon: <IconReceipt size={24} stroke={1.6} />, className: 'blue', label: 'Pedidos Realizados', value: orders.length },
+    { icon: <IconClock size={24} stroke={1.6} />, style: { background: 'rgba(255, 152, 0, 0.15)', color: '#ff9800' }, label: 'Pedidos Pendentes', value: pendingOrders },
+    { icon: <IconCurrencyReal size={24} stroke={1.6} />, className: 'gold', label: 'Ticket Médio', value: formatCurrency(avgTicket) },
+    { icon: <IconBoxSeam size={24} stroke={1.6} />, style: { background: 'rgba(156, 39, 176, 0.15)', color: '#9c27b0' }, label: 'Itens em Estoque', value: totalStock },
+    { icon: <IconAlertTriangle size={24} stroke={1.6} />, style: { background: 'rgba(244, 67, 54, 0.15)', color: '#f44336' }, label: 'Alertas de Estoque', value: lowStockProducts.length + outOfStockProducts.length },
   ];
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <div className="admin-page-header">
         <h1>Dashboard</h1>
-        <p>Visão geral do sistema M&apos;Martin Estofados</p>
+        <p>Visão geral de faturamento e administração de pedidos</p>
       </div>
 
       <div className="dashboard-kpis">
@@ -67,23 +73,6 @@ const DashboardPage = () => {
       </div>
 
       <div className="dashboard-sections">
-        <motion.div className="dashboard-section" initial="hidden" animate="visible" variants={sectionVariants} transition={{ delay: 0.35 }}>
-          <h2>
-            <IconAlertTriangle size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#f44336' }} />
-            Estoque Baixo
-          </h2>
-          {lowStockProducts.length === 0 ? (
-            <p className="empty-state">Todos os produtos estão com estoque adequado.</p>
-          ) : (
-            lowStockProducts.map((p, i) => (
-              <motion.div key={p.id} className="low-stock-item" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.05 }}>
-                <span className="item-name">{p.name}</span>
-                <span className="item-qty">{stock[p.id]?.quantity ?? 0} un.</span>
-              </motion.div>
-            ))
-          )}
-        </motion.div>
-
         <motion.div className="dashboard-section" initial="hidden" animate="visible" variants={sectionVariants} transition={{ delay: 0.45 }}>
           <h2>
             <IconReceipt size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#2196f3' }} />
@@ -92,15 +81,51 @@ const DashboardPage = () => {
           {orders.length === 0 ? (
             <p className="empty-state">Nenhum pedido registrado ainda.</p>
           ) : (
-            orders.slice(0, 5).map((o, i) => (
-              <motion.div key={o.id} className="recent-order-item" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.05 }}>
-                <div>
-                  <span className="order-id">#{o.id}</span>
-                  <span className="order-date"> — {new Date(o.date).toLocaleDateString('pt-BR')}</span>
+            orders.slice(0, 6).map((o, i) => (
+              <motion.div key={o.id} className="recent-order-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.05 }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div>
+                    <span className="order-id">#{o.id}</span>
+                    <span className="order-date" style={{ marginLeft: 8, color: '#888', fontSize: '0.85rem' }}>{new Date(o.date).toLocaleDateString('pt-BR')}</span>
+                  </div>
+                  <span style={{ fontSize: '0.9rem', color: '#555', marginTop: '4px' }}>{o.customer?.name || 'Cliente Não Identificado'}</span>
                 </div>
-                <span className={`order-status ${o.status}`}>{o.status}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                  <span style={{ fontWeight: 'bold', color: '#333' }}>{formatCurrency(o.total || 0)}</span>
+                  <span className={`order-status ${o.status}`}>{o.status}</span>
+                </div>
               </motion.div>
             ))
+          )}
+        </motion.div>
+
+        <motion.div className="dashboard-section" initial="hidden" animate="visible" variants={sectionVariants} transition={{ delay: 0.35 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h2 style={{ margin: 0 }}>
+              <IconAlertTriangle size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#f44336' }} />
+              Atenção no Estoque
+            </h2>
+            <span style={{ fontSize: '0.85rem', color: '#888' }}>
+              Capital imobilizado: {formatCurrency(totalStockValue)}
+            </span>
+          </div>
+          {lowStockProducts.length === 0 && outOfStockProducts.length === 0 ? (
+            <p className="empty-state">Todos os produtos estão com estoque adequado.</p>
+          ) : (
+            <>
+              {outOfStockProducts.map((p, i) => (
+                <motion.div key={`out-${p.id}`} className="low-stock-item" style={{ background: 'rgba(244, 67, 54, 0.05)', borderLeft: '3px solid #f44336' }} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.05 }}>
+                  <span className="item-name" style={{ color: '#d32f2f', fontWeight: 500 }}>{p.name} (Esgotado)</span>
+                  <span className="item-qty" style={{ color: '#d32f2f' }}>0 un.</span>
+                </motion.div>
+              ))}
+              {lowStockProducts.map((p, i) => (
+                <motion.div key={`low-${p.id}`} className="low-stock-item" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.05 }}>
+                  <span className="item-name">{p.name}</span>
+                  <span className="item-qty" style={{ color: '#ff9800', fontWeight: 500 }}>{stock[p.id]?.quantity ?? 0} un.</span>
+                </motion.div>
+              ))}
+            </>
           )}
         </motion.div>
       </div>
