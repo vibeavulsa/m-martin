@@ -37,43 +37,45 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick }) =
           <a href="#travesseiros" className="nav-link" onClick={(e) => handleNavClick(e, 'travesseiros')}>Travesseiros</a>
           <a href="#puffs-chaise" className="nav-link" onClick={(e) => handleNavClick(e, 'puffs-chaise')}>Puffs & Chaise</a>
           <a href="#homecare-hospitalar" className="nav-link" onClick={(e) => handleNavClick(e, 'homecare-hospitalar')}>Para Acamados</a>
-          <div className="nav-actions">
-            <motion.button
-              className={`nav-icon-btn ${isAuthenticated ? 'nav-icon-btn-auth' : ''}`}
-              onClick={onAuthClick}
-              aria-label={isAuthenticated ? 'Conta autenticada' : 'Entrar'}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              title={isAuthenticated ? 'Conta / Admin' : 'Entrar'}
-            >
-              {isAuthenticated ? <IconShieldCheck size={20} stroke={1.8} /> : <IconLogin size={20} stroke={1.8} />}
-              {isAuthenticated && (
-                <motion.span
-                  className="auth-indicator"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 500 }}
-                />
-              )}
-            </motion.button>
-            <motion.button
-              className={`nav-icon-btn ${isLoggedIn ? 'nav-icon-btn-active' : ''}`}
-              onClick={onProfileClick}
-              aria-label="Perfil do usuário"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <IconUser size={20} stroke={1.8} />
-              {isLoggedIn && (
-                <motion.span
-                  className="user-indicator"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 500 }}
-                  title={profile.name}
-                />
-              )}
-            </motion.button>
+        </nav>
+        <div className="nav-actions">
+          <motion.button
+            className={`nav-icon-btn ${isAuthenticated ? 'nav-icon-btn-auth' : ''}`}
+            onClick={onAuthClick}
+            aria-label={isAuthenticated ? 'Conta autenticada' : 'Entrar'}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            title={isAuthenticated ? 'Conta / Admin' : 'Entrar'}
+          >
+            {isAuthenticated ? <IconShieldCheck size={20} stroke={1.8} /> : <IconLogin size={20} stroke={1.8} />}
+            {isAuthenticated && (
+              <motion.span
+                className="auth-indicator"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 500 }}
+              />
+            )}
+          </motion.button>
+          <motion.button
+            className={`nav-icon-btn ${isLoggedIn ? 'nav-icon-btn-active' : ''}`}
+            onClick={onProfileClick}
+            aria-label="Perfil do usuário"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <IconUser size={20} stroke={1.8} />
+            {isLoggedIn && (
+              <motion.span
+                className="user-indicator"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 500 }}
+                title={profile.name}
+              />
+            )}
+          </motion.button>
+          {isAuthenticated && (
             <motion.button
               className="nav-icon-btn"
               onClick={onSettingsClick}
@@ -84,28 +86,28 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick }) =
             >
               <IconSettings size={20} stroke={1.8} />
             </motion.button>
-            <motion.button
-              className="nav-cart-btn"
-              onClick={onCartClick}
-              aria-label="Abrir carrinho"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <IconShoppingCart size={22} stroke={1.8} />
-              {totalItems > 0 && (
-                <motion.span
-                  className="cart-badge"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 500 }}
-                  key={totalItems}
-                >
-                  {totalItems}
-                </motion.span>
-              )}
-            </motion.button>
-          </div>
-        </nav>
+          )}
+          <motion.button
+            className="nav-cart-btn"
+            onClick={onCartClick}
+            aria-label="Abrir carrinho"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <IconShoppingCart size={22} stroke={1.8} />
+            {totalItems > 0 && (
+              <motion.span
+                className="cart-badge"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 500 }}
+                key={totalItems}
+              >
+                {totalItems}
+              </motion.span>
+            )}
+          </motion.button>
+        </div>
       </div>
     </motion.header>
   );

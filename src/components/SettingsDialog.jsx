@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { IconX, IconSettings, IconRefresh } from '@tabler/icons-react';
 import { useUser } from '../context/UserContext';
+import { useAuth } from '../context/AuthContext';
 import { categorySettingKey } from '../utils/homeDisplayUtils';
 import './SettingsDialog.css';
 
@@ -40,6 +41,7 @@ const itemVariants = {
 
 const SettingsDialog = ({ isOpen, onClose }) => {
   const { settings, updateSettings, resetSettings, homeDisplaySettings, updateHomeDisplaySettings, resetHomeDisplaySettings, categories } = useUser();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -181,8 +183,9 @@ const SettingsDialog = ({ isOpen, onClose }) => {
                 </div>
               </motion.div>
 
-              <motion.div className="settings-section" variants={itemVariants}>
-                  <h3 className="settings-section-title">Exibição na Home</h3>
+              {isAuthenticated && (
+                <motion.div className="settings-section" variants={itemVariants}>
+                  <h3 className="settings-section-title">Exibição na Home (Admin)</h3>
 
                   {(categories || []).map((cat) => {
                     const key = categorySettingKey(cat.id);
@@ -261,6 +264,7 @@ const SettingsDialog = ({ isOpen, onClose }) => {
                     </motion.button>
                   </div>
                 </motion.div>
+              )}
 
               <motion.div className="settings-footer" variants={itemVariants}>
                 <motion.button
