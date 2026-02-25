@@ -107,11 +107,12 @@
 }
 
 .pillow-banner-actions {
+    position: absolute;
+    bottom: 2.5rem;
+    right: 2.5rem;
+    z-index: 10;
     display: flex;
     gap: 1rem;
-    justify-content: flex-end;
-    align-self: flex-end;
-    width: auto;
 }
 
 .pillow-btn-add {
@@ -250,5 +251,15 @@
 
     .pillow-video-text {
         font-size: 1.6rem;
+    }
+
+    .pillow-banner-actions {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        justify-content: center;
+        align-self: center;
+        width: 100%;
+        margin-top: 1rem;
     }
 }

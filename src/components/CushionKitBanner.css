@@ -104,6 +104,10 @@
 }
 
 .cushion-kit-banner-cta {
+  position: absolute;
+  bottom: 2.5rem;
+  right: 2.5rem;
+  z-index: 10;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -391,5 +395,15 @@
 
   .cushion-kit-dialog-actions {
     flex-direction: column;
+  }
+
+  .cushion-kit-banner-cta {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    align-self: center;
+    width: 100%;
+    margin-top: 1rem;
+    justify-content: center;
   }
 }
