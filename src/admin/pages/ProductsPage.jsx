@@ -11,13 +11,26 @@ import {
   IconCurrencyDollar,
   IconStack2,
   IconPhoto,
+  IconChevronRight,
+  IconChevronLeft,
+  IconCheck,
+  IconSparkles,
 } from '@tabler/icons-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
 import ImagePasteArea from '../components/ImagePasteArea';
 import '../Admin.css';
 
-const SOFA_MODELS = ['Zeus', 'Chronos', 'Roma', 'RC', 'Orgânico', 'Sem Caixa'];
+const SOFA_MODELS = ['Zeus', 'Chronos', 'Roma', 'RC', 'Orgânico', 'Sem Caixa', 'Chaise'];
+
+const ALL_CATEGORIES = [
+  { id: 'sofas', name: 'Sofás' },
+  { id: 'almofadas', name: 'Almofadas' },
+  { id: 'travesseiros', name: 'Travesseiros' },
+  { id: 'puffs-chaise', name: 'Puffs e Chaise' },
+  { id: 'homecare-hospitalar', name: 'Homecare / Hospitalar' },
+  { id: 'pet', name: 'Linha Pet' },
+];
 
 const emptyProduct = {
   name: '',
@@ -39,6 +52,12 @@ const emptyProduct = {
   isCustomOrder: false,
 };
 
+const STEPS = [
+  { id: 'info', label: 'Informações', icon: IconInfoCircle },
+  { id: 'pricing', label: 'Preço e Estoque', icon: IconCurrencyDollar },
+  { id: 'media', label: 'Imagens', icon: IconPhoto },
+];
+
 const rowVariants = {
   hidden: { opacity: 0, x: -12 },
   visible: (i) => ({
@@ -49,6 +68,12 @@ const rowVariants = {
   exit: { opacity: 0, x: 12, transition: { duration: 0.2 } },
 };
 
+const stepContentVariants = {
+  enter: (dir) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
+};
+
 const ProductsPage = () => {
   const { products, categories, addProduct, updateProduct, deleteProduct, stock } = useAdmin();
   const [search, setSearch] = useState('');
@@ -56,6 +81,24 @@ const ProductsPage = () => {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyProduct);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [step, setStep] = useState(0);
+  const [stepDir, setStepDir] = useState(1);
+
+  // Merge DB categories with fallback static categories
+  const mergedCategories = useMemo(() => {
+    if (categories && categories.length > 0) {
+      // Add any missing categories from ALL_CATEGORIES
+      const catIds = new Set(categories.map(c => c.id));
+      const merged = [...categories];
+      for (const cat of ALL_CATEGORIES) {
+        if (!catIds.has(cat.id)) {
+          merged.push(cat);
+        }
+      }
+      return merged;
+    }
+    return ALL_CATEGORIES;
+  }, [categories]);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return products;
@@ -68,16 +111,17 @@ const ProductsPage = () => {
   const openNew = () => {
     setEditing(null);
     setForm(emptyProduct);
+    setStep(0);
+    setStepDir(1);
     setModalOpen(true);
   };
 
   const openEdit = (product) => {
     setEditing(product.id);
-    // Support both old single image and new multiple images format
-    const productImages = product.images && product.images.length > 0 
-      ? product.images 
-      : product.image 
-        ? [product.image] 
+    const productImages = product.images && product.images.length > 0
+      ? product.images
+      : product.image
+        ? [product.image]
         : [];
     setForm({
       name: product.name,
@@ -98,12 +142,12 @@ const ProductsPage = () => {
       sofaModel: product.sofaModel || '',
       isCustomOrder: product.isCustomOrder || false,
     });
+    setStep(0);
+    setStepDir(1);
     setModalOpen(true);
   };
 
-  const handleDelete = (product) => {
-    setConfirmDelete(product);
-  };
+  const handleDelete = (product) => setConfirmDelete(product);
 
   const confirmDeleteProduct = () => {
     if (confirmDelete) {
@@ -115,6 +159,25 @@ const ProductsPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const goNext = () => {
+    if (step < STEPS.length - 1) {
+      setStepDir(1);
+      setStep(s => s + 1);
+    }
+  };
+
+  const goPrev = () => {
+    if (step > 0) {
+      setStepDir(-1);
+      setStep(s => s - 1);
+    }
+  };
+
+  const goToStep = (idx) => {
+    setStepDir(idx > step ? 1 : -1);
+    setStep(idx);
   };
 
   const handleSubmit = (e) => {
@@ -129,9 +192,7 @@ const ProductsPage = () => {
       category: form.category,
       description: form.description,
       price: form.price,
-      // Keep backward compatibility: set image to first image or empty
       image: form.images && form.images.length > 0 ? form.images[0] : form.image,
-      // Add images array for multi-image support
       images: form.images && form.images.length > 0 ? form.images : undefined,
       features: featuresArr,
       stockQuantity: parseInt(form.stockQuantity, 10) || 0,
@@ -158,9 +219,143 @@ const ProductsPage = () => {
   };
 
   const getCategoryName = (id) => {
-    const cat = categories.find((c) => c.id === id);
+    const cat = mergedCategories.find((c) => c.id === id);
     return cat ? cat.name : id;
   };
+
+  const canProceed = () => {
+    if (step === 0) return form.name.trim() !== '' && form.category !== '';
+    if (step === 1) return form.price.trim() !== '';
+    return true;
+  };
+
+  // Stepper sub-components
+  const renderStepInfo = () => (
+    <div className="product-step-content">
+      <div className="form-group">
+        <label htmlFor="prod-name">Nome do Produto *</label>
+        <input id="prod-name" name="name" value={form.name} onChange={handleChange} placeholder="Ex: Sofá Premium" required />
+      </div>
+
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="prod-category">Categoria *</label>
+          <select id="prod-category" name="category" value={form.category} onChange={handleChange}>
+            {mergedCategories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="prod-barcode">Código / SKU</label>
+          <input id="prod-barcode" name="barcode" value={form.barcode} onChange={handleChange} placeholder="7891234567890" />
+        </div>
+      </div>
+
+      {form.category === 'sofas' && (
+        <div className="form-group">
+          <label htmlFor="prod-sofa-model">Modelo do Sofá</label>
+          <select id="prod-sofa-model" name="sofaModel" value={form.sofaModel} onChange={handleChange}>
+            <option value="">Selecione o modelo</option>
+            {SOFA_MODELS.map((m) => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="prod-supplier">Fornecedor</label>
+          <input id="prod-supplier" name="supplier" value={form.supplier} onChange={handleChange} placeholder="Nome do fornecedor" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="prod-unit">Unidade</label>
+          <select id="prod-unit" name="unit" value={form.unit} onChange={handleChange}>
+            <option value="UNIDADE">Unidade</option>
+            <option value="KG">Quilograma (KG)</option>
+            <option value="METRO">Metro</option>
+            <option value="PEÇA">Peça</option>
+            <option value="CAIXA">Caixa</option>
+            <option value="PACOTE">Pacote</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="prod-desc">Descrição</label>
+        <textarea id="prod-desc" name="description" value={form.description} onChange={handleChange} rows="3" placeholder="Descreva o produto..." />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="prod-features">Características (separadas por vírgula)</label>
+        <input id="prod-features" name="features" value={form.features} onChange={handleChange} placeholder="Tecido premium, Design moderno" />
+      </div>
+    </div>
+  );
+
+  const renderStepPricing = () => (
+    <div className="product-step-content">
+      <div className="product-form-section">
+        <div className="product-form-section-header">
+          <IconCurrencyDollar size={20} stroke={1.8} />
+          <h3>Preço</h3>
+        </div>
+        <div className="form-row-3">
+          <div className="form-group">
+            <label htmlFor="prod-cost">Custo</label>
+            <input id="prod-cost" name="costPrice" value={form.costPrice} onChange={handleChange} placeholder="R$ 0,00" />
+          </div>
+          <div className="form-group">
+            <label htmlFor="prod-price">Varejo *</label>
+            <input id="prod-price" name="price" value={form.price} onChange={handleChange} placeholder="R$ 0,00" required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="prod-wholesale">Atacado</label>
+            <input id="prod-wholesale" name="wholesalePrice" value={form.wholesalePrice} onChange={handleChange} placeholder="R$ 0,00" />
+          </div>
+        </div>
+      </div>
+
+      <div className="product-form-section">
+        <div className="product-form-section-header">
+          <IconStack2 size={20} stroke={1.8} />
+          <h3>Estoque</h3>
+        </div>
+        <div className="form-row-3">
+          <div className="form-group">
+            <label htmlFor="prod-max">Máximo</label>
+            <input id="prod-max" name="maxStock" type="number" min="0" value={form.maxStock} onChange={handleChange} placeholder="100" />
+          </div>
+          <div className="form-group">
+            <label htmlFor="prod-min">Mínimo</label>
+            <input id="prod-min" name="minStock" type="number" min="0" value={form.minStock} onChange={handleChange} placeholder="5" />
+          </div>
+          <div className="form-group">
+            <label htmlFor="prod-stock">Atual</label>
+            <input id="prod-stock" name="stockQuantity" type="number" min="0" value={form.stockQuantity} onChange={handleChange} placeholder="50" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStepMedia = () => (
+    <div className="product-step-content">
+      <div className="product-form-section">
+        <div className="product-form-section-header">
+          <IconPhoto size={20} stroke={1.8} />
+          <h3>Imagens do Produto</h3>
+        </div>
+        <ImagePasteArea
+          images={form.images}
+          onChange={(newImages) => setForm((prev) => ({ ...prev, images: newImages }))}
+        />
+      </div>
+    </div>
+  );
+
+  const stepRenderers = [renderStepInfo, renderStepPricing, renderStepMedia];
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
@@ -246,6 +441,7 @@ const ProductsPage = () => {
         </table>
       </motion.div>
 
+      {/* Product Modal with Stepper */}
       <AnimatePresence>
         {modalOpen && (
           <motion.div className="admin-modal-overlay" onClick={() => setModalOpen(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
@@ -259,152 +455,119 @@ const ProductsPage = () => {
                   <h2>{editing !== null ? 'Editar Produto' : 'Novo Produto'}</h2>
                   <p>{editing !== null ? 'Atualize as informações do produto' : 'Preencha os dados para cadastrar um novo produto'}</p>
                 </div>
-              <form onSubmit={handleSubmit}>
-                <div className="product-form-layout">
-                  {/* Left Column - Product Information */}
-                  <div className="product-form-column">
-                    <div className="product-form-section">
-                      <div className="product-form-section-header">
-                        <IconInfoCircle size={20} stroke={1.8} />
-                        <h3>Informações do Produto</h3>
-                      </div>
-                      
-                      <div className="form-group">
-                        <label htmlFor="prod-name">Nome do Produto</label>
-                        <input id="prod-name" name="name" value={form.name} onChange={handleChange} placeholder="Ex: Sofá Premium" required />
-                      </div>
 
-                      <div className="form-row">
-                        <div className="form-group">
-                          <label htmlFor="prod-barcode">Código de Barras / SKU</label>
-                          <input id="prod-barcode" name="barcode" value={form.barcode} onChange={handleChange} placeholder="Ex: 7891234567890" />
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="prod-category">Categoria</label>
-                          <select id="prod-category" name="category" value={form.category} onChange={handleChange}>
-                            {categories.map((c) => (
-                              <option key={c.id} value={c.id}>{c.name}</option>
-                            ))}
-                          </select>
-                        </div>
+                {/* Stepper Indicator */}
+                <div className="stepper-container">
+                  {STEPS.map((s, idx) => {
+                    const StepIcon = s.icon;
+                    const isActive = idx === step;
+                    const isCompleted = idx < step;
+                    return (
+                      <div key={s.id} className="stepper-item-wrapper">
+                        <motion.button
+                          type="button"
+                          className={`stepper-item ${isActive ? 'stepper-active' : ''} ${isCompleted ? 'stepper-completed' : ''}`}
+                          onClick={() => goToStep(idx)}
+                          whileHover={{ scale: 1.06 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <motion.div
+                            className="stepper-circle"
+                            animate={{
+                              background: isActive
+                                ? 'linear-gradient(135deg, #d9b154, #c49a3c)'
+                                : isCompleted
+                                  ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+                                  : 'rgba(255,255,255,0.06)',
+                              boxShadow: isActive ? '0 0 16px rgba(217,177,84,0.4)' : 'none',
+                            }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            {isCompleted ? (
+                              <IconCheck size={16} stroke={2.5} />
+                            ) : (
+                              <StepIcon size={16} stroke={1.8} />
+                            )}
+                          </motion.div>
+                          <span className="stepper-label">{s.label}</span>
+                        </motion.button>
+                        {idx < STEPS.length - 1 && (
+                          <div className={`stepper-connector ${isCompleted ? 'stepper-connector-done' : ''}`} />
+                        )}
                       </div>
+                    );
+                  })}
+                </div>
 
-                      {form.category === 'sofas' && (
-                        <div className="form-group">
-                          <label htmlFor="prod-sofa-model">Modelo do Sofá</label>
-                          <select id="prod-sofa-model" name="sofaModel" value={form.sofaModel} onChange={handleChange}>
-                            <option value="">Selecione o modelo</option>
-                            {SOFA_MODELS.map((m) => (
-                              <option key={m} value={m}>{m}</option>
-                            ))}
-                          </select>
-                        </div>
+                {/* Step content with animated transitions */}
+                <form onSubmit={handleSubmit}>
+                  <div className="stepper-body">
+                    <AnimatePresence mode="wait" custom={stepDir}>
+                      <motion.div
+                        key={step}
+                        custom={stepDir}
+                        variants={stepContentVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                      >
+                        {stepRenderers[step]()}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Navigation Buttons */}
+                  <div className="stepper-actions">
+                    <div className="stepper-actions-left">
+                      {step > 0 && (
+                        <motion.button
+                          type="button"
+                          className="btn-secondary"
+                          onClick={goPrev}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <IconChevronLeft size={16} stroke={2} />
+                          Voltar
+                        </motion.button>
                       )}
-
-                      <div className="form-row">
-                        <div className="form-group">
-                          <label htmlFor="prod-supplier">Fornecedor</label>
-                          <input id="prod-supplier" name="supplier" value={form.supplier} onChange={handleChange} placeholder="Nome do fornecedor" />
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="prod-unit">Unidade</label>
-                          <select id="prod-unit" name="unit" value={form.unit} onChange={handleChange}>
-                            <option value="UNIDADE">Unidade</option>
-                            <option value="KG">Quilograma (KG)</option>
-                            <option value="METRO">Metro</option>
-                            <option value="PEÇA">Peça</option>
-                            <option value="CAIXA">Caixa</option>
-                            <option value="PACOTE">Pacote</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="form-group">
-                        <label htmlFor="prod-desc">Descrição</label>
-                        <textarea id="prod-desc" name="description" value={form.description} onChange={handleChange} rows="3" placeholder="Descreva o produto..." />
-                      </div>
-
-                      <div className="form-group">
-                        <label htmlFor="prod-features">Características (separadas por vírgula)</label>
-                        <input id="prod-features" name="features" value={form.features} onChange={handleChange} placeholder="Tecido premium, Design moderno" />
-                      </div>
+                    </div>
+                    <div className="stepper-actions-right">
+                      {step < STEPS.length - 1 ? (
+                        <motion.button
+                          type="button"
+                          className="btn-primary"
+                          onClick={goNext}
+                          disabled={!canProceed()}
+                          whileHover={canProceed() ? { scale: 1.03 } : {}}
+                          whileTap={canProceed() ? { scale: 0.97 } : {}}
+                        >
+                          Próximo
+                          <IconChevronRight size={16} stroke={2} />
+                        </motion.button>
+                      ) : (
+                        <motion.button
+                          type="submit"
+                          className="btn-primary btn-success"
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          <IconSparkles size={16} stroke={2} />
+                          {editing !== null ? 'Salvar Alterações' : 'Cadastrar Produto'}
+                        </motion.button>
+                      )}
                     </div>
                   </div>
-
-                  {/* Right Column - Price, Stock, Image */}
-                  <div className="product-form-column">
-                    {/* Price Section */}
-                    <div className="product-form-section">
-                      <div className="product-form-section-header">
-                        <IconCurrencyDollar size={20} stroke={1.8} />
-                        <h3>Preço</h3>
-                      </div>
-                      
-                      <div className="form-row-3">
-                        <div className="form-group">
-                          <label htmlFor="prod-cost">Custo</label>
-                          <input id="prod-cost" name="costPrice" value={form.costPrice} onChange={handleChange} placeholder="R$ 0,00" />
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="prod-price">Varejo</label>
-                          <input id="prod-price" name="price" value={form.price} onChange={handleChange} placeholder="R$ 0,00" required />
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="prod-wholesale">Atacado</label>
-                          <input id="prod-wholesale" name="wholesalePrice" value={form.wholesalePrice} onChange={handleChange} placeholder="R$ 0,00" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Stock Section */}
-                    <div className="product-form-section">
-                      <div className="product-form-section-header">
-                        <IconStack2 size={20} stroke={1.8} />
-                        <h3>Estoque</h3>
-                      </div>
-                      
-                      <div className="form-row-3">
-                        <div className="form-group">
-                          <label htmlFor="prod-max">Máximo</label>
-                          <input id="prod-max" name="maxStock" type="number" min="0" value={form.maxStock} onChange={handleChange} placeholder="100" />
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="prod-min">Mínimo</label>
-                          <input id="prod-min" name="minStock" type="number" min="0" value={form.minStock} onChange={handleChange} placeholder="5" />
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="prod-stock">Atual</label>
-                          <input id="prod-stock" name="stockQuantity" type="number" min="0" value={form.stockQuantity} onChange={handleChange} placeholder="50" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Image Section */}
-                    <div className="product-form-section">
-                      <div className="product-form-section-header">
-                        <IconPhoto size={20} stroke={1.8} />
-                        <h3>Imagens do Produto</h3>
-                      </div>
-                      
-                      <ImagePasteArea
-                        images={form.images}
-                        onChange={(newImages) => setForm((prev) => ({ ...prev, images: newImages }))}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-actions">
-                  <button type="button" className="btn-secondary" onClick={() => setModalOpen(false)}>Cancelar</button>
-                  <button type="submit" className="btn-primary">{editing !== null ? 'Salvar Alterações' : 'Cadastrar Produto'}</button>
-                </div>
-              </form>
-            </div>
+                </form>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Delete confirmation */}
       <AnimatePresence>
         {confirmDelete && (
           <motion.div className="admin-confirm-overlay" onClick={() => setConfirmDelete(null)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>

@@ -11,6 +11,30 @@ export const categories = [
     name: 'Almofadas',
     description: 'Fibra siliconada 500g que não embola — maciez e beleza que duram',
     iconName: 'IconPalette'
+  },
+  {
+    id: 'travesseiros',
+    name: 'Travesseiros',
+    description: 'Travesseiros com fibra siliconada para noites de sono perfeitas',
+    iconName: 'IconMoon'
+  },
+  {
+    id: 'puffs-chaise',
+    name: 'Puffs e Chaise',
+    description: 'Puffs e chaises elegantes para compor seu ambiente com estilo',
+    iconName: 'IconSofa'
+  },
+  {
+    id: 'homecare-hospitalar',
+    name: 'Homecare / Hospitalar',
+    description: 'Colchões e acessórios hospitalares com conforto e segurança',
+    iconName: 'IconFirstAidKit'
+  },
+  {
+    id: 'pet',
+    name: 'Linha Pet',
+    description: 'Caminhas e almofadas para o conforto do seu pet',
+    iconName: 'IconPaw'
   }
 ];
 
