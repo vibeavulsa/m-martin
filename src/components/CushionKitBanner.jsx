@@ -136,15 +136,6 @@ const CushionKitBanner = ({ kitConfig }) => {
               </span>
             ))}
           </div>
-          <motion.button
-            className="cushion-kit-banner-cta"
-            onClick={handleOpenDialog}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            <IconPalette size={20} stroke={2} />
-            Montar Meu Kit
-          </motion.button>
         </div>
         <div className="cushion-kit-banner-visual">
           <div
@@ -171,7 +162,17 @@ const CushionKitBanner = ({ kitConfig }) => {
             </div>
           </div>
         </div>
-      </motion.div>
+
+        <motion.button
+          className="cushion-kit-banner-cta"
+          onClick={handleOpenDialog}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <IconPalette size={20} stroke={2} />
+          Montar Meu Kit
+        </motion.button>
+      </motion.div >
 
       <AnimatePresence>
         {dialogOpen && (

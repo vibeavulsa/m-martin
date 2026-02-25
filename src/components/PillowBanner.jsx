@@ -69,29 +69,6 @@ const PillowBanner = ({ product }) => {
                     ))}
                 </div>
 
-                <div className="pillow-banner-actions">
-                    {!isSobConsulta ? (
-                        <motion.button
-                            className={`pillow-btn-add ${added ? 'added' : ''}`}
-                            onClick={handleAddToCart}
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                        >
-                            {added ? <IconCheck size={20} /> : <IconShoppingCartPlus size={20} />}
-                            {added ? 'Adicionado' : 'Comprar Agora'}
-                        </motion.button>
-                    ) : (
-                        <motion.button
-                            className="pillow-btn-whatsapp"
-                            onClick={handleWhatsApp}
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                        >
-                            <IconBrandWhatsapp size={20} stroke={2.5} />
-                            Ver Preços e Modelos
-                        </motion.button>
-                    )}
-                </div>
             </div>
 
             <div className="pillow-banner-visual">
@@ -110,6 +87,30 @@ const PillowBanner = ({ product }) => {
                         </h3>
                     </div>
                 </div>
+            </div>
+
+            <div className="pillow-banner-actions">
+                {!isSobConsulta ? (
+                    <motion.button
+                        className={`pillow-btn-add ${added ? 'added' : ''}`}
+                        onClick={handleAddToCart}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                    >
+                        {added ? <IconCheck size={20} /> : <IconShoppingCartPlus size={20} />}
+                        {added ? 'Adicionado' : 'Comprar Agora'}
+                    </motion.button>
+                ) : (
+                    <motion.button
+                        className="pillow-btn-whatsapp"
+                        onClick={handleWhatsApp}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                    >
+                        <IconBrandWhatsapp size={20} stroke={2.5} />
+                        Ver Preços e Modelos
+                    </motion.button>
+                )}
             </div>
         </motion.div>
     );
