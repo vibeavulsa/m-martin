@@ -106,6 +106,7 @@
 .pillow-banner-actions {
     display: flex;
     gap: 1rem;
+    justify-content: flex-end;
 }
 
 .pillow-btn-add {
@@ -156,7 +157,7 @@
     position: relative;
     z-index: 1;
     flex-shrink: 0;
-    width: 475px;
+    width: 570px;
 }
 
 .pillow-video-container {
