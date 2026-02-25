@@ -1,7 +1,14 @@
-import React from 'react';
-import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import './Hero.css';
 import logo from '../assets/logo.png';
+
+const sofaImages = [
+  '/assets/sofas/Zeus.png',
+  '/assets/sofas/Chronos.png',
+  '/assets/sofas/Roma.png',
+  '/assets/sofas/Organico.png',
+];
 
 const heroVariants = {
   hidden: { opacity: 0 },
@@ -21,8 +28,34 @@ const itemVariants = {
 };
 
 const Hero = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % sofaImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="hero">
+      {/* Background slideshow */}
+      <div className="hero-slideshow">
+        <AnimatePresence mode="popLayout">
+          <motion.img
+            key={currentSlide}
+            src={sofaImages[currentSlide]}
+            alt=""
+            className="hero-slide-img"
+            initial={{ opacity: 0, scale: 1.08 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: 'easeInOut' }}
+          />
+        </AnimatePresence>
+      </div>
+      <div className="hero-slideshow-overlay" />
+
       <motion.div
         className="hero-content"
         variants={heroVariants}
@@ -88,3 +121,4 @@ const Hero = () => {
 };
 
 export default Hero;
+
