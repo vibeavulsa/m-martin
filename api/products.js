@@ -46,6 +46,8 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       const p = req.body;
+      // Convert empty strings to null for optional fields
+      const toNull = (v) => (v === '' || v === undefined ? null : v);
       const { rows } = await sql`
         INSERT INTO products (
           id, name, category, description, price, image, images, features,
@@ -56,27 +58,27 @@ export default async function handler(req, res) {
           ${p.id},
           ${p.name},
           ${p.category},
-          ${p.description ?? null},
-          ${p.price ?? null},
-          ${p.image ?? null},
-          ${JSON.stringify(p.images ?? [])},
-          ${JSON.stringify(p.features ?? [])},
+          ${toNull(p.description)},
+          ${toNull(p.price)},
+          ${toNull(p.image)},
+          ${JSON.stringify(p.images ?? [])}::jsonb,
+          ${JSON.stringify(p.features ?? [])}::jsonb,
           ${p.isSofa ?? false},
           ${p.isCustomOrder ?? false},
-          ${p.sofaModel ?? null},
+          ${toNull(p.sofaModel)},
           ${p.isKit ?? false},
-          ${p.kitQuantity ?? null},
-          ${p.priceCash ?? null},
-          ${p.priceInstallment ?? null},
-          ${p.installments ?? null},
-          ${p.barcode ?? null},
-          ${p.supplier ?? null},
-          ${p.unit ?? null},
-          ${p.costPrice ?? null},
-          ${p.wholesalePrice ?? null},
-          ${p.maxStock ?? null},
-          ${JSON.stringify(p.fabrics ?? [])},
-          ${JSON.stringify(p.extra ?? {})}
+          ${toNull(p.kitQuantity)},
+          ${toNull(p.priceCash)},
+          ${toNull(p.priceInstallment)},
+          ${toNull(p.installments)},
+          ${toNull(p.barcode)},
+          ${toNull(p.supplier)},
+          ${toNull(p.unit)},
+          ${toNull(p.costPrice)},
+          ${toNull(p.wholesalePrice)},
+          ${toNull(p.maxStock)},
+          ${JSON.stringify(p.fabrics ?? [])}::jsonb,
+          ${JSON.stringify(p.extra ?? {})}::jsonb
         )
         RETURNING id
       `;
