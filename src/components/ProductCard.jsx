@@ -61,6 +61,7 @@ const ProductCard = ({ product: initialProduct }) => {
               src={product.video}
               className="product-img"
               autoPlay
+              loop
               muted
               playsInline
               style={{ objectFit: 'cover' }}

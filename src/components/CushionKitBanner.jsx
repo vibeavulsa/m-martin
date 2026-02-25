@@ -12,7 +12,7 @@ import {
 import { useCart } from '../context/CartContext';
 import CushionKitSelector from './CushionKitSelector';
 import './CushionKitBanner.css';
-import coresVideo from '../assets/almofadas/cores2.mp4';
+const coresVideo = '/assets/almofada/almofada.mp4';
 
 const defaultColors = ['Preto', 'Branco', 'Azul Royal', 'Cinza Rato', 'Malva', 'Terracota', 'Bege', 'Bordô', 'Pink'];
 const defaultSizes = ['45x45', '50x50'];
