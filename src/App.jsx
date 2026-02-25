@@ -6,6 +6,7 @@ import Hero from './components/Hero';
 import CategorySection from './components/CategorySection';
 import ProductCard from './components/ProductCard';
 import CushionKitBanner from './components/CushionKitBanner';
+import PillowBanner from './components/PillowBanner';
 import CartDialog from './components/CartDialog';
 import CustomerDialog from './components/CustomerDialog';
 import CheckoutDialog from './components/CheckoutDialog';
@@ -210,6 +211,16 @@ class AppCatalog extends Component {
         <section key={`expositor-numero-${numeroExposicao}`} className="category-group">
           <CategorySection category={exposicao.metadadosLinha} />
           <CushionKitBanner kitConfig={this.props.cushionKit} />
+        </section>
+      );
+    }
+    if (exposicao.metadadosLinha.id === 'travesseiros') {
+      // Pass the first product of pillows, if any, otherwise fallback logic in component handles it.
+      const pillowProduct = exposicao.colecaoPecas[0] || null;
+      return (
+        <section key={`expositor-numero-${numeroExposicao}`} className="category-group">
+          <CategorySection category={exposicao.metadadosLinha} />
+          <PillowBanner product={pillowProduct} />
         </section>
       );
     }
