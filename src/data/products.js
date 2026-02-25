@@ -62,6 +62,7 @@ export const products = [
     description: 'Imponência e conforto em perfeita harmonia. O Zeus combina estrutura robusta com design arrojado, ideal para salas amplas que pedem personalidade e sofisticação.',
     price: 'Sob consulta',
     image: '/assets/sofas/Zeus.png',
+    video: '/assets/sofas/Zeus.mp4',
     images: ['/assets/sofas/Zeus.png'],
     features: ['Sob encomenda', 'Estrutura reforçada', 'Design arrojado', 'Diversos tecidos disponíveis', 'Medidas personalizadas'],
     isSofa: true,

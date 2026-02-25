@@ -11,9 +11,9 @@ import {
   IconBrandWhatsapp,
   IconCheck,
   IconStar,
-  IconChevronLeft,
   IconChevronRight,
   IconZoomIn,
+  IconPlayerPlay,
 } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import CushionKitSelector from './CushionKitSelector';
@@ -73,12 +73,19 @@ const DialogInner = ({ product, onClose }) => {
   const [zoomedImage, setZoomedImage] = useState(false);
   const { addItem } = useCart();
 
-  // Get images array (support both single image and multiple images)
-  const images = product.images && product.images.length > 0 
-    ? product.images 
-    : product.image 
-      ? [product.image] 
+  // Get media array (support video and images)
+  const mediaItems = [];
+  if (product.video) {
+    mediaItems.push({ type: 'video', src: product.video });
+  }
+
+  const productImages = product.images && product.images.length > 0
+    ? product.images
+    : product.image
+      ? [product.image]
       : [];
+
+  mediaItems.push(...productImages.map(src => ({ type: 'image', src })));
 
   // Reset states when product changes
   useEffect(() => {
@@ -106,12 +113,12 @@ const DialogInner = ({ product, onClose }) => {
     return () => document.removeEventListener('keydown', handleKey);
   }, [zoomedImage]);
 
-  // Reset image index if it exceeds the current images array length
+  // Reset image index if it exceeds the current media array length
   useEffect(() => {
-    if (currentImageIndex >= images.length && images.length > 0) {
+    if (currentImageIndex >= mediaItems.length && mediaItems.length > 0) {
       setCurrentImageIndex(0);
     }
-  }, [images.length, currentImageIndex]);
+  }, [mediaItems.length, currentImageIndex]);
 
   const handleAddToCart = () => {
     const itemData = {
@@ -193,20 +200,43 @@ const DialogInner = ({ product, onClose }) => {
         >
           <div
             className="dialog-image"
-            onClick={() => images.length > 0 && !imageError && setZoomedImage(true)}
+            onClick={() => mediaItems.length > 0 && !imageError && mediaItems[currentImageIndex].type === 'image' && setZoomedImage(true)}
+            style={{ cursor: mediaItems[currentImageIndex]?.type === 'image' ? 'zoom-in' : 'default' }}
           >
-            {images.length > 0 && !imageError ? (
+            {mediaItems.length > 0 && !imageError ? (
               <AnimatePresence mode="wait">
-                <motion.img
-                  key={currentImageIndex}
-                  src={images[currentImageIndex]}
-                  alt={`${product.name} - Imagem ${currentImageIndex + 1}`}
-                  onError={() => setImageError(true)}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
+                {mediaItems[currentImageIndex].type === 'video' ? (
+                  <motion.div
+                    key="video-player"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="dialog-video-wrapper"
+                    style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000' }}
+                  >
+                    <video
+                      src={mediaItems[currentImageIndex].src}
+                      controls
+                      autoPlay
+                      muted={false} // User might want sound in modal
+                      playsInline
+                      loop={false}
+                      className="dialog-video-element"
+                      style={{ maxWidth: '100%', maxHeight: '100%' }}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.img
+                    key={mediaItems[currentImageIndex].src}
+                    src={mediaItems[currentImageIndex].src}
+                    alt={`${product.name} - Visualização ${currentImageIndex + 1}`}
+                    onError={() => setImageError(true)}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
               </AnimatePresence>
             ) : (
               <div className="dialog-image-placeholder">
@@ -215,7 +245,7 @@ const DialogInner = ({ product, onClose }) => {
             )}
           </div>
 
-          {images.length > 0 && !imageError && (
+          {mediaItems.length > 0 && !imageError && mediaItems[currentImageIndex].type === 'image' && (
             <motion.button
               className="dialog-zoom-btn"
               onClick={() => setZoomedImage(true)}
@@ -227,38 +257,44 @@ const DialogInner = ({ product, onClose }) => {
             </motion.button>
           )}
 
-          {images.length > 1 && !imageError && (
+          {mediaItems.length > 1 && !imageError && (
             <>
               <motion.button
                 className="dialog-image-nav dialog-image-nav-prev"
-                onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+                onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? mediaItems.length - 1 : prev - 1))}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                aria-label="Imagem anterior"
+                aria-label="Anterior"
               >
                 <IconChevronLeft size={24} stroke={2} />
               </motion.button>
               <motion.button
                 className="dialog-image-nav dialog-image-nav-next"
-                onClick={() => setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+                onClick={() => setCurrentImageIndex((prev) => (prev === mediaItems.length - 1 ? 0 : prev + 1))}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                aria-label="Próxima imagem"
+                aria-label="Próximo"
               >
                 <IconChevronRight size={24} stroke={2} />
               </motion.button>
-              
+
               <div className="dialog-image-thumbnails">
-                {images.map((img, index) => (
+                {mediaItems.map((item, index) => (
                   <motion.button
                     key={index}
                     className={`dialog-image-thumbnail ${index === currentImageIndex ? 'thumbnail-active' : ''}`}
                     onClick={() => setCurrentImageIndex(index)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    aria-label={`Ver imagem ${index + 1}`}
+                    aria-label={`Ver item ${index + 1}`}
                   >
-                    <img src={img} alt={`Miniatura ${index + 1}`} />
+                    {item.type === 'video' ? (
+                      <div className="thumbnail-video-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: '#191210' }}>
+                        <IconPlayerPlay size={20} color="#d9b154" />
+                      </div>
+                    ) : (
+                      <img src={item.src} alt={`Miniatura ${index + 1}`} />
+                    )}
                   </motion.button>
                 ))}
               </div>
@@ -372,14 +408,14 @@ const DialogInner = ({ product, onClose }) => {
               </div>
             ) : product.priceInstallment ? (
               <div className="dialog-price-options">
-                <div 
+                <div
                   className={`dialog-price-option ${paymentType === 'cash' ? 'price-option-active' : ''}`}
                   onClick={() => setPaymentType('cash')}
                 >
                   <span className="price-option-label">À vista</span>
                   <span className="dialog-price">{product.priceCash || product.price}</span>
                 </div>
-                <div 
+                <div
                   className={`dialog-price-option ${paymentType === 'installment' ? 'price-option-active' : ''}`}
                   onClick={() => setPaymentType('installment')}
                 >
@@ -507,7 +543,7 @@ const DialogInner = ({ product, onClose }) => {
 
       {/* Fullscreen zoom overlay */}
       <AnimatePresence>
-        {zoomedImage && images.length > 0 && (
+        {zoomedImage && mediaItems.length > 0 && mediaItems[currentImageIndex].type === 'image' && (
           <motion.div
             className="dialog-zoom-overlay"
             initial={{ opacity: 0 }}
@@ -527,7 +563,7 @@ const DialogInner = ({ product, onClose }) => {
             </motion.button>
             <motion.img
               className="dialog-zoom-image"
-              src={images[currentImageIndex]}
+              src={mediaItems[currentImageIndex].src}
               alt={`${product.name} - Zoom`}
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}

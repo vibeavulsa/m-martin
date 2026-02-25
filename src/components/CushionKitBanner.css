@@ -127,7 +127,7 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  width: 475px;
+  width: 570px;
 }
 
 .cushion-video-container {
@@ -163,7 +163,7 @@
   font-weight: 700;
   color: #ffffff;
   text-align: center;
-  text-shadow: 
+  text-shadow:
     0 2px 8px rgba(0, 0, 0, 0.8),
     0 0 20px rgba(217, 177, 84, 0.6),
     0 0 40px rgba(217, 177, 84, 0.4);
@@ -175,13 +175,14 @@
 
 @keyframes glow {
   from {
-    text-shadow: 
+    text-shadow:
       0 2px 8px rgba(0, 0, 0, 0.8),
       0 0 20px rgba(217, 177, 84, 0.6),
       0 0 40px rgba(217, 177, 84, 0.4);
   }
+
   to {
-    text-shadow: 
+    text-shadow:
       0 2px 8px rgba(0, 0, 0, 0.8),
       0 0 30px rgba(217, 177, 84, 0.8),
       0 0 60px rgba(217, 177, 84, 0.6);
@@ -377,7 +378,7 @@
 
   .cushion-kit-banner-visual {
     width: 100%;
-    max-width: 280px;
+    max-width: 336px;
   }
 
   .cushion-video-text {

@@ -16,6 +16,7 @@ const cardVariants = {
 
 const ProductCard = ({ product }) => {
   const [imageError, setImageError] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
@@ -41,26 +42,43 @@ const ProductCard = ({ product }) => {
         whileHover={{ y: -7, boxShadow: '0 18px 38px rgba(0,0,0,0.38), 0 0 18px rgba(217,177,84,0.12)' }}
         transition={{ duration: 0.28 }}
       >
-        <div className="product-image" onClick={() => setDialogOpen(true)} style={{ cursor: 'pointer' }}>
-          {!imageError && displayImage ? (
-            <>
-              <img 
-                src={displayImage} 
-                alt={product.name}
-                className="product-img"
-                onError={() => setImageError(true)}
-              />
-              {hasMultipleImages && (
-                <div className="product-image-badge">
-                  <IconPackage size={14} stroke={2} />
-                  <span>{product.images.length} fotos</span>
-                </div>
-              )}
-            </>
+        <div
+          className="product-image"
+          onClick={() => setDialogOpen(true)}
+          style={{ cursor: 'pointer' }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          {product.video && hovered ? (
+            <video
+              src={product.video}
+              className="product-img"
+              autoPlay
+              muted
+              playsInline
+              style={{ objectFit: 'cover' }}
+            />
           ) : (
-            <div className="image-placeholder">
-              <IconPackage size={64} stroke={1.5} className="placeholder-icon" />
-            </div>
+            !imageError && displayImage ? (
+              <>
+                <img
+                  src={displayImage}
+                  alt={product.name}
+                  className="product-img"
+                  onError={() => setImageError(true)}
+                />
+                {hasMultipleImages && (
+                  <div className="product-image-badge">
+                    <IconPackage size={14} stroke={2} />
+                    <span>{product.images.length} fotos</span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="image-placeholder">
+                <IconPackage size={64} stroke={1.5} className="placeholder-icon" />
+              </div>
+            )
           )}
         </div>
         <div className="product-info">
