@@ -11,6 +11,7 @@ import {
   IconBrandWhatsapp,
   IconCheck,
   IconStar,
+  IconChevronLeft,
   IconChevronRight,
   IconZoomIn,
   IconPlayerPlay,
