@@ -40,9 +40,12 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.02);
   }
@@ -198,6 +201,242 @@
   font-size: 0.85rem;
 }
 
+/* ── Action Buttons Row ─────────────────────────────── */
+.image-action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.image-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  background: rgba(217, 177, 84, 0.08);
+  border: 1px solid rgba(217, 177, 84, 0.18);
+  border-radius: 10px;
+  color: #d9b154;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.image-action-btn:hover {
+  background: rgba(217, 177, 84, 0.15);
+  border-color: rgba(217, 177, 84, 0.35);
+}
+
+/* ── Typed Path Input ───────────────────────────────── */
+.typed-path-section {
+  margin-top: 0.75rem;
+  overflow: hidden;
+}
+
+.typed-path-help {
+  margin-bottom: 0.5rem;
+}
+
+.typed-path-help p {
+  color: #bfb3a2;
+  font-size: 0.8rem;
+  margin: 0 0 0.2rem;
+}
+
+.typed-path-help code {
+  background: rgba(217, 177, 84, 0.12);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  color: #d9b154;
+}
+
+.typed-path-example {
+  opacity: 0.7;
+  font-size: 0.75rem !important;
+}
+
+.typed-path-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(72, 55, 38, 0.35);
+  border: 1px solid rgba(217, 177, 84, 0.18);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.typed-path-prefix {
+  color: #bfb3a2;
+  font-size: 0.85rem;
+  font-family: monospace;
+  padding: 0.7rem 0.25rem 0.7rem 0.85rem;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.typed-path-input {
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.7rem 0.5rem !important;
+  color: #e8e1d4;
+  font-family: monospace;
+  font-size: 0.88rem;
+  outline: none;
+  box-shadow: none !important;
+}
+
+.typed-path-input::placeholder {
+  color: #bfb3a2;
+  opacity: 0.5;
+}
+
+.typed-path-add-btn {
+  border-radius: 0 !important;
+  padding: 0.7rem 1rem !important;
+  font-size: 0.82rem !important;
+  white-space: nowrap;
+}
+
+/* ── Asset Browser ──────────────────────────────────── */
+.asset-browser {
+  margin-top: 0.75rem;
+  background: rgba(25, 18, 16, 0.7);
+  border: 1px solid rgba(217, 177, 84, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.asset-browser-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(217, 177, 84, 0.06);
+  border-bottom: 1px solid rgba(217, 177, 84, 0.08);
+  color: #bfb3a2;
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+.asset-browser-folders {
+  padding: 0.5rem 0;
+}
+
+.asset-folder-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  color: #e8e1d4;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.asset-folder-btn:hover {
+  background: rgba(217, 177, 84, 0.06);
+}
+
+.asset-folder-btn.open {
+  background: rgba(217, 177, 84, 0.08);
+  color: #d9b154;
+}
+
+.folder-chevron {
+  transition: transform 0.2s ease;
+  color: #bfb3a2;
+  flex-shrink: 0;
+}
+
+.folder-chevron.rotated {
+  transform: rotate(90deg);
+  color: #d9b154;
+}
+
+.folder-count {
+  margin-left: auto;
+  color: #bfb3a2;
+  font-size: 0.72rem;
+  background: rgba(217, 177, 84, 0.1);
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+}
+
+.asset-file-list {
+  overflow: hidden;
+  padding-left: 1rem;
+}
+
+.asset-file-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  color: #bfb3a2;
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.asset-file-btn:hover {
+  background: rgba(217, 177, 84, 0.06);
+  color: #e8e1d4;
+}
+
+.asset-file-btn.selected {
+  color: #22c55e;
+}
+
+.asset-file-name {
+  flex: 1;
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.asset-file-preview {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(217, 177, 84, 0.12);
+}
+
+.asset-file-check {
+  color: #22c55e;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* ── Thumbnail path label ───────────────────────────── */
+.image-thumbnail-path {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.2rem 0.4rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: #bfb3a2;
+  font-size: 0.6rem;
+  font-family: monospace;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 768px) {
   .image-thumbnails-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -220,5 +459,29 @@
 
   .paste-area-subtitle {
     font-size: 0.75rem;
+  }
+
+  .image-action-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .typed-path-row {
+    flex-direction: column;
+  }
+
+  .typed-path-prefix {
+    padding: 0.5rem 0.85rem 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .typed-path-input {
+    width: 100%;
+  }
+
+  .typed-path-add-btn {
+    width: 100%;
+    border-radius: 0 0 9px 9px !important;
   }
 }
