@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { IconPackage, IconShoppingCartPlus, IconEye, IconTruck, IconTool } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
+import { products as staticProducts } from '../data/products';
 import ProductDialog from './ProductDialog';
 import './ProductCard.css';
 
@@ -14,7 +15,13 @@ const cardVariants = {
   }
 };
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product: initialProduct }) => {
+  // Merge with static data to ensure new fields (like video) appear even if not yet in DB
+  const product = {
+    ...initialProduct,
+    video: initialProduct.video || staticProducts.find(p => String(p.id) === String(initialProduct.id))?.video
+  };
+
   const [imageError, setImageError] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
