@@ -41,7 +41,7 @@ const CushionKitPage = () => {
   const [productForm, setProductForm] = useState({
     name: cushionKit.product.name,
     description: cushionKit.product.description,
-    price: cushionKit.product.price,
+    price: cushionKit.product.priceCash || cushionKit.product.price,
     priceCash: cushionKit.product.priceCash || cushionKit.product.price,
     priceInstallment: cushionKit.product.priceInstallment || '',
     installments: cushionKit.product.installments || 5,
@@ -66,7 +66,7 @@ const CushionKitPage = () => {
     const outOfStockColors = Object.entries(cushionKit.stockCapas)
       .filter(([, stock]) => stock <= 0)
       .map(([color]) => color);
-    
+
     const lowStockColors = Object.entries(cushionKit.stockCapas)
       .filter(([, stock]) => stock > 0 && stock <= LOW_STOCK_THRESHOLD_COVERS)
       .map(([color]) => color);
@@ -137,7 +137,7 @@ const CushionKitPage = () => {
         ...cushionKit.product,
         name: productForm.name,
         description: productForm.description,
-        price: productForm.price,
+        price: productForm.priceCash,
         priceCash: productForm.priceCash,
         priceInstallment: productForm.priceInstallment,
         installments: parseInt(productForm.installments, 10) || 5,
@@ -207,7 +207,7 @@ const CushionKitPage = () => {
             <IconBoxSeam size={18} stroke={1.6} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#d9b154' }} />
             Controle de Estoque
           </h2>
-          
+
           {/* Refis Stock Control */}
           <div style={{ marginBottom: '1.5rem' }}>
             <h3 className="cushion-stock-section-title">Refis (Enchimento)</h3>
@@ -250,7 +250,7 @@ const CushionKitPage = () => {
             <div className="cushion-color-grid">
               {cushionKit.colors.map((color) => {
                 const colorStock = cushionKit.stockCapas[color] || 0;
-                
+
                 return (
                   <div
                     key={color}
@@ -283,7 +283,7 @@ const CushionKitPage = () => {
             <div className="cushion-alert danger">
               <IconAlertTriangle size={16} stroke={2} />
               {cushionKit.stockRefis <= 0 && 'Refis sem estoque! '}
-              {stockAlerts.outOfStockColors.length > 0 && 
+              {stockAlerts.outOfStockColors.length > 0 &&
                 `Capas sem estoque: ${stockAlerts.outOfStockColors.join(', ')}`}
             </div>
           )}
@@ -435,25 +435,25 @@ const CushionKitPage = () => {
 
             <div className="cushion-form-grid-2">
               <div className="form-group">
-                <label htmlFor="kit-price" className="cushion-form-label">Preço à Vista</label>
+                <label htmlFor="kit-price" className="cushion-form-label">Preço Total (à Vista)</label>
                 <input
                   id="kit-price"
                   name="priceCash"
                   value={productForm.priceCash}
                   onChange={handleProductChange}
-                  placeholder="R$ 0,00"
+                  placeholder="Ex: R$ 329,50"
                   required
                   className="cushion-form-input"
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="kit-installment" className="cushion-form-label">Preço Parcela</label>
+                <label htmlFor="kit-installment" className="cushion-form-label">Preço da Parcela (ex: 1x de)</label>
                 <input
                   id="kit-installment"
                   name="priceInstallment"
                   value={productForm.priceInstallment}
                   onChange={handleProductChange}
-                  placeholder="R$ 0,00"
+                  placeholder="Ex: R$ 69,90"
                   className="cushion-form-input"
                 />
               </div>
@@ -461,7 +461,7 @@ const CushionKitPage = () => {
 
             <div className="cushion-form-grid-2">
               <div className="form-group">
-                <label htmlFor="kit-installments" className="cushion-form-label">Nº de Parcelas</label>
+                <label htmlFor="kit-installments" className="cushion-form-label">Quantidade de Parcelas (Nº)</label>
                 <input
                   id="kit-installments"
                   name="installments"

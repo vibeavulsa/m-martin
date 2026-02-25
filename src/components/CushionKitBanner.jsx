@@ -125,7 +125,7 @@ const CushionKitBanner = ({ kitConfig }) => {
           </p>
           <div className="cushion-kit-banner-price">
             {kitProduct.installments && kitProduct.priceInstallment && (
-              <>{kitProduct.installments}x de <strong>{kitProduct.priceInstallment}</strong> <span style={{ fontSize: '0.85em', color: '#bfb3a2' }}>(total {kitProduct.price})</span></>
+              <>{kitProduct.installments}x de <strong>{kitProduct.priceInstallment}</strong> <span style={{ fontSize: '0.85em', color: '#bfb3a2' }}>(total à vista {kitProduct.priceCash || kitProduct.price})</span></>
             )}
           </div>
           <div className="cushion-kit-banner-features">
@@ -147,15 +147,15 @@ const CushionKitBanner = ({ kitConfig }) => {
           </motion.button>
         </div>
         <div className="cushion-kit-banner-visual">
-          <div 
-            className="cushion-video-container" 
+          <div
+            className="cushion-video-container"
             onClick={handleOpenDialog}
             onKeyDown={handleKeyPress}
             tabIndex={0}
             role="button"
             aria-label="Abrir seletor de cores de almofadas"
           >
-            <video 
+            <video
               className="cushion-video"
               src={coresVideo}
               autoPlay
