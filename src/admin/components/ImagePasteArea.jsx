@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { IconPhoto, IconX, IconUpload, IconFolder, IconChevronRight, IconFileImage, IconKeyboard } from '@tabler/icons-react';
+import { IconPhoto, IconX, IconUpload, IconFolder, IconChevronRight, IconFile, IconKeyboard } from '@tabler/icons-react';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import './ImagePasteArea.css';
 
@@ -364,7 +364,7 @@ const ImagePasteArea = ({ images = [], onChange }) => {
                               whileHover={{ x: 4 }}
                               whileTap={{ scale: 0.98 }}
                             >
-                              <IconFileImage size={14} stroke={1.6} />
+                              <IconFile size={14} stroke={1.6} />
                               <span className="asset-file-name">{file.name}</span>
                               <img
                                 src={file.path}
