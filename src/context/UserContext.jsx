@@ -12,7 +12,7 @@ const defaultSettings = {
 };
 
 const defaultHomeDisplaySettings = {
-  showLoyaltyProgram: true,
+
   showTestimonials: true,
   showNewsletter: true,
   showCategorySofas: true,
@@ -129,7 +129,7 @@ export function UserProvider({ children }) {
   const updateSettings = useCallback((data) => {
     setSettingsState((prev) => {
       const updated = { ...prev, ...data };
-      db.saveSetting('user_settings', updated).catch(() => {});
+      db.saveSetting('user_settings', updated).catch(() => { });
       return updated;
     });
   }, []);
@@ -137,7 +137,7 @@ export function UserProvider({ children }) {
   const updateHomeDisplaySettings = useCallback((data) => {
     setHomeDisplaySettings((prev) => {
       const updated = { ...prev, ...data };
-      db.saveSetting('home_display', updated).catch(() => {});
+      db.saveSetting('home_display', updated).catch(() => { });
       return updated;
     });
   }, []);
@@ -150,12 +150,12 @@ export function UserProvider({ children }) {
 
   const resetSettings = useCallback(() => {
     setSettingsState(defaultSettings);
-    db.saveSetting('user_settings', defaultSettings).catch(() => {});
+    db.saveSetting('user_settings', defaultSettings).catch(() => { });
   }, []);
 
   const resetHomeDisplaySettings = useCallback(() => {
     setHomeDisplaySettings(defaultHomeDisplaySettings);
-    db.saveSetting('home_display', defaultHomeDisplaySettings).catch(() => {});
+    db.saveSetting('home_display', defaultHomeDisplaySettings).catch(() => { });
   }, []);
 
   const value = {

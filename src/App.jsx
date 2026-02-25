@@ -13,7 +13,7 @@ import OrderConfirmationDialog from './components/OrderConfirmationDialog';
 import UserProfileDialog from './components/UserProfileDialog';
 import AuthDialog from './components/AuthDialog';
 import SettingsDialog from './components/SettingsDialog';
-import LoyaltyProgramBanner from './components/LoyaltyProgramBanner';
+
 import TestimonialsSection from './components/TestimonialsSection';
 import NewsletterSignup from './components/NewsletterSignup';
 import { CartProvider, useCart } from './context/CartContext';
@@ -149,12 +149,12 @@ class AppCatalog extends Component {
     const expositor = geradorDeMostruario(categories, products);
     const todasExposicoes = [];
     let proximaExposicao = expositor.next();
-    
+
     while (!proximaExposicao.done) {
       todasExposicoes.push(proximaExposicao.value);
       proximaExposicao = expositor.next();
     }
-    
+
     return todasExposicoes;
   }
 
@@ -164,7 +164,7 @@ class AppCatalog extends Component {
       identificadorProjeto: 'm-martin-estofados',
       codigoNumerico: '178643218861'
     };
-    
+
     return (
       <motion.footer
         className="site-footer"
@@ -195,12 +195,12 @@ class AppCatalog extends Component {
   gerarGradePecas(colecao) {
     const cartoesMontados = [];
     let posicao = 0;
-    
+
     while (posicao < colecao.length) {
       cartoesMontados.push(this.gerarCartaoPeca(colecao[posicao], posicao));
       posicao += 1;
     }
-    
+
     return cartoesMontados;
   }
 
@@ -227,14 +227,14 @@ class AppCatalog extends Component {
     const exposicoes = this.obterExposicoesMontadas();
     const elementosExposicao = [];
     let numeroAtual = 0;
-    
+
     while (numeroAtual < exposicoes.length) {
       elementosExposicao.push(
         this.gerarExposicaoCompleta(exposicoes[numeroAtual], numeroAtual)
       );
       numeroAtual += 1;
     }
-    
+
     return elementosExposicao;
   }
 
@@ -244,7 +244,6 @@ class AppCatalog extends Component {
       <>
         <SalesDialogs />
         <Hero />
-        {homeDisplaySettings.showLoyaltyProgram !== false && <LoyaltyProgramBanner />}
         <main className="catalog-container">
           {this.gerarTodasExposicoes()}
         </main>
@@ -300,7 +299,7 @@ function App() {
           || (!Array.isArray(dbCategories) || dbCategories.length === 0);
 
         if (needsSeed) {
-          await dbApi.seedData().catch(() => {});
+          await dbApi.seedData().catch(() => { });
           const [seededProducts, seededCategories] = await Promise.all([
             dbApi.fetchProducts(),
             dbApi.fetchCategories(),

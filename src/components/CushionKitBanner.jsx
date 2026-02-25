@@ -29,7 +29,7 @@ const defaultKitProduct = {
   unitPriceCash: 'R$ 69,90',
   unitPriceInstallment: 'R$ 69,90',
   image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=600',
-  features: ['Kit com 5 unidades', 'Tecido Oxford premium', 'Fibra siliconada 500g', 'Não embola', 'Alta durabilidade', 'Escolha cada cor'],
+  features: ['Kit com 5 unidades', 'Refil em tecido Oxford', 'Capas em Camurça Importada', 'Fibra siliconada 500g', 'Não embola', 'Alta durabilidade', 'Escolha cada cor'],
   isKit: true,
   kitQuantity: 5,
 };

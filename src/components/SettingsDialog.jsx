@@ -210,23 +210,7 @@ const SettingsDialog = ({ isOpen, onClose }) => {
                     );
                   })}
 
-                  <div className="settings-item">
-                    <div className="settings-item-info">
-                      <span className="settings-item-label">Sistema de Fidelidade</span>
-                      <span className="settings-item-desc">Exibir banner de fidelidade na página inicial</span>
-                    </div>
-                    <motion.button
-                      className={`settings-toggle ${homeDisplaySettings.showLoyaltyProgram !== false ? 'active' : ''}`}
-                      onClick={() => updateHomeDisplaySettings({ showLoyaltyProgram: homeDisplaySettings.showLoyaltyProgram === false })}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <motion.span
-                        className="toggle-knob"
-                        layout
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                      />
-                    </motion.button>
-                  </div>
+
 
                   <div className="settings-item">
                     <div className="settings-item-info">

@@ -503,7 +503,7 @@ const CushionKitPage = () => {
                 name="features"
                 value={productForm.features}
                 onChange={handleProductChange}
-                placeholder="Kit com 5 unidades, Tecido Oxford"
+                placeholder="Kit com 5 unidades, Refil em tecido Oxford"
                 className="cushion-form-input"
               />
             </div>
