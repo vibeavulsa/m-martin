@@ -319,8 +319,15 @@ function App() {
           }
 
           if (Array.isArray(dbCategories) && dbCategories.length > 0) {
-            setCategories(dbCategories);
-            localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(dbCategories));
+            // Auto-sync: if DB has fewer categories than our static file, update DB
+            if (dbCategories.length < staticCategories.length) {
+              await dbApi.saveCategories(staticCategories).catch(() => { });
+              setCategories(staticCategories);
+              localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(staticCategories));
+            } else {
+              setCategories(dbCategories);
+              localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(dbCategories));
+            }
           }
         }
 
