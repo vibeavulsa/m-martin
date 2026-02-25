@@ -18,6 +18,30 @@ const seedCategories = [
     name: 'Almofadas',
     description: 'Fibra siliconada 500g que não embola — maciez e beleza que duram',
     iconName: 'IconPalette'
+  },
+  {
+    id: 'travesseiros',
+    name: 'Travesseiros',
+    description: 'Travesseiros com fibra siliconada para noites de sono perfeitas',
+    iconName: 'IconMoon'
+  },
+  {
+    id: 'puffs-chaise',
+    name: 'Puffs e Chaise',
+    description: 'Puffs e chaises elegantes para compor seu ambiente com estilo',
+    iconName: 'IconSofa'
+  },
+  {
+    id: 'homecare-hospitalar',
+    name: 'Homecare / Hospitalar',
+    description: 'Colchões e acessórios hospitalares com conforto e segurança',
+    iconName: 'IconFirstAidKit'
+  },
+  {
+    id: 'pet',
+    name: 'Linha Pet',
+    description: 'Caminhas e almofadas para o conforto do seu pet',
+    iconName: 'IconPaw'
   }
 ];
 
@@ -157,15 +181,15 @@ export default async function handler(req, res) {
   try {
     const results = { categories: false, sofaFabrics: false, products: 0 };
 
-    // Seed categories
-    const catSetting = await sql`SELECT key FROM settings WHERE key = 'categories'`;
-    if (catSetting.rows.length === 0) {
-      await sql`
-        INSERT INTO settings (key, value, updated_at)
-        VALUES ('categories', ${JSON.stringify(seedCategories)}, NOW())
-      `;
-      results.categories = true;
-    }
+    // Seed/update categories (always upsert so new categories are added)
+    await sql`
+      INSERT INTO settings (key, value, updated_at)
+      VALUES ('categories', ${JSON.stringify(seedCategories)}::jsonb, NOW())
+      ON CONFLICT (key) DO UPDATE SET
+        value = ${JSON.stringify(seedCategories)}::jsonb,
+        updated_at = NOW()
+    `;
+    results.categories = true;
 
     // Seed sofaFabrics
     const fabSetting = await sql`SELECT key FROM settings WHERE key = 'sofaFabrics'`;
