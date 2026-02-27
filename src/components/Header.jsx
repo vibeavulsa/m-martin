@@ -1,13 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconShoppingCart, IconUser, IconSettings, IconLogin, IconShieldCheck } from '@tabler/icons-react';
+import { IconShoppingCart, IconUser, IconSettings, IconLogin, IconShieldCheck, IconClipboardList } from '@tabler/icons-react';
 import { useCart } from '../context/CartContext';
 import { useUser } from '../context/UserContext';
 import { useAuth } from '../context/AuthContext';
 import './Header.css';
 import logo from '../assets/logo.png';
 
-const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick }) => {
+const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick, onMyOrdersClick }) => {
   const { totalItems } = useCart();
   const { isLoggedIn, profile } = useUser();
   const { isAuthenticated } = useAuth();
@@ -57,6 +57,18 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick }) =
               />
             )}
           </motion.button>
+          {isAuthenticated && (
+            <motion.button
+              className="nav-icon-btn"
+              onClick={onMyOrdersClick}
+              aria-label="Meus Pedidos"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title="Meus Pedidos"
+            >
+              <IconClipboardList size={20} stroke={1.8} />
+            </motion.button>
+          )}
           <motion.button
             className={`nav-icon-btn ${isLoggedIn ? 'nav-icon-btn-active' : ''}`}
             onClick={onProfileClick}

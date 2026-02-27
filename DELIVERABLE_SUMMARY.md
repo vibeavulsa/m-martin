@@ -1,20 +1,22 @@
-# 📦 Entrega Final - Núcleo de Segurança e Integridade
+# 📦 Entrega Final - Segurança, Integridade e Migração Serverless
 
 ## ✅ Implementação Completa
 
-Todas as funcionalidades solicitadas foram implementadas com sucesso:
+Todas as funcionalidades foram implementadas com sucesso, incluindo a **migração completa de Firebase Firestore para Vercel Serverless + PostgreSQL (Neon)**.
+
+---
 
 ### 1. 🔐 Sistema de Autenticação Firebase
 **Status:** ✅ Implementado e testado
 
-**Arquivos criados/modificados:**
+**Arquivos:**
 - `src/context/AuthContext.jsx` - Context de autenticação global
 - `src/components/Login.jsx` - Página de login
-- `src/components/Login.css` - Estilos do login
+- `src/components/AuthDialog.jsx` - 🆕 Login/logout guest-first na home
 - `src/components/PrivateRoute.jsx` - Proteção de rotas
 - `src/config/firebase.js` - Inicialização do Firebase Auth
 - `src/main.jsx` - Integração do AuthProvider
-- `src/admin/AdminRoutes.jsx` - Remoção de autenticação duplicada
+- `src/admin/AdminRoutes.jsx` - Rotas do admin
 - `src/admin/components/AdminLayout.jsx` - Logout com Firebase Auth
 
 **Funcionalidades:**
@@ -23,23 +25,54 @@ Todas as funcionalidades solicitadas foram implementadas com sucesso:
 - ✅ Redirecionamento para `/login` se não autenticado
 - ✅ Context global para gerenciar estado de autenticação
 - ✅ Logout seguro que invalida sessão
+- ✅ 🆕 AuthDialog guest-first — navega sem login, header mostra ícone de escudo quando autenticado
+- ✅ 🆕 Botão "Painel Admin" visível apenas para usuários autenticados
 
 **Como usar:**
 1. Acesse `http://localhost:5173/login`
 2. Use credenciais criadas no Firebase Console
 3. Será redirecionado para dashboard admin
-4. Botão "Sair" desloga e volta para login
+4. Na home, header mostra ícone de login (guest) ou escudo (autenticado)
 
 ---
 
-### 2. ⚛️ Transações Atômicas de Estoque (Migrado para Postgres)
-**Status:** ✅ Implementado via Vercel Postgres
+### 2. 🗄️ Backend Serverless — Vercel + PostgreSQL (Neon) 🆕
+**Status:** ✅ Implementado — Substituiu completamente o Firebase Firestore
 
-**Arquivos modificados:**
-- `src/services/dbService.js` - Cliente para comunicar com API routes do Postgres
-- `src/services/orderService.ts` - Adaptado para comunicação backend-to-database
-- `src/components/CheckoutDialog.jsx` - Tratamento de erros
-- `src/components/CheckoutDialog.css` - Estilos do erro
+**Arquivos:**
+- `api/init-db.js` - Criação de tabelas PostgreSQL
+- `api/seed-data.js` - Seed idempotente (upsert de todos os produtos)
+- `api/products.js` - CRUD completo de produtos
+- `api/stock.js` - Gestão de estoque por product_id
+- `api/orders.js` - Pedidos com transações atômicas SQL
+- `api/cushion-kit.js` - Config do kit de almofadas (single-row)
+- `api/settings.js` - Key-value store (categorias, config, exibição)
+- `api/payment.js` - Integração Mercado Pago
+- `src/services/dbService.js` - 🆕 Cliente HTTP para API routes
+- `vercel.json` - Rewrites para API routes
+
+**Schema PostgreSQL:**
+```sql
+products    (id TEXT PK, name, category, price, images JSONB, features JSONB, …)
+stock       (product_id TEXT PK, quantity INT, min_stock INT)
+orders      (id TEXT PK, customer JSONB, items JSONB, status TEXT, …)
+cushion_kit (id INT PK DEFAULT 1, config JSONB)
+settings    (key TEXT PK, value JSONB)
+```
+
+**Funcionalidades:**
+- ✅ API routes isoladas do cliente (segurança server-side)
+- ✅ CRUD completo para todos os recursos
+- ✅ Seed data idempotente com `ON CONFLICT DO UPDATE`
+- ✅ Transações SQL atômicas para controle de estoque
+- ✅ Key-value store para configurações flexíveis
+- ✅ Respostas graceful (empty arrays) quando DB indisponível
+- ✅ Fallback para dados estáticos (`src/data/products.js`) se API falhar
+
+---
+
+### 3. ⚛️ Transações Atômicas de Estoque
+**Status:** ✅ Implementado via PostgreSQL SQL Transactions
 
 **Lógica implementada:**
 ```
@@ -55,72 +88,45 @@ Todas as funcionalidades solicitadas foram implementadas com sucesso:
 
 **Funcionalidades:**
 - ✅ Verificação de estoque ANTES de criar pedido
-- ✅ Operações atômicas - ou tudo funciona, ou nada muda
+- ✅ Operações atômicas SQL — ou tudo funciona, ou nada muda
 - ✅ Erro específico: "Estoque insuficiente: [Nome do Produto]"
 - ✅ Modal permanece aberto para ajustar carrinho
-- ✅ Proteção contra race conditions
-- ✅ Checks defensivos para dados de produto
+- ✅ Proteção contra race conditions via SQL transactions
 
-**Fluxo de erro:**
+---
+
+### 4. 🔄 Migração de Dados (Firestore → PostgreSQL) 🆕
+**Status:** ✅ Concluída
+
+**O que mudou:**
+
+| Componente | Antes (Firestore) | Agora (PostgreSQL) |
+|------------|-------------------|---------------------|
+| `App.jsx` | `getDocs`/`collection` do Firebase | `dbService.fetchProducts()` via API |
+| `AdminContext.jsx` | `import from 'data/products'` | `dbService` + API routes |
+| `UserContext.jsx` | localStorage apenas | PostgreSQL via `/api/settings` + cache localStorage |
+| `PaymentSettingsPage.jsx` | Firestore `getDoc`/`setDoc` | `dbService.fetchSetting`/`saveSetting` |
+| `SettingsDialog.jsx` | Categorias estáticas | Categorias do `UserContext` (DB-backed) |
+
+**Fluxo de dados:**
 ```
-Usuário tenta comprar 5 unidades
-↓
-Estoque tem apenas 2 unidades
-↓
-❌ Transação falha
-↓
-🔴 Alerta vermelho aparece
-↓
-Modal permanece aberto
-↓
-Usuário pode ajustar e tentar novamente
+mount → fetch da API (PostgreSQL) → atualiza estado + cache localStorage
+         ↓ (se DB vazio)
+       POST /api/seed-data → popula DB → re-fetch
 ```
 
 ---
 
-### 3. 🛡️ Regras de Segurança e Backend Isolado
-**Status:** ✅ Migrado para rotas de API
+### 5. 🖼️ Fix de Imagens e Assets Estáticos 🆕
+**Status:** ✅ Corrigido
 
-**Nota Histórica:**
-- O projeto inicialmente utilizava `firestore.rules` para segurança client-side.
-- Com a migração recente, toda a segurança de banco de dados passou para as rotas de API (`api/`) no backend (Vercel Postgres), isolando o banco do cliente.
+**Problema:** Imagens de sofás desapareceram após migração porque `src/data/products.js` usava imports Vite (`import zeusImg from '../assets/sofas/Zeus.png'`) que geravam URLs hashadas, incompatíveis com os paths estáticos do seed data.
 
-**Correções aplicadas:**
-1. ✅ Campo `total` → `totalPrice` (correto)
-2. ✅ Remoção de regras duplicadas de `update`
-3. ✅ Suporte a transações de estoque
-4. ✅ Validação de campos obrigatórios
-5. ✅ Proteção de dados sensíveis
-
-**Regras por coleção:**
-
-#### `products`
-- 🟢 **Leitura**: Pública (qualquer um vê catálogo)
-- 🔴 **Criar/Deletar**: Apenas Admin
-- 🟡 **Atualizar**: Admin OU decrementação válida de estoque
-  - Decrementação deve:
-    - Modificar APENAS campo `quantity`
-    - Ser uma redução (novo < antigo)
-    - Resultar em quantidade >= 0
-
-#### `orders`
-- 🟢 **Criar**: Pública com validações
-  - Campos obrigatórios: `totalPrice`, `items`, `customer`
-  - `totalPrice` > 0
-  - `items` não vazio
-- 🔴 **Ler/Atualizar/Deletar**: Apenas Admin
-
-#### `categories` e `cushionKit`
-- 🟢 **Ler**: Pública
-- 🔴 **Escrever**: Apenas Admin
-
-**Helper Functions:**
-```javascript
-isAdmin() - Verifica se usuário é admin
-hasRequiredOrderFields() - Valida campos do pedido (totalPrice, items, customer)
-isValidTotal() - Valida totalPrice e items
-isValidStockDecrement() - Valida decrementação de estoque
-```
+**Solução:**
+- Imagens copiadas para `public/assets/sofas/`
+- Imports Vite substituídos por strings estáticas: `/assets/sofas/Zeus.png`
+- Seed data usa os mesmos paths estáticos
+- Fallback local alinhado com dados do banco
 
 ---
 
@@ -131,99 +137,68 @@ isValidStockDecrement() - Valida decrementação de estoque
 npm run build
 ```
 **Resultado:** ✅ Build concluído com sucesso
-- Bundle: 800KB (comprimido: 246KB)
+- Bundle: ~800KB (comprimido: ~246KB)
 - Sem erros de compilação
-- Todas as otimizações aplicadas
+- API routes deployam como serverless functions
 
 ### ✅ Code Review
-**Resultado:** ✅ Aprovado com 1 sugestão implementada
-- Adicionado check defensivo para `productData`
+**Resultado:** ✅ Aprovado
 - Código segue melhores práticas
 - Tratamento de erros robusto
+- API handlers retornam respostas graceful
 
 ### ✅ CodeQL Security Scan
 **Resultado:** ✅ 0 vulnerabilidades encontradas
-- Sem problemas de segurança
-- Sem vazamentos de dados
-- Sem injeções de código
-
----
-
-## 📚 Documentação Criada
-
-### 1. `SECURITY_IMPLEMENTATION.md`
-**Conteúdo:** Documentação técnica completa
-- Arquitetura detalhada de cada componente
-- Fluxos de transação explicados
-- Estrutura de arquivos
-- Notas de segurança para produção
-- Guia de troubleshooting
-
-### 2. `SETUP_INSTRUCTIONS.md`
-**Conteúdo:** Guia passo-a-passo em português
-- Instruções de configuração do admin
-- Como testar cada funcionalidade
-- Checklist de deployment
-- Problemas comuns e soluções
-- Avisos de segurança para produção
-
-### 3. `README.md` (atualizado)
-**Conteúdo:** Overview das novas funcionalidades
-- Destaque para recursos de segurança
-- Links para documentação detalhada
-- Quick start para configuração
 
 ---
 
 ## 🎯 Instruções de Configuração Final
 
-### Passo 1: Criar Usuário Admin
+### Passo 1: Provisionar Banco de Dados
 ```
-1. Acesse: https://console.firebase.google.com
-2. Projeto: m-martin-estofados
-3. Authentication → Users → Add user
-4. Email: admin@mmartin.com
-5. Password: [escolha senha forte]
-6. Clique "Add user"
+1. Vercel Dashboard → Storage → Create → Postgres (Neon)
+2. As variáveis de ambiente são injetadas automaticamente
+3. Alternativamente, configure manualmente no .env
 ```
 
-### Passo 2: Deploy das Regras
+### Passo 2: Criar Tabelas
 ```bash
-firebase deploy --only firestore:rules
+# Executar uma vez após provisionar o banco
+curl -X POST https://seu-dominio.vercel.app/api/init-db
 ```
 
-### Passo 3: Adicionar Campo Quantity
-Certifique-se de que produtos têm campo `quantity`:
-```javascript
-// No Firestore Console, para cada produto:
-{
-  name: "Nome do Produto",
-  price: "R$ 999,00",
-  quantity: 10,  // ← Adicione este campo
-  // ... outros campos
-}
+### Passo 3: Popular Dados Iniciais
+```bash
+# Seed idempotente — pode executar múltiplas vezes
+curl -X POST https://seu-dominio.vercel.app/api/seed-data
 ```
 
-### Passo 4: Testar
+### Passo 4: Criar Usuário Admin
+```
+1. Firebase Console → Authentication → Users → Add user
+2. Email: admin@mmartin.com
+3. Password: [escolha senha forte]
+```
+
+### Passo 5: Testar
 ```bash
 npm run dev
 ```
-1. Acesse `/admin` → deve redirecionar para `/login`
-2. Faça login com credenciais criadas
-3. Teste compra com estoque insuficiente
-4. Verifique que estoque decrementa corretamente
+1. Home carrega produtos do PostgreSQL (ou fallback local)
+2. Header mostra ícone de login → clique para autenticar
+3. Após login, botão "Painel Admin" aparece
+4. `/admin` → Dashboard com KPIs do banco de dados
+5. Teste checkout → transação atômica de estoque funciona
 
 ---
 
-### Situação Atual
-O sistema confia que o Firebase Auth restringe o acesso ao dashboard administrativo (`src/components/PrivateRoute.jsx`). Porém, para proteção de API (para evitar que robôs chamem `api/products` com método POST e falsifiquem produtos, por exemplo), as rotas `/api/*` precisam fazer validação efetiva do token JWT.
+### ⚠️ Antes de Produção
 
-### Antes de Produção
+**Proteção nas API Routes (Serverless Functions)**
 
-**Proteção nas Vercel API Routes (Serverless Functions)**
+Atualmente, as APIs confiam em dados brutos. Para produção, implementar:
 
-1. Enviar o Token JWT no Frontend:
-Ao realizar chamadas (`fetch`), é necessário adicionar o header Authorization:
+1. **Enviar Token JWT no Frontend:**
 ```javascript
 import { auth } from './config/firebase';
 
@@ -238,24 +213,22 @@ const response = await fetch('/api/products', {
 });
 ```
 
-2. Validar no Backend (`/api/*`):
+2. **Validar no Backend (`/api/*`):**
 ```javascript
 import { getAuth } from "firebase-admin/auth";
-// Inicialize o firebase-admin corretamente na API
-// ...
+
 export default async function handler(req, res) {
    const authHeader = req.headers.authorization;
-   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+   if (!authHeader?.startsWith('Bearer ')) {
        return res.status(401).json({ error: 'Não autorizado' });
    }
    const token = authHeader.split('Bearer ')[1];
    try {
-       const decodedToken = await getAuth().verifyIdToken(token);
-       // Checa se o usuário é o administrador permitido
-       if (decodedToken.email !== 'seu-email-admin@dominio.com') {
+       const decoded = await getAuth().verifyIdToken(token);
+       if (decoded.email !== 'admin@mmartin.com') {
            return res.status(403).json({ error: 'Acesso negado' });
        }
-       // Proceder com inserções no DB ...
+       // Prosseguir com a lógica ...
    } catch (error) {
        return res.status(401).json({ error: 'Token inválido' });
    }
@@ -269,11 +242,16 @@ export default async function handler(req, res) {
 | Funcionalidade | Status | Arquivo Principal |
 |---------------|--------|-------------------|
 | Firebase Auth | ✅ | `src/context/AuthContext.jsx` |
+| AuthDialog Guest-First | ✅ | `src/components/AuthDialog.jsx` |
 | Login Page | ✅ | `src/components/Login.jsx` |
-| Route Protection & Guest-First | ✅ | `src/components/PrivateRoute.jsx` & AuthContext |
-| Atomic Transactions (Postgres) | ✅ | `api/orders/route.js` |
+| Route Protection | ✅ | `src/components/PrivateRoute.jsx` |
+| **Vercel Serverless API** | ✅ 🆕 | `api/*.js` |
+| **PostgreSQL (Neon)** | ✅ 🆕 | Schema criado por `api/init-db.js` |
+| **dbService (HTTP Client)** | ✅ 🆕 | `src/services/dbService.js` |
+| Atomic Transactions (SQL) | ✅ | `api/orders.js` |
+| Seed Data (Idempotente) | ✅ 🆕 | `api/seed-data.js` |
 | Stock Error Handling | ✅ | `src/components/CheckoutDialog.jsx` |
-| API/Backend Security | ✅ | Rotas `/api/*` |
+| Static Image Fix | ✅ 🆕 | `public/assets/sofas/*.png` |
 | Documentation | ✅ | `*.md` files |
 | Build Validation | ✅ | Passed |
 | Code Review | ✅ | Approved |
@@ -284,21 +262,24 @@ export default async function handler(req, res) {
 ## 📞 Suporte
 
 **Documentação:**
+- `README.md` - Visão geral e arquitetura
 - `SETUP_INSTRUCTIONS.md` - Guia de configuração
 - `SECURITY_IMPLEMENTATION.md` - Documentação técnica
 
 **Problemas Comuns:**
+- Produtos não carregam → Execute `POST /api/seed-data`
 - Login falha → Verifique Firebase Console
-- Erro de permissão → Deploy das rules
-- Estoque não decrementa → Campo `quantity` nos produtos
+- Tabelas não existem → Execute `POST /api/init-db`
+- Imagens não aparecem → Verifique `public/assets/sofas/`
 
 **Debug:**
 - Console do navegador → Erros client-side
-- Firebase Console → Auth e Firestore logs
-- Rules Playground → Testar regras
+- Network tab → Respostas das API routes
+- Vercel Logs → Erros nas serverless functions
+- Neon Console → Queries SQL e performance
 
 ---
 
-**Implementado por:** GitHub Copilot Agent  
-**Atualizado em:** 23 de Fevereiro de 2026  
-**Tecnologias:** React, Firebase Auth, Vercel Postgres, Guest-First Flow, API Routes
+**Implementado por:** GitHub Copilot Agent + Equipe M'Martin  
+**Atualizado em:** 27 de Fevereiro de 2026  
+**Stack:** React 19, Vite 7, Vercel Serverless, PostgreSQL (Neon), Firebase Auth, Mercado Pago

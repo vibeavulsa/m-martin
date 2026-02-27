@@ -1,15 +1,49 @@
 import { sql } from '@vercel/postgres';
+import { requireAdmin, getAuthUser } from './_lib/auth.js';
 
 /**
  * /api/orders
- * GET    → list all orders (newest first)
- * POST   → create a new order     (body: order object)
- * PUT    → update order status    (body: { id, status })
- * DELETE → delete an order        (query: ?id=<order_id>)
+ * GET    → list all orders (admin) or filter by userId (client)
+ * POST   → create a new order (public — customers create orders)
+ * PUT    → update order status (admin only)
+ * DELETE → delete an order     (admin only)
  */
 export default async function handler(req, res) {
   try {
+    // ── GET: List / query orders ────────────────────────────────────────────
     if (req.method === 'GET') {
+      const { userId } = req.query;
+
+      if (userId) {
+        // Client requesting their own orders — verify they are the owner
+        const user = await getAuthUser(req);
+        if (!user || user.uid !== userId) {
+          return res.status(401).json({ error: 'Autenticação necessária para ver pedidos.' });
+        }
+
+        const { rows } = await sql`
+          SELECT
+            id,
+            customer,
+            items,
+            status,
+            total,
+            payment_method AS "paymentMethod",
+            notes,
+            user_id AS "userId",
+            created_at AS "date",
+            updated_at AS "updatedAt"
+          FROM orders
+          WHERE user_id = ${userId}
+          ORDER BY created_at DESC
+        `;
+        return res.status(200).json(rows);
+      }
+
+      // No userId filter → admin listing all orders
+      const { error } = await requireAdmin(req, res);
+      if (error) return;
+
       const { rows } = await sql`
         SELECT
           id,
@@ -19,6 +53,7 @@ export default async function handler(req, res) {
           total,
           payment_method AS "paymentMethod",
           notes,
+          user_id AS "userId",
           created_at AS "date",
           updated_at AS "updatedAt"
         FROM orders
@@ -27,11 +62,15 @@ export default async function handler(req, res) {
       return res.status(200).json(rows);
     }
 
+    // ── POST: Create a new order (public) ───────────────────────────────────
     if (req.method === 'POST') {
       const o = req.body;
       if (!o.id) return res.status(400).json({ error: 'Missing id' });
 
-      // Import db inside handler or use the one at top (we need db from @vercel/postgres)
+      // Optionally attach the authenticated user's ID
+      const user = await getAuthUser(req);
+      const userId = user?.uid || o.userId || null;
+
       const { db } = require('@vercel/postgres');
       const client = await db.connect();
 
@@ -81,9 +120,9 @@ export default async function handler(req, res) {
           `;
         }
 
-        // 3. Create the order with server-computed values
+        // 3. Create the order with server-computed values and optional userId
         await client.sql`
-          INSERT INTO orders (id, customer, items, status, total, payment_method, notes)
+          INSERT INTO orders (id, customer, items, status, total, payment_method, notes, user_id)
           VALUES (
             ${o.id},
             ${JSON.stringify(o.customer ?? {})},
@@ -91,7 +130,8 @@ export default async function handler(req, res) {
             ${o.status ?? 'pendente'},
             ${serverTotalPrice},
             ${o.paymentMethod ?? null},
-            ${o.notes ?? null}
+            ${o.notes ?? null},
+            ${userId}
           )
         `;
 
@@ -103,6 +143,12 @@ export default async function handler(req, res) {
       } finally {
         client.release();
       }
+    }
+
+    // ── PUT / DELETE: Admin-only operations ──────────────────────────────────
+    if (req.method === 'PUT' || req.method === 'DELETE') {
+      const { error } = await requireAdmin(req, res);
+      if (error) return;
     }
 
     if (req.method === 'PUT') {

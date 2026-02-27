@@ -1,10 +1,11 @@
 import { sql } from '@vercel/postgres';
+import { requireAdmin } from './_lib/auth.js';
 
 /**
  * /api/settings
- * GET    → all settings, or ?key=<key> for a specific setting
- * POST   → upsert a setting  (body: { key, value })
- * DELETE → remove a setting  (query: ?key=<key>)
+ * GET    → all settings, or ?key=<key> for a specific setting (public)
+ * POST   → upsert a setting  (admin only)
+ * DELETE → remove a setting  (admin only)
  */
 export default async function handler(req, res) {
   try {
@@ -20,6 +21,12 @@ export default async function handler(req, res) {
       const result = {};
       for (const row of rows) result[row.key] = row.value;
       return res.status(200).json(result);
+    }
+
+    // ── Admin-only operations ─────────────────────────────────────────────────
+    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+      const { error } = await requireAdmin(req, res);
+      if (error) return;
     }
 
     if (req.method === 'POST' || req.method === 'PUT') {

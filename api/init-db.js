@@ -60,9 +60,29 @@ export default async function handler(req, res) {
         total TEXT,
         payment_method TEXT,
         notes TEXT,
+        user_id TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
       )
+    `;
+
+    // Add user_id column if it doesn't exist (migration for existing DBs)
+    await sql`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'orders' AND column_name = 'user_id'
+        ) THEN
+          ALTER TABLE orders ADD COLUMN user_id TEXT;
+        END IF;
+      END $$
+    `;
+
+    // Create index on user_id for efficient "Meus Pedidos" queries
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders (user_id)
+      WHERE user_id IS NOT NULL
     `;
 
     await sql`
@@ -82,7 +102,7 @@ export default async function handler(req, res) {
       )
     `;
 
-    return res.status(200).json({ ok: true, message: 'Tables created (or already exist).' });
+    return res.status(200).json({ ok: true, message: 'Tables created (or already exist). Indexes applied.' });
   } catch (err) {
     console.error('[init-db]', err);
     return res.status(500).json({ error: err.message });

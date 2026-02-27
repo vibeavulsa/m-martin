@@ -58,9 +58,22 @@ export async function createOrder(
       paymentMethod: orderData.paymentMethod || 'whatsapp_checkout',
     };
 
+    // Include Firebase auth token so the backend can attach userId to the order
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    try {
+      const { auth } = await import('../config/firebase');
+      const user = auth.currentUser;
+      if (user) {
+        const token = await user.getIdToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    } catch {
+      // Auth not available — order will be created without userId
+    }
+
     const response = await fetch('/api/orders', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(input),
     });
 

@@ -1,6 +1,8 @@
 # 📋 Plano de Próximos Passos — M'Martin Estofados
 
-Este documento apresenta o plano de evolução do projeto, organizado por prioridade e baseado na análise dos 28 pull requests mergeados e no estado atual do código.
+Este documento apresenta o plano de evolução do projeto, organizado por prioridade e baseado na análise dos **71 pull requests mergeados** e no estado atual do código.
+
+> **Nota:** O projeto migrou de Firebase Firestore para **Vercel Serverless Functions + PostgreSQL (Neon)** na Fase 5. Toda persistência de dados agora é feita via API routes serverless. O Firebase é usado apenas para autenticação.
 
 ---
 
@@ -8,155 +10,150 @@ Este documento apresenta o plano de evolução do projeto, organizado por priori
 
 Itens obrigatórios antes de ir para produção.
 
-### 1. Implementar verificação avançada de Admin (Autenticação)
-**Status atual:** A Autenticação via Firebase Auth é limitada apenas aos e-mails permitidos manualmente ou a implementação das rotas `/admin/*` não valida o backend de forma robusta por session cookie.
+### 1. Implementar verificação de Admin nas API Routes
+**Status atual:** As rotas `/api/*` não validam o token JWT do Firebase Auth. Qualquer pessoa pode chamar `POST /api/products` e criar produtos.
 **Ação:**
-- Garantir que todas as chamadas `PUT`, `POST` e `DELETE` no frontend (via `api/orders`, `api/products`, etc.) validem o token JWT de Firebase do usuário.
-- Atualmente, as APIs confiam em dados brutos. Precisamos validar o header `Authorization: Bearer <token>` nas Serverless Functions do Vercel e garantir que pertença a um usuário que seja admin.
+- Adicionar middleware de autenticação nas Serverless Functions
+- Validar header `Authorization: Bearer <token>` usando `firebase-admin` SDK
+- Verificar se o email do token pertence a um admin autorizado
+- Exemplo:
+```javascript
+import { getAuth } from "firebase-admin/auth";
 
-### 2. Monitoramento e Otimização do Vercel Postgres
-**Status atual:** Toda a lógica de gestão de estoque e pedidos foi migrada para Vercel Postgres (`api/orders`, `api/stock`), o que garante consistência usando transações SQL.
-**Ação:**
-- Testar sob estresse as conexões do banco de dados (pool limit).
-- Garantir que índices corretos existam (`CREATE INDEX`) para acelerar as consultas principais de catálogo.
+export default async function handler(req, res) {
+   const authHeader = req.headers.authorization;
+   if (!authHeader?.startsWith('Bearer ')) {
+       return res.status(401).json({ error: 'Não autorizado' });
+   }
+   const token = authHeader.split('Bearer ')[1];
+   const decoded = await getAuth().verifyIdToken(token);
+   if (decoded.email !== 'admin@mmartin.com') {
+       return res.status(403).json({ error: 'Acesso negado' });
+   }
+   // ... prosseguir com a lógica
+}
+```
 
-### 3. Validação completa de pedidos no servidor (API)
-**Status atual:** A rota API `/api/orders` valida preços e realiza transação atômica de estoque de forma correta, mas as verificações sobre formatação do e-mail, telefone e endereço do cliente poderiam ser mais rigorosas.
+### 2. Monitoramento e Otimização do PostgreSQL (Neon)
+**Status atual:** Toda a lógica de gestão de estoque e pedidos está no PostgreSQL via transações SQL.
 **Ação:**
-- Implementar sanitização dos inputs no backend.
-- Adicionar logging robusto aos pedidos recusados (tentativas de preço alterado, estoque faltante, parâmetros inválidos).
+- Testar sob estresse as conexões do banco de dados (pool limit do Neon)
+- Criar índices SQL (`CREATE INDEX`) para acelerar consultas de catálogo
+- Monitorar uso do free tier do Neon (compute hours, storage)
+- Configurar alertas para erros de conexão
+
+### 3. Validação completa de pedidos no servidor
+**Status atual:** A rota `/api/orders` valida preços e realiza transação atômica de estoque, mas inputs do cliente (email, telefone, endereço) não são sanitizados rigorosamente.
+**Ação:**
+- Implementar sanitização de inputs no backend
+- Adicionar logging robusto de tentativas inválidas
+- Validar formato de email, telefone e endereço
 
 ### 4. Configurar ambientes separados (dev/staging/produção)
-**Status atual:** Vercel permite configurar variáveis `.env` independentes.
+**Status atual:** Vercel permite configurar variáveis `.env` independentes por ambiente.
 **Ação:**
-- Cadastrar corretamente `MERCADO_PAGO_ACCESS_TOKEN` na Vercel (Produção e Preview) para processamento real via `/api/payment`.
-- Separar chaves do Mercado Pago (sandbox vs produção).
+- Cadastrar `MERCADO_PAGO_ACCESS_TOKEN` separado para Preview vs Produção
+- Separar chaves sandbox e produção do Mercado Pago
+- Configurar banco de dados separado para Preview deployments (branch databases no Neon)
 
 ---
 
 ## 🟡 Prioridade Média — Funcionalidades de Negócio
 
-Melhorias que agregam valor ao negócio e à experiência do cliente.
-
 ### 5. Sistema de busca e filtros
-**Status atual:** Navegação apenas por categorias, sem busca textual.
-
+**Status atual:** Navegação apenas por categorias.
 **Ação:**
-- Adicionar barra de busca no Header (por nome e descrição)
+- Barra de busca no Header (por nome e descrição)
 - Filtros por faixa de preço, categoria e disponibilidade
 - Ordenação por preço, nome ou popularidade
+- Query SQL `WHERE name ILIKE '%termo%'` na API
 
 ### 6. Histórico de pedidos para o cliente
-**Status atual:** Clientes não conseguem ver seus próprios pedidos após a criação.
-
+**Status atual:** Clientes não conseguem ver seus pedidos.
 **Ação:**
-- Adicionar `userId` aos pedidos (quando autenticado)
+- Adicionar `user_id` aos pedidos (quando autenticado)
 - Criar página "Meus Pedidos" com tracking de status
-- Atualizar Firestore Rules para permitir leitura do próprio pedido
+- API route `/api/orders?userId=...` com filtro
 - Notificação por email quando status muda
 
 ### 7. Integrar newsletter com serviço de email
-**Status atual:** Cadastro de newsletter salva apenas no frontend (sem backend).
-
+**Status atual:** Cadastro de newsletter salva apenas no frontend.
 **Ação:**
-- Integrar com Mailchimp, SendGrid ou Firebase Extensions
-- Criar Cloud Function para salvar inscrições no Firestore
-- Implementar email de boas-vindas automático
-- Adicionar opção de cancelar inscrição
+- Integrar com SendGrid ou Resend via API route
+- Salvar inscrições na tabela `settings` ou nova tabela `newsletter_subscribers`
+- Email de boas-vindas automático
+- Opção de cancelar inscrição
 
 ### 8. Sistema de avaliações de produtos
-**Status atual:** Depoimentos são hardcoded no componente `TestimonialsSection`.
-
+**Status atual:** Depoimentos são hardcoded.
 **Ação:**
-- Criar coleção `reviews` no Firestore
-- Permitir que clientes enviem avaliações após compra
-- Moderar avaliações no painel admin
+- Criar tabela `reviews` no PostgreSQL
+- API route `/api/reviews` para CRUD
+- Moderar avaliações no admin
 - Exibir nota média por produto
 
 ### 9. Gestão de cupons e promoções
 **Status atual:** Não existe sistema de descontos.
-
 **Ação:**
-- Criar coleção `coupons` no Firestore
-- Validar cupons na Cloud Function `createOrder`
-- Adicionar campo de cupom no checkout
+- Criar tabela `coupons` no PostgreSQL
+- Validar cupons na API route `/api/orders`
+- Campo de cupom no checkout
 - Página de gestão de cupons no admin
 
 ### 10. Notificações de pedidos
 **Status atual:** Sem notificações automáticas.
-
 **Ação:**
-- Email de confirmação de pedido para o cliente
-- Notificação WhatsApp/email para o admin quando novo pedido chega
-- Push notifications para mudança de status do pedido
+- Email de confirmação via SendGrid/Resend
+- Notificação WhatsApp para admin (novo pedido)
+- Webhook para mudança de status
 
 ---
 
 ## 🟢 Prioridade Baixa — Melhorias de UX e Infraestrutura
 
-Otimizações que melhoram a experiência mas não são bloqueadoras.
-
 ### 11. Testes automatizados
-**Status atual:** Nenhum teste automatizado no projeto.
-
 **Ação:**
-- Configurar Vitest para testes unitários
-- Testes para Cloud Functions (createOrder, processPayment)
-- Testes para contextos (CartContext, AuthContext)
-- Testes E2E para fluxo de checkout com Playwright
+- Vitest para testes unitários
+- Testes para API routes (products, orders, stock)
+- Testes para contextos (CartContext, AdminContext)
+- E2E com Playwright para fluxo de checkout
 
 ### 12. Performance e otimização
-**Status atual:** Bundle de ~800KB (246KB comprimido).
-
+**Status atual:** Bundle ~800KB (246KB comprimido).
 **Ação:**
-- Lazy loading de rotas do admin (React.lazy + Suspense)
-- Otimização de imagens (WebP, lazy loading, srcset)
+- Lazy loading de rotas admin (`React.lazy + Suspense`)
+- Imagens WebP com lazy loading e srcset
 - Code splitting por rota
 - Service Worker para cache offline
-- Lighthouse audit e correções
+- Lighthouse audit
 
 ### 13. Analytics e monitoramento
-**Status atual:** Firebase Analytics configurado mas sem eventos customizados.
-
 **Ação:**
-- Rastrear eventos de e-commerce (view_item, add_to_cart, purchase)
-- Configurar Google Analytics 4 com conversões
-- Dashboard de métricas de negócio (taxa de conversão, ticket médio)
-- Monitoramento de erros com Firebase Crashlytics ou Sentry
+- Eventos de e-commerce (view_item, add_to_cart, purchase)
+- Google Analytics 4 com conversões
+- Monitoramento de erros com Sentry
+- Dashboard de métricas de negócio
 
 ### 14. Programa de fidelidade funcional
-**Status atual:** Banner exibe benefícios mas não há lógica implementada.
-
+**Status atual:** Banner exibe benefícios mas sem lógica.
 **Ação:**
-- Criar sistema de pontos no Firestore
+- Tabela `loyalty_points` no PostgreSQL
 - Acumular pontos por compra
-- Permitir resgate de pontos como desconto
-- Níveis de fidelidade (Bronze, Prata, Ouro)
+- Resgate como desconto
+- Níveis (Bronze, Prata, Ouro)
 
-### 15. Multi-idioma
-**Status atual:** Interface apenas em português.
-
+### 15. PWA (Progressive Web App)
 **Ação:**
-- Implementar i18n com react-intl ou i18next
-- Traduzir para espanhol (mercado regional)
-- Detectar idioma do navegador
-
-### 16. PWA (Progressive Web App)
-**Status atual:** Apenas web app tradicional.
-
-**Ação:**
-- Adicionar manifest.json e Service Worker
+- manifest.json e Service Worker
 - Ícones para home screen
 - Suporte offline para catálogo
 - Push notifications
 
-### 17. Integração com ERP/estoque físico
-**Status atual:** Estoque gerenciado apenas no Firestore.
-
+### 16. Integração com ERP/estoque físico
 **Ação:**
-- API de sincronização com sistema ERP do cliente
-- Webhooks para atualização de estoque bidirecional
-- Importação/exportação de produtos via CSV
+- API de sincronização com ERP
+- Webhooks bidirecionais de estoque
+- Importação/exportação CSV
 
 ---
 
@@ -167,23 +164,19 @@ Otimizações que melhoram a experiência mas não são bloqueadoras.
 | **Fase 1** (Imediato) | #1, #2, #3, #4 | Segurança para produção |
 | **Fase 2** (Curto prazo) | #5, #6, #7, #10 | Funcionalidades essenciais |
 | **Fase 3** (Médio prazo) | #8, #9, #11, #12 | Crescimento e qualidade |
-| **Fase 4** (Longo prazo) | #13, #14, #15, #16, #17 | Escala e maturidade |
+| **Fase 4** (Longo prazo) | #13, #14, #15, #16 | Escala e maturidade |
 
 ---
 
 ## ✅ Já Implementado (Referência)
 
-Funcionalidades completadas nos 28 PRs anteriores:
+Funcionalidades completadas nos 71 PRs:
 
+### Catálogo & UX
 - ✅ Catálogo com glassmorphism e imagens reais
 - ✅ Kit de almofadas interativo com seletor de cores
 - ✅ Checkout em 3 etapas (carrinho → dados → pagamento)
 - ✅ 4 métodos de pagamento (WhatsApp, Mercado Pago, PIX, cartão)
-- ✅ Firebase Auth para admin
-- ✅ Cloud Functions com validação server-side
-- ✅ Transações atômicas de estoque
-- ✅ Rate limiting (5 req/min/IP)
-- ✅ Firestore Security Rules completas
 - ✅ CRUD de produtos com múltiplas imagens
 - ✅ Gestão de estoque com alertas visuais
 - ✅ Tracking de pedidos
@@ -192,10 +185,17 @@ Funcionalidades completadas nos 28 PRs anteriores:
 - ✅ SEO (meta tags, Open Graph, schema, sitemap)
 - ✅ Animações Framer Motion no admin
 - ✅ Navegação mobile otimizada
-- ✅ Programa de fidelidade (banner)
-- ✅ Depoimentos e newsletter
 - ✅ Paleta de marca padronizada (marrom/dourado)
+
+### Infraestrutura (Migração Serverless) 🆕
+- ✅ **Vercel Serverless Functions** — API routes para products, stock, orders, settings
+- ✅ **PostgreSQL (Neon)** — Banco relacional com transações SQL
+- ✅ **Seed data idempotente** — Upsert de produtos e categorias
+- ✅ **dbService.js** — Cliente HTTP (substituiu Firebase SDK)
+- ✅ **AuthDialog guest-first** — Navega sem login, admin com login
+- ✅ **Fallback local** — Renderiza dados estáticos se DB indisponível
+- ✅ **Settings via PostgreSQL** — Categorias, config, exibição da home
 
 ---
 
-**Última atualização:** Fevereiro 2026
+**Última atualização:** 27 de Fevereiro de 2026

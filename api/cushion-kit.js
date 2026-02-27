@@ -1,9 +1,10 @@
 import { sql } from '@vercel/postgres';
+import { requireAdmin } from './_lib/auth.js';
 
 /**
  * /api/cushion-kit
- * GET  → return the cushion-kit config row
- * POST → upsert (create or replace) the cushion-kit config
+ * GET  → return the cushion-kit config row (public)
+ * POST → upsert (create or replace) the cushion-kit config (admin only)
  */
 export default async function handler(req, res) {
   try {
@@ -16,6 +17,9 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST' || req.method === 'PUT') {
+      const { error } = await requireAdmin(req, res);
+      if (error) return;
+
       const config = req.body;
       await sql`
         INSERT INTO cushion_kit (id, config, updated_at)

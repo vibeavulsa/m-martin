@@ -1,11 +1,12 @@
 import { sql } from '@vercel/postgres';
+import { requireAdmin } from './_lib/auth.js';
 
 /**
  * /api/products
- * GET    → list all products
- * POST   → create a product  (body: product object)
- * PUT    → update a product  (body: { id, ...fields })
- * DELETE → delete a product  (query: ?id=<product_id>)
+ * GET    → list all products  (public)
+ * POST   → create a product   (admin only)
+ * PUT    → update a product   (admin only)
+ * DELETE → delete a product   (admin only)
  */
 export default async function handler(req, res) {
   try {
@@ -42,6 +43,12 @@ export default async function handler(req, res) {
         ORDER BY created_at ASC
       `;
       return res.status(200).json(rows);
+    }
+
+    // ── Admin-only operations ─────────────────────────────────────────────────
+    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+      const { error } = await requireAdmin(req, res);
+      if (error) return; // 401/403 already sent
     }
 
     if (req.method === 'POST') {

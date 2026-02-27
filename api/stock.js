@@ -1,11 +1,12 @@
 import { sql } from '@vercel/postgres';
+import { requireAdmin } from './_lib/auth.js';
 
 /**
  * /api/stock
- * GET    → all stock rows  (or ?id=<product_id> for a single row)
- * POST   → upsert a row    (body: { productId, quantity, minStock })
- * PUT    → same as POST (alias)
- * DELETE → remove a row    (query: ?id=<product_id>)
+ * GET    → all stock rows  (public — storefront needs availability)
+ * POST   → upsert a row    (admin only)
+ * PUT    → same as POST     (admin only)
+ * DELETE → remove a row     (admin only)
  */
 export default async function handler(req, res) {
   try {
@@ -23,6 +24,12 @@ export default async function handler(req, res) {
         FROM stock ORDER BY product_id
       `;
       return res.status(200).json(rows);
+    }
+
+    // ── Admin-only operations ─────────────────────────────────────────────────
+    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+      const { error } = await requireAdmin(req, res);
+      if (error) return;
     }
 
     if (req.method === 'POST' || req.method === 'PUT') {

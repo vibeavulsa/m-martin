@@ -14,6 +14,7 @@ import OrderConfirmationDialog from './components/OrderConfirmationDialog';
 import UserProfileDialog from './components/UserProfileDialog';
 import AuthDialog from './components/AuthDialog';
 import SettingsDialog from './components/SettingsDialog';
+import MyOrdersPage from './components/MyOrdersPage';
 
 import TestimonialsSection from './components/TestimonialsSection';
 import NewsletterSignup from './components/NewsletterSignup';
@@ -55,6 +56,7 @@ function SalesDialogs() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [showMyOrders, setShowMyOrders] = useState(false);
   const [orderNumber, setOrderNumber] = useState(null);
   const { setCustomer, clearCart } = useCart();
 
@@ -66,6 +68,8 @@ function SalesDialogs() {
   const handleCloseSettings = useCallback(() => setSettingsOpen(false), []);
   const handleOpenAuth = useCallback(() => setAuthOpen(true), []);
   const handleCloseAuth = useCallback(() => setAuthOpen(false), []);
+  const handleOpenMyOrders = useCallback(() => setShowMyOrders(true), []);
+  const handleCloseMyOrders = useCallback(() => setShowMyOrders(false), []);
 
   const handleCheckout = useCallback(() => {
     setCartOpen(false);
@@ -106,6 +110,7 @@ function SalesDialogs() {
         onProfileClick={handleOpenProfile}
         onSettingsClick={handleOpenSettings}
         onAuthClick={handleOpenAuth}
+        onMyOrdersClick={handleOpenMyOrders}
       />
       <AuthDialog
         isOpen={authOpen}
@@ -140,6 +145,9 @@ function SalesDialogs() {
         isOpen={settingsOpen}
         onClose={handleCloseSettings}
       />
+      {showMyOrders && (
+        <MyOrdersPage onBack={handleCloseMyOrders} />
+      )}
     </>
   );
 }
