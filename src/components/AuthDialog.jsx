@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
-import { IconX, IconLock, IconLogout, IconLoader2, IconShieldCheck } from '@tabler/icons-react';
+import { IconX, IconLock, IconLogout, IconLoader2, IconShieldCheck, IconBrandGoogle, IconUser } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import './AuthDialog.css';
 
@@ -27,12 +27,12 @@ const dialogVariants = {
   }
 };
 
-const AuthDialog = ({ isOpen, onClose }) => {
+const AuthDialog = ({ isOpen, onClose, onProfileClick }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { user, isAuthenticated, login, logout } = useAuth();
+  const { user, isAuthenticated, login, loginWithGoogle, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,6 +81,18 @@ const AuthDialog = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    const result = await loginWithGoogle();
+    setLoading(false);
+    if (result.success) {
+      onClose();
+    } else {
+      setError(result.error || 'Erro ao entrar com Google.');
+    }
+  };
+
   const handleLogout = async () => {
     await logout();
     onClose();
@@ -89,6 +101,11 @@ const AuthDialog = ({ isOpen, onClose }) => {
   const handleGoToAdmin = () => {
     onClose();
     navigate('/admin');
+  };
+
+  const handleOpenProfile = () => {
+    onClose();
+    if (onProfileClick) onProfileClick();
   };
 
   return (
@@ -129,14 +146,25 @@ const AuthDialog = ({ isOpen, onClose }) => {
                   <p className="auth-user-email">{user?.email}</p>
                 </div>
                 <div className="auth-actions">
+                  {user?.email === 'admin@mmartin.com' && (
+                    <motion.button
+                      className="btn-admin"
+                      onClick={handleGoToAdmin}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      <IconShieldCheck size={18} stroke={2} />
+                      Painel Admin
+                    </motion.button>
+                  )}
                   <motion.button
-                    className="btn-admin"
-                    onClick={handleGoToAdmin}
+                    className="btn-profile-local"
+                    onClick={handleOpenProfile}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    <IconShieldCheck size={18} stroke={2} />
-                    Painel Admin
+                    <IconUser size={18} stroke={2} />
+                    Dados Cadastrais
                   </motion.button>
                   <motion.button
                     className="btn-auth-logout"
@@ -193,12 +221,28 @@ const AuthDialog = ({ isOpen, onClose }) => {
                         Entrando...
                       </>
                     ) : (
-                      'Entrar'
+                      'Entrar com Email'
                     )}
                   </button>
                 </form>
+
+                <div className="auth-divider">
+                  <span>ou</span>
+                </div>
+
+                <motion.button
+                  className="btn-auth-google"
+                  onClick={handleGoogleLogin}
+                  disabled={loading}
+                  whileHover={!loading ? { scale: 1.03 } : {}}
+                  whileTap={!loading ? { scale: 0.97 } : {}}
+                >
+                  <IconBrandGoogle size={20} />
+                  Entrar com Google
+                </motion.button>
               </div>
             )}
+
           </motion.div>
         </motion.div>
       )}

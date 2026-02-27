@@ -4,6 +4,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
@@ -28,15 +30,32 @@ export function AuthProvider({ children }) {
       return { success: true, user: userCredential.user };
     } catch (error) {
       console.error('[AuthContext] Login error:', error);
-      
+
       // Provide detailed error message
       let errorMessage = error.message;
-      
+
       // Check for Firebase configuration errors
       if (error.code === 'auth/api-key-not-valid') {
         errorMessage = 'Firebase não está configurado corretamente. Verifique o arquivo .env e consulte FIREBASE_SETUP.md';
       }
-      
+
+      return { success: false, error: errorMessage, code: error.code };
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      return { success: true, user: result.user };
+    } catch (error) {
+      console.error('[AuthContext] Google Login error:', error);
+      let errorMessage = error.message;
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'O login foi cancelado.';
+      } else if (error.code === 'auth/api-key-not-valid') {
+        errorMessage = 'Firebase não está configurado corretamente. Verifique o arquivo .env';
+      }
       return { success: false, error: errorMessage, code: error.code };
     }
   };
@@ -55,6 +74,7 @@ export function AuthProvider({ children }) {
     user,
     loading,
     login,
+    loginWithGoogle,
     logout,
     isAuthenticated: !!user,
   };

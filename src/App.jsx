@@ -115,6 +115,7 @@ function SalesDialogs() {
       <AuthDialog
         isOpen={authOpen}
         onClose={handleCloseAuth}
+        onProfileClick={handleOpenProfile}
       />
       <CartDialog
         isOpen={cartOpen}

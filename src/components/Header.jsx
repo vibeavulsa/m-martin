@@ -10,7 +10,7 @@ import logo from '../assets/logo.png';
 const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick, onMyOrdersClick }) => {
   const { totalItems } = useCart();
   const { isLoggedIn, profile } = useUser();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const handleNavClick = (e, targetId) => {
     e.preventDefault();
@@ -39,24 +39,6 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick, onM
           <a href="#homecare-hospitalar" className="nav-link" onClick={(e) => handleNavClick(e, 'homecare-hospitalar')}>Para Acamados</a>
         </nav>
         <div className="nav-actions">
-          <motion.button
-            className={`nav-icon-btn ${isAuthenticated ? 'nav-icon-btn-auth' : ''}`}
-            onClick={onAuthClick}
-            aria-label={isAuthenticated ? 'Conta autenticada' : 'Entrar'}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            title={isAuthenticated ? 'Conta / Admin' : 'Entrar'}
-          >
-            {isAuthenticated ? <IconShieldCheck size={20} stroke={1.8} /> : <IconLogin size={20} stroke={1.8} />}
-            {isAuthenticated && (
-              <motion.span
-                className="auth-indicator"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 500 }}
-              />
-            )}
-          </motion.button>
           {isAuthenticated && (
             <motion.button
               className="nav-icon-btn"
@@ -70,28 +52,28 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick, onM
             </motion.button>
           )}
           <motion.button
-            className={`nav-icon-btn ${isLoggedIn ? 'nav-icon-btn-active' : ''}`}
-            onClick={onProfileClick}
-            aria-label="Perfil do usuário"
+            className={`nav-icon-btn ${isAuthenticated ? 'nav-icon-btn-auth' : ''}`}
+            onClick={onAuthClick}
+            aria-label={isAuthenticated ? 'Minha Conta' : 'Entrar'}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
+            title={isAuthenticated ? 'Minha Conta' : 'Entrar'}
           >
-            <IconUser size={20} stroke={1.8} />
-            {isLoggedIn && (
+            {isAuthenticated ? <IconUser size={20} stroke={1.8} /> : <IconLogin size={20} stroke={1.8} />}
+            {isAuthenticated && (
               <motion.span
-                className="user-indicator"
+                className="auth-indicator"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 500 }}
-                title={profile.name}
               />
             )}
           </motion.button>
-          {isAuthenticated && (
+          {isAuthenticated && user?.email === 'admin@mmartin.com' && (
             <motion.button
               className="nav-icon-btn"
               onClick={onSettingsClick}
-              aria-label="Configurações"
+              aria-label="Configurações Admin"
               whileHover={{ scale: 1.1, rotate: 45 }}
               whileTap={{ scale: 0.9 }}
               transition={{ type: 'spring', stiffness: 300 }}
