@@ -8,15 +8,30 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
+        inlineWorkboxRuntime: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg,mp4,webm,ogg}'],
         runtimeCaching: [
           {
-            urlPattern: ({ request }) => request.destination === 'image' || request.destination === 'video',
+            urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'media-cache',
+              cacheName: 'firebase-media-cache',
               expiration: {
-                maxEntries: 200,
+                maxEntries: 100,
+                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /\.(?:png|gif|jpg|jpeg|webp|svg|mp4|webm|ogg)(?:\?.*)?$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'local-media-cache',
+              expiration: {
+                maxEntries: 100,
                 maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
               },
               cacheableResponse: {
