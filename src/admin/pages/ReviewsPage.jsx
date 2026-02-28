@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchReviews, approveReview, deleteReview } from '../../services/dbService';
 import { IconCheck, IconX, IconTrash, IconMessageCircle } from '@tabler/icons-react';
-import './Admin.css'; // Reuse existing admin styles
+import '../Admin.css'; // Reuse existing admin styles
 
 const ReviewsPage = () => {
     const [reviews, setReviews] = useState([]);
