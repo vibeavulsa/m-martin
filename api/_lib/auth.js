@@ -28,7 +28,8 @@ const ADMIN_EMAILS = [
  * @returns {string|null}
  */
 function extractToken(req) {
-    const authHeader = req.headers?.authorization;
+    const headers = req.headers || {};
+    const authHeader = headers.authorization || headers.Authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
     return authHeader.split('Bearer ')[1];
 }
@@ -52,11 +53,18 @@ async function verifyFirebaseToken(idToken) {
             }
         );
 
-        if (!response.ok) return null;
+        if (!response.ok) {
+            const errBody = await response.text().catch(() => '');
+            console.error('[auth] Google verification failed. Status:', response.status, 'Body:', errBody);
+            return null;
+        }
 
         const data = await response.json();
         const user = data.users?.[0];
-        if (!user) return null;
+        if (!user) {
+            console.error('[auth] No user returned from Google verified info.');
+            return null;
+        }
 
         return {
             uid: user.localId,

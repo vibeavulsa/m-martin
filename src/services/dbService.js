@@ -17,9 +17,13 @@ const BASE = '/api';
 async function getAuthToken() {
   try {
     const user = auth.currentUser;
-    if (!user) return null;
+    if (!user) {
+      console.warn('[dbService] getAuthToken called, but auth.currentUser is null! Request might fail 401.');
+      return null;
+    }
     return await user.getIdToken();
-  } catch {
+  } catch (err) {
+    console.error('[dbService] Error getting auth token:', err);
     return null;
   }
 }

@@ -18,6 +18,7 @@ export default async function handler(req, res) {
         // Client requesting their own orders — verify they are the owner
         const user = await getAuthUser(req);
         if (!user || user.uid !== userId) {
+          console.error(`[api/orders] fetchMyOrders 401: Requested userId='${userId}', but token decoded as:`, user);
           return res.status(401).json({ error: 'Autenticação necessária para ver pedidos.' });
         }
 
