@@ -9,6 +9,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         inlineWorkboxRuntime: true,
+        maximumFileSizeToCacheInBytes: 20 * 1024 * 1024, // 20 MB limit
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg,mp4,webm,ogg}'],
         runtimeCaching: [
           {
