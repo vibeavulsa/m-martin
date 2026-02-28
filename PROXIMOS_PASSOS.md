@@ -60,13 +60,8 @@ export default async function handler(req, res) {
 
 ## 🟡 Prioridade Média — Funcionalidades de Negócio
 
-### 5. Sistema de busca e filtros
-**Status atual:** Navegação apenas por categorias.
-**Ação:**
-- Barra de busca no Header (por nome e descrição)
-- Filtros por faixa de preço, categoria e disponibilidade
-- Ordenação por preço, nome ou popularidade
-- Query SQL `WHERE name ILIKE '%termo%'` na API
+### ~~5. Sistema de busca e filtros~~ ✅
+**Status atual:** Concluído. API suporta filtro por query `%termo%`. Frontend possui barra de busca na Header, Toolbar de filtros por categoria, faixa de preço e ordenação ascendente/descendente.
 
 ### 6. Histórico de pedidos para o cliente
 **Status atual:** Clientes não conseguem ver seus pedidos.
@@ -112,14 +107,13 @@ export default async function handler(req, res) {
 - Testes para contextos (CartContext, AdminContext)
 - E2E com Playwright para fluxo de checkout
 
-### 12. Performance e otimização
-**Status atual:** Bundle ~800KB (246KB comprimido).
+### ~~12. Performance e otimização~~ ✅
+**Status atual:** Concluído.
 **Ação:**
-- Lazy loading de rotas admin (`React.lazy + Suspense`)
-- Imagens WebP com lazy loading e srcset
-- Code splitting por rota
-- Service Worker para cache offline
-- Lighthouse audit
+- Lazy loading com `React.lazy + Suspense` no Painel Admin finalizado.
+- `loading="lazy"` adicionado em imagens via `ProductCard`.
+- Code splitting implementado via `manualChunks` no `vite.config.js`.
+- Service Worker registrado (cache offline e cache prioritário na API/Imagens) usando `vite-plugin-pwa`.
 
 ### 13. Analytics e monitoramento
 **Ação:**

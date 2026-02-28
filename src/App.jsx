@@ -15,6 +15,7 @@ import UserProfileDialog from './components/UserProfileDialog';
 import AuthDialog from './components/AuthDialog';
 import SettingsDialog from './components/SettingsDialog';
 import MyOrdersPage from './components/MyOrdersPage';
+import CatalogToolbar from './components/CatalogToolbar';
 
 import TestimonialsSection from './components/TestimonialsSection';
 import NewsletterSignup from './components/NewsletterSignup';
@@ -48,7 +49,7 @@ function* geradorDeMostruario(linhasProdutos, inventarioGeral) {
   }
 }
 
-function SalesDialogs() {
+function SalesDialogs({ onSearch }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [customerOpen, setCustomerOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -111,6 +112,7 @@ function SalesDialogs() {
         onSettingsClick={handleOpenSettings}
         onAuthClick={handleOpenAuth}
         onMyOrdersClick={handleOpenMyOrders}
+        onSearch={onSearch}
       />
       <AuthDialog
         isOpen={authOpen}
@@ -259,11 +261,12 @@ class AppCatalog extends Component {
   }
 
   render() {
-    const { homeDisplaySettings } = this.props;
+    const { homeDisplaySettings, onSearch, isSearching, toolbarProps } = this.props;
     return (
       <>
-        <SalesDialogs />
-        <Hero />
+        <SalesDialogs onSearch={onSearch} />
+        {!isSearching && <Hero />}
+        {(isSearching || true) && <CatalogToolbar {...toolbarProps} isSearching={isSearching} />}
         <main className="catalog-container">
           {this.gerarTodasExposicoes()}
         </main>
@@ -277,18 +280,75 @@ class AppCatalog extends Component {
 
 function AppContent({ categories, products, cushionKit }) {
   const { homeDisplaySettings } = useUser();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [priceRange, setPriceRange] = useState('');
+  const [sortBy, setSortBy] = useState('default');
 
   const visibleCategories = categories.filter(
     (c) => homeDisplaySettings[categorySettingKey(c.id)] !== false
   );
 
+  let filteredProducts = products;
+
+  // 1. Serch Filter
+  if (searchQuery) {
+    filteredProducts = filteredProducts.filter(p =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }
+
+  // 2. Category Filter
+  if (categoryFilter) {
+    filteredProducts = filteredProducts.filter(p => p.category === categoryFilter);
+  }
+
+  // 3. Price Filter
+  if (priceRange) {
+    filteredProducts = filteredProducts.filter(p => {
+      const price = parseFloat(p.price?.replace(/[^\d.,-]/g, '').replace(',', '.') || 0);
+      if (priceRange === 'under_1000') return price <= 1000;
+      if (priceRange === '1000_3000') return price > 1000 && price <= 3000;
+      if (priceRange === 'over_3000') return price > 3000;
+      return true;
+    });
+  }
+
+  // 4. Sort
+  if (sortBy !== 'default') {
+    filteredProducts = [...filteredProducts].sort((a, b) => {
+      const priceA = parseFloat(a.price?.replace(/[^\d.,-]/g, '').replace(',', '.') || 0);
+      const priceB = parseFloat(b.price?.replace(/[^\d.,-]/g, '').replace(',', '.') || 0);
+      if (sortBy === 'price_asc') return priceA - priceB;
+      if (sortBy === 'price_desc') return priceB - priceA;
+      if (sortBy === 'name_asc') return a.name.localeCompare(b.name);
+      return 0;
+    });
+  }
+
+  // Only show categories that still have products
+  const filteredCategories = (searchQuery || categoryFilter || priceRange)
+    ? visibleCategories.filter(c => filteredProducts.some(p => p.category === c.id))
+    : visibleCategories;
+
+  const toolbarProps = {
+    categoryFilter, setCategoryFilter,
+    priceRange, setPriceRange,
+    sortBy, setSortBy,
+    categories: visibleCategories
+  };
+
   return (
     <div className="app-wrapper">
       <AppCatalog
-        categories={visibleCategories}
-        products={products}
+        categories={filteredCategories}
+        products={filteredProducts}
         cushionKit={cushionKit}
         homeDisplaySettings={homeDisplaySettings}
+        onSearch={setSearchQuery}
+        isSearching={!!searchQuery}
+        toolbarProps={toolbarProps}
       />
     </div>
   );

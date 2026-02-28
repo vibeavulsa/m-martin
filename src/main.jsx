@@ -7,6 +7,18 @@ import AdminRoutes from './admin/AdminRoutes.jsx'
 import Login from './components/Login.jsx'
 import PrivateRoute from './components/PrivateRoute.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import { registerSW } from 'virtual:pwa-register'
+
+const updateSW = registerSW({
+  onNeedRefresh() {
+    if (confirm('Nova atualização disponível. Deseja atualizar agora?')) {
+      updateSW(true)
+    }
+  },
+  onOfflineReady() {
+    console.log('App pronto para trabalhar offline.')
+  },
+})
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -14,13 +26,13 @@ createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route 
-            path="/admin/*" 
+          <Route
+            path="/admin/*"
             element={
               <PrivateRoute>
                 <AdminRoutes />
               </PrivateRoute>
-            } 
+            }
           />
           <Route path="/*" element={<App />} />
         </Routes>

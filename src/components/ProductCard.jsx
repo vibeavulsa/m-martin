@@ -73,6 +73,7 @@ const ProductCard = ({ product: initialProduct }) => {
                   src={displayImage}
                   alt={product.name}
                   className="product-img"
+                  loading="lazy"
                   onError={() => setImageError(true)}
                 />
                 {hasMultipleImages && (

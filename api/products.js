@@ -11,37 +11,39 @@ import { requireAdmin } from './_lib/auth.js';
 export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
-      const { rows } = await sql`
-        SELECT
-          id,
-          name,
-          category,
-          description,
-          price,
-          image,
-          images,
-          features,
-          is_sofa AS "isSofa",
-          is_custom_order AS "isCustomOrder",
-          sofa_model AS "sofaModel",
-          is_kit AS "isKit",
-          kit_quantity AS "kitQuantity",
-          price_cash AS "priceCash",
-          price_installment AS "priceInstallment",
-          installments,
-          barcode,
-          supplier,
-          unit,
-          cost_price AS "costPrice",
-          wholesale_price AS "wholesalePrice",
-          max_stock AS "maxStock",
-          fabrics,
-          extra,
-          created_at AS "createdAt",
-          updated_at AS "updatedAt"
-        FROM products
-        ORDER BY created_at ASC
-      `;
+      const { search } = req.query;
+      let rows;
+      if (search) {
+        const searchTerm = `%${search}%`;
+        const result = await sql`
+          SELECT
+            id, name, category, description, price, image, images, features,
+            is_sofa AS "isSofa", is_custom_order AS "isCustomOrder", sofa_model AS "sofaModel",
+            is_kit AS "isKit", kit_quantity AS "kitQuantity", price_cash AS "priceCash",
+            price_installment AS "priceInstallment", installments, barcode, supplier,
+            unit, cost_price AS "costPrice", wholesale_price AS "wholesalePrice",
+            max_stock AS "maxStock", fabrics, extra, created_at AS "createdAt",
+            updated_at AS "updatedAt"
+          FROM products
+          WHERE name ILIKE ${searchTerm} OR description ILIKE ${searchTerm}
+          ORDER BY created_at ASC
+        `;
+        rows = result.rows;
+      } else {
+        const result = await sql`
+          SELECT
+            id, name, category, description, price, image, images, features,
+            is_sofa AS "isSofa", is_custom_order AS "isCustomOrder", sofa_model AS "sofaModel",
+            is_kit AS "isKit", kit_quantity AS "kitQuantity", price_cash AS "priceCash",
+            price_installment AS "priceInstallment", installments, barcode, supplier,
+            unit, cost_price AS "costPrice", wholesale_price AS "wholesalePrice",
+            max_stock AS "maxStock", fabrics, extra, created_at AS "createdAt",
+            updated_at AS "updatedAt"
+          FROM products
+          ORDER BY created_at ASC
+        `;
+        rows = result.rows;
+      }
       return res.status(200).json(rows);
     }
 

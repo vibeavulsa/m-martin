@@ -91,8 +91,8 @@ async function request(path, options = {}, requiresAuth = false) {
 
 // ─── Products ────────────────────────────────────────────────────────────────
 
-export async function fetchProducts() {
-  return request('/products');
+export async function fetchProducts(search = '') {
+  return request(`/products${search ? `?search=${encodeURIComponent(search)}` : ''}`);
 }
 
 export async function createProduct(product) {
