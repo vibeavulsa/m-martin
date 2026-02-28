@@ -80,7 +80,8 @@ async function verifyFirebaseToken(idToken) {
  * Falls back to the hardcoded project key if env var is not set.
  */
 function getFirebaseApiKey() {
-    return process.env.FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY || 'AIzaSyDpM6q7Czf8o0EJ5NkyiWLoDJtEv2_ZEH8';
+    const rawKey = process.env.FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY || 'AIzaSyDpM6q7Czf8o0EJ5NkyiWLoDJtEv2_ZEH8';
+    return rawKey.replace(/['"]/g, '').trim();
 }
 
 /**
