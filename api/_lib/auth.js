@@ -55,15 +55,13 @@ async function verifyFirebaseToken(idToken) {
 
         if (!response.ok) {
             const errBody = await response.text().catch(() => '');
-            console.error('[auth] Google verification failed. Status:', response.status, 'Body:', errBody);
-            return null;
+            throw new Error(`Google API falhou [Status ${response.status}]: ${errBody}`);
         }
 
         const data = await response.json();
         const user = data.users?.[0];
         if (!user) {
-            console.error('[auth] No user returned from Google verified info.');
-            return null;
+            throw new Error('Nenhum usuário retornado pelo Google.');
         }
 
         return {
@@ -73,7 +71,7 @@ async function verifyFirebaseToken(idToken) {
         };
     } catch (err) {
         console.error('[auth] Token verification failed:', err.message);
-        return null;
+        throw err; // Re-throw to caller to expose the exact reason
     }
 }
 
@@ -94,8 +92,13 @@ function getFirebaseApiKey() {
  */
 export async function getAuthUser(req) {
     const token = extractToken(req);
-    if (!token) return null;
-    return verifyFirebaseToken(token);
+    if (!token) return { user: null, error: null };
+    try {
+        const user = await verifyFirebaseToken(token);
+        return { user, error: null };
+    } catch (err) {
+        return { user: null, error: err.message };
+    }
 }
 
 /**
@@ -115,10 +118,16 @@ export async function requireAdmin(req, res) {
         return { error: true };
     }
 
-    const user = await verifyFirebaseToken(token);
+    let user;
+    try {
+        user = await verifyFirebaseToken(token);
+    } catch (err) {
+        res.status(401).json({ error: `Falha no Token JWT: ${err.message}` });
+        return { error: true };
+    }
 
     if (!user) {
-        res.status(401).json({ error: 'Token inválido ou expirado. Faça login novamente.' });
+        res.status(401).json({ error: 'Token inválido ou expirado.' });
         return { error: true };
     }
 

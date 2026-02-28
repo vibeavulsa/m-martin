@@ -17,11 +17,11 @@ export default async function handler(req, res) {
       if (userId) {
         // Client requesting their own orders — verify they are the owner
         const tokenString = req.headers.authorization || req.headers.Authorization || '';
-        const user = await getAuthUser(req);
+        const { user, error: tokenError } = await getAuthUser(req);
         if (!user || user.uid !== userId) {
-          const debugMsg = `Token missing? ${!tokenString}. User decodificado: ${user ? user.uid : 'NULO'}. Requerido: ${userId}.`;
+          const debugMsg = `Token sent? ${!!tokenString}. Err: ${tokenError || 'nenhum'}. User: ${user ? user.uid : 'NULO'}. Exigido: ${userId}.`;
           console.error(`[api/orders] fetchMyOrders 401:`, debugMsg);
-          return res.status(401).json({ error: `Autenticação necessária para ver pedidos. [Debug: ${debugMsg}]` });
+          return res.status(401).json({ error: `Sem permissão. [Info: ${debugMsg}]` });
         }
 
         const { rows } = await sql`
