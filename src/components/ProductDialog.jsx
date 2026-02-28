@@ -19,6 +19,7 @@ import {
 import { useCart } from '../context/CartContext';
 import CushionKitSelector from './CushionKitSelector';
 import SofaConfigurator from './SofaConfigurator';
+import ProductReviews from './ProductReviews';
 import './ProductDialog.css';
 
 const overlayVariants = {
@@ -538,6 +539,10 @@ const DialogInner = ({ product, onClose }) => {
                 <span>Sob encomenda — feito para você</span>
               </div>
             )}
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <ProductReviews productId={product.id} />
           </motion.div>
         </motion.div>
       </div>

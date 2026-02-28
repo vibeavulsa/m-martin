@@ -11,6 +11,33 @@ import { auth } from '../config/firebase';
 
 const BASE = '/api';
 
+// ─── Reviews ─────────────────────────────────────────────────────────────────
+
+export async function fetchReviews(productId, all = false) {
+  let url = '/reviews';
+  if (productId) url += `?productId=${encodeURIComponent(productId)}`;
+  if (all) url += `${productId ? '&' : '?'}all=true`;
+  return request(url, {}, all); // requires admin auth if requesting all
+}
+
+export async function createReview(review) {
+  return request('/reviews', {
+    method: 'POST',
+    body: JSON.stringify(review),
+  });
+}
+
+export async function approveReview(id, isApproved) {
+  return request('/reviews', {
+    method: 'PUT',
+    body: JSON.stringify({ id, isApproved }),
+  }, true); // requires admin auth
+}
+
+export async function deleteReview(id) {
+  return request(`/reviews?id=${encodeURIComponent(id)}`, { method: 'DELETE' }, true);
+}
+
 /**
  * Get the current user's Firebase ID token, or null if not logged in.
  */

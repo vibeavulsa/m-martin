@@ -44,8 +44,9 @@ function extractToken(req) {
 async function verifyFirebaseToken(idToken) {
     try {
         // Use Google's secure token verification endpoint
+        const apiKey = getFirebaseApiKey();
         const response = await fetch(
-            `https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo?key=${getFirebaseApiKey()}`,
+            `https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -55,7 +56,8 @@ async function verifyFirebaseToken(idToken) {
 
         if (!response.ok) {
             const errBody = await response.text().catch(() => '');
-            throw new Error(`Google API falhou [Status ${response.status}]: ${errBody}`);
+            const keyDebug = apiKey.length > 5 ? apiKey.substring(0, 5) + '...' : 'Vazio';
+            throw new Error(`Google API falhou [HTTP ${response.status}] [Chave iniciada em: ${keyDebug}]. Retorno: ${errBody}`);
         }
 
         const data = await response.json();
@@ -77,11 +79,11 @@ async function verifyFirebaseToken(idToken) {
 
 /**
  * Get the Firebase Web API key.
- * Falls back to the hardcoded project key if env var is not set.
+ * This key is public in the frontend and safe to hardcode here.
+ * Bypasses environment variable issues on Vercel causing 400 API key errors.
  */
 function getFirebaseApiKey() {
-    const rawKey = process.env.FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY || 'AIzaSyDpM6q7Czf8o0EJ5NkyiWLoDJtEv2_ZEH8';
-    return rawKey.replace(/['"]/g, '').trim();
+    return 'AIzaSyDpM6q7Czf8o0EJ5NkyiWLoDJtEv2_ZEH8';
 }
 
 /**

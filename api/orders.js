@@ -139,6 +139,14 @@ export default async function handler(req, res) {
         `;
 
         await client.sql`COMMIT`;
+
+        // Ativar Notificações Assíncronas (Item 10)
+        import('./_lib/notifications.js').then(({ sendOrderConfirmation, notifyAdminNewOrder }) => {
+          const newOrder = { id: o.id, customer: o.customer, items: validItems, total: serverTotalPrice };
+          sendOrderConfirmation(newOrder).catch(console.error);
+          notifyAdminNewOrder(newOrder).catch(console.error);
+        }).catch(err => console.error('Error importing notifications module:', err));
+
         return res.status(201).json({ id: o.id, total: serverTotalPrice });
       } catch (err) {
         await client.sql`ROLLBACK`;
@@ -163,6 +171,18 @@ export default async function handler(req, res) {
           updated_at = NOW()
         WHERE id = ${id}
       `;
+
+      // Ativar Notificações Assíncronas para status
+      if (status) {
+        import('./_lib/notifications.js').then(async ({ sendOrderStatusUpdate }) => {
+          // fetch customer email to notify
+          const { rows } = await sql`SELECT customer FROM orders WHERE id = ${id}`;
+          if (rows.length > 0) {
+            sendOrderStatusUpdate({ id, customer: rows[0].customer, status }).catch(console.error);
+          }
+        }).catch(err => console.error(err));
+      }
+
       return res.status(200).json({ ok: true });
     }
 

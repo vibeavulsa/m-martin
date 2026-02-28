@@ -102,6 +102,24 @@ export default async function handler(req, res) {
       )
     `;
 
+    await sql`
+      CREATE TABLE IF NOT EXISTS reviews (
+        id TEXT PRIMARY KEY,
+        product_id TEXT NOT NULL,
+        user_name TEXT NOT NULL,
+        rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+        comment TEXT,
+        is_approved BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+
+    // Create index on product_id for fast lookups
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews (product_id)
+    `;
+
+
     return res.status(200).json({ ok: true, message: 'Tables created (or already exist). Indexes applied.' });
   } catch (err) {
     console.error('[init-db]', err);

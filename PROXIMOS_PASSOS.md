@@ -84,13 +84,8 @@ export default async function handler(req, res) {
 - Email de boas-vindas automático
 - Opção de cancelar inscrição
 
-### 8. Sistema de avaliações de produtos
-**Status atual:** Depoimentos são hardcoded.
-**Ação:**
-- Criar tabela `reviews` no PostgreSQL
-- API route `/api/reviews` para CRUD
-- Moderar avaliações no admin
-- Exibir nota média por produto
+### ~~8. Sistema de avaliações de produtos~~ ✅
+**Status atual:** Concluído. Tabela `reviews` criada. CRUD em `/api/reviews`. Integrado na página de produto (`ProductReviews.jsx`) e moderado no painel Admin (`ReviewsPage.jsx`).
 
 ### 9. Gestão de cupons e promoções
 **Status atual:** Não existe sistema de descontos.
@@ -100,12 +95,11 @@ export default async function handler(req, res) {
 - Campo de cupom no checkout
 - Página de gestão de cupons no admin
 
-### 10. Notificações de pedidos
-**Status atual:** Sem notificações automáticas.
+### ~~10. Notificações de pedidos~~ ✅
+**Status atual:** Concluído. O arquivo `/api/_lib/notifications.js` lida com as notificações por email (cliente), webhook ou WhatsApp para admin.
 **Ação:**
-- Email de confirmação via SendGrid/Resend
-- Notificação WhatsApp para admin (novo pedido)
-- Webhook para mudança de status
+- Email de confirmação via SendGrid/Resend incorporado no `api/orders.js`.
+- Notificações de atualização de status implementadas.
 
 ---
 
