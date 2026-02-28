@@ -39,7 +39,7 @@ const Header = ({ onCartClick, onProfileClick, onSettingsClick, onAuthClick, onM
           <a href="#homecare-hospitalar" className="nav-link" onClick={(e) => handleNavClick(e, 'homecare-hospitalar')}>Para Acamados</a>
         </nav>
         <div className="nav-actions">
-          {isAuthenticated && (
+          {isAuthenticated && user?.email !== 'admin@mmartin.com' && (
             <motion.button
               className="nav-icon-btn"
               onClick={onMyOrdersClick}

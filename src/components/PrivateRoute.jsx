@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
  * Redirects to login if user is not authenticated.
  */
 function PrivateRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -23,8 +23,8 @@ function PrivateRoute({ children }) {
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  if (!isAuthenticated || user?.email !== 'admin@mmartin.com') {
+    return <Navigate to="/" replace />;
   }
 
   return children;
